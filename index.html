@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Will You Be My Valentine, Tomisin? 💕</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="hearts-animation">
+                <span class="heart">💕</span>
+                <span class="heart">💖</span>
+                <span class="heart">💗</span>
+            </div>
+            
+            <h1 class="title">Will You Be My Valentine?</h1>
+            <p class="subtitle">Tomisin, I want to ask you something special...</p>
+            
+            <div class="message">
+                <p>Every moment with you is a treasure. Your smile lights up my world, and I can't imagine my life without you. You make every day special in ways I can't even describe.</p>
+                <p>So, I'm asking you today: Will you be my Valentine?</p>
+            </div>
+            
+            <div class="button-container">
+                <button class="btn btn-yes" onclick="handleYes()">Yes! 💕</button>
+                <button class="btn btn-no" id="noBtn" onmouseover="moveButton()" onclick="handleNo()">No</button>
+            </div>
+            
+            <div class="response-message" id="responseMessage"></div>
+            
+            <div class="confetti" id="confetti"></div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
