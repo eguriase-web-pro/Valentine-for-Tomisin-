@@ -1,39 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Will You Be My Valentine, Tomisin? 💕</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tomisin ❤️ Be My Valentine</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Poppins', Arial, sans-serif;
+      background: linear-gradient(135deg, #ff758f, #ffb3c6);
+    }
+    .box {
+      background: white;
+      padding: 30px 24px;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    }
+    h1 {
+      color: #e03131;
+      margin-bottom: 10px;
+    }
+    p {
+      font-size: 1rem;
+      color: #333;
+      margin-bottom: 20px;
+    }
+    button {
+      border: none;
+      padding: 12px 20px;
+      border-radius: 30px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin: 8px;
+      transition: 0.2s ease;
+    }
+    .yes {
+      background: #ff4d6d;
+      color: white;
+    }
+    .yes:hover { 
+      transform: scale(1.05); 
+      background: #ff3658;
+    }
+    .no {
+      background: #dee2e6;
+      color: #333;
+    }
+    .no:hover {
+      background: #ced4da;
+    }
+    .message {
+      margin-top: 20px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      display: none;
+    }
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background: #ff4d6d;
+      pointer-events: none;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="card">
-            <div class="hearts-animation">
-                <span class="heart">💕</span>
-                <span class="heart">💖</span>
-                <span class="heart">💗</span>
-            </div>
-            
-            <h1 class="title">Will You Be My Valentine?</h1>
-            <p class="subtitle">Tomisin, I want to ask you something special...</p>
-            
-            <div class="message">
-                <p>Every moment with you is a treasure. Your smile lights up my world, and I can't imagine my life without you. You make every day special in ways I can't even describe.</p>
-                <p>So, I'm asking you today: Will you be my Valentine?</p>
-            </div>
-            
-            <div class="button-container">
-                <button class="btn btn-yes" onclick="handleYes()">Yes! 💕</button>
-                <button class="btn btn-no" id="noBtn" onmouseover="moveButton()" onclick="handleNo()">No</button>
-            </div>
-            
-            <div class="response-message" id="responseMessage"></div>
-            
-            <div class="confetti" id="confetti"></div>
-        </div>
-    </div>
-    
-    <script src="script.js"></script>
+  <div class="box">
+    <h1>Hey Tomisin 💖</h1>
+    <p>
+      You make my days brighter and my heart calmer.
+      I just want to ask you one important question…
+    </p>
+    <h1>Will you be my Valentine? 🌹</h1>
+    <button class="yes" onclick="yesClick()">Yes ❤️</button>
+    <button class="no" id="noBtn" onclick="noClick()">No 🙈</button>
+
+    <div class="message" id="msg"></div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
