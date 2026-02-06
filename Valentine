@@ -1,0 +1,86 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tomisin ❤️ Be My Valentine</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Poppins', Arial, sans-serif;
+      background: linear-gradient(135deg, #ff758f, #ffb3c6);
+    }
+    .box {
+      background: white;
+      padding: 30px 24px;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    }
+    h1 {
+      color: #e03131;
+      margin-bottom: 10px;
+    }
+    p {
+      font-size: 1rem;
+      color: #333;
+      margin-bottom: 20px;
+    }
+    button {
+      border: none;
+      padding: 12px 20px;
+      border-radius: 30px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin: 8px;
+      transition: 0.2s ease;
+    }
+    .yes {
+      background: #ff4d6d;
+      color: white;
+    }
+    .yes:hover { transform: scale(1.05); }
+    .no {
+      background: #dee2e6;
+      color: #333;
+    }
+    .message {
+      margin-top: 20px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Hey Tomisin 💖</h1>
+    <p>
+      You make my days brighter and my heart calmer.
+      I just want to ask you one important question…
+    </p>
+    <h1>Will you be my Valentine? 🌹</h1><button class="yes" onclick="yesClick()">Yes ❤️</button>
+<button class="no" onclick="noClick()">No 🙈</button>
+
+<div class="message" id="msg"></div>
+
+  </div>  <script>
+    function yesClick() {
+      const m = document.getElementById('msg');
+      m.style.display = 'block';
+      m.style.color = '#e03131';
+      m.innerHTML = 'Yayyy 🥹❤️ I can’t wait to spend Valentine with you, Tomisin.';
+    }
+    function noClick() {
+      const m = document.getElementById('msg');
+      m.style.display = 'block';
+      m.style.color = '#495057';
+      m.innerHTML = 'Still love you regardless 🤍';
+    }
+  </script></body>
+</html>
