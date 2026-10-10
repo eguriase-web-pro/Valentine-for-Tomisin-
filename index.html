@@ -1,90 +1,3000 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tomisin ❤️ Be My Valentine</title>
-  <style>
-    body {
-      margin: 0;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Poppins', Arial, sans-serif;
-      background: linear-gradient(135deg, #ff758f, #ffb3c6);
-    }
-    .box {
-      background: white;
-      padding: 30px 24px;
-      border-radius: 20px;
-      width: 90%;
-      max-width: 400px;
-      text-align: center;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-    }
-    h1 {
-      color: #e03131;
-      margin-bottom: 10px;
-    }
-    p {
-      font-size: 1rem;
-      color: #333;
-      margin-bottom: 20px;
-    }
-    button {
-      border: none;
-      padding: 12px 20px;
-      border-radius: 30px;
-      font-size: 1rem;
-      cursor: pointer;
-      margin: 8px;
-      transition: 0.2s ease;
-    }
-    .yes {
-      background: #ff4d6d;
-      color: white;
-    }
-    .yes:hover { 
-      transform: scale(1.05); 
-      background: #ff3658;
-    }
-    .no {
-      background: #dee2e6;
-      color: #333;
-    }
-    .no:hover {
-      background: #ced4da;
-    }
-    .message {
-      margin-top: 20px;
-      font-size: 1.1rem;
-      font-weight: 600;
-      display: none;
-    }
-    .confetti {
-      position: fixed;
-      width: 10px;
-      height: 10px;
-      background: #ff4d6d;
-      pointer-events: none;
-    }
-  </style>
-</head>
-<body>
-  <div class="box">
-    <h1>Hey Tomisin 💖</h1>
-    <p>
-      You make my days brighter and my heart calmer.
-      I just want to ask you one important question…
-    </p>
-    <h1>Will you be my Valentine? 🌹</h1>
-    <button class="yes" onclick="yesClick()">Yes ❤️</button>
-    <button class="no" id="noBtn" onclick="noClick()">No 🙈</button>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 
-    <div class="message" id="msg"></div>
+<title>PNGPD LIFE 2.0</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  touch-action: none;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #87ceeb;
+  font-family: system-ui, sans-serif;
+}
+
+canvas {
+  display: block;
+}
+
+/* HUD */
+#hud {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.pill {
+  background: #e10600;
+  color: #fff;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  width: fit-content;
+}
+
+#loc {
+  background: #fff;
+  color: #e10600;
+}
+
+/* Mini map */
+#mini {
+  position: fixed;
+  top: 8px;
+  right: 8px;
+  width: 110px;
+  height: 110px;
+  border-radius: 12px;
+  border: 3px solid #fff;
+  background: #2e7d32;
+  pointer-events: none;
+}
+
+/* Joystick */
+#joy {
+  position: fixed;
+  left: 24px;
+  bottom: 30px;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.35);
+  border: 3px solid rgba(255,255,255,.8);
+}
+
+#knob {
+  position: absolute;
+  left: 35px;
+  top: 35px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #e10600;
+  border: 3px solid #fff;
+}
+
+/* Buttons */
+.btn {
+  position: fixed;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  color: #fff;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#run {
+  right: 24px;
+  bottom: 30px;
+  width: 76px;
+  height: 76px;
+  background: #ff9800;
+  font-size: 14px;
+}
+
+#act {
+  right: 112px;
+  bottom: 90px;
+  width: 84px;
+  height: 84px;
+  background: #e10600;
+  font-size: 15px;
+  display: none;
+}
+
+/* Toast */
+#toast {
+  position: fixed;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,.75);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 12px;
+  display: none;
+  max-width: 70%;
+  text-align: center;
+}
+
+/* Stats */
+#stats {
+  background: rgba(0,0,0,.55);
+  color: #fff;
+  border-radius: 12px;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.5;
+  display: none;
+}
+
+.bar {
+  height: 7px;
+  border-radius: 4px;
+  background: rgba(255,255,255,.3);
+  overflow: hidden;
+  width: 110px;
+}
+
+.bar i {
+  display: block;
+  height: 100%;
+}
+
+/* Login overlay */
+#ov {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: linear-gradient(
+    160deg,
+    #e10600,
+    #ff9800 60%,
+    #ffeb3b
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  touch-action: auto;
+}
+
+#ov * {
+  touch-action: auto;
+  user-select: auto;
+}
+
+.card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 22px;
+  width: 100%;
+  max-width: 340px;
+  text-align: center;
+}
+
+.card h1 {
+  margin: 0 0 4px;
+  color: #e10600;
+  font-size: 26px;
+}
+
+.card p {
+  margin: 0 0 14px;
+  color: #555;
+  font-size: 14px;
+}
+
+.card input {
+  width: 100%;
+  padding: 12px;
+  margin: 5px 0;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  font-size: 16px;
+}
+
+.card button {
+  width: 100%;
+  padding: 13px;
+  margin-top: 8px;
+  border: 0;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 800;
+  color: #fff;
+  background: #e10600;
+}
+
+.card button.alt {
+  background: #fff;
+  color: #e10600;
+  border: 2px solid #e10600;
+}
+
+#msg {
+  color: #c00;
+  font-size: 13px;
+  min-height: 18px;
+  margin-top: 6px;
+}
+
+/* Character colours */
+.sw {
+  display: inline-block;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  margin: 5px;
+  border: 4px solid #fff;
+  box-shadow: 0 0 0 2px #ccc;
+}
+
+.sw.on {
+  box-shadow: 0 0 0 3px #000;
+}
+</style>
+</head>
+
+<body>
+
+<!-- HUD -->
+<div id="hud">
+  <div class="pill">PNGPD LIFE 2.0</div>
+  <div class="pill" id="loc">PTI Entrance</div>
+  <div id="stats"></div>
+</div>
+
+<!-- Mini map -->
+<canvas id="mini" width="220" height="220"></canvas>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- Login / Registration -->
+<div id="ov">
+
+  <!-- Login -->
+  <div class="card" id="c1">
+    <h1>PNGPD LIFE 2.0</h1>
+
+    <p>Your virtual life at PTI Effurun</p>
+
+    <input
+      id="un"
+      placeholder="Username"
+      autocapitalize="none"
+      autocomplete="username"
+    >
+
+    <input
+      id="pw"
+      type="password"
+      placeholder="Password (min 6 characters)"
+      autocomplete="current-password"
+    >
+
+    <button id="bl">LOGIN</button>
+
+    <button class="alt" id="br">
+      CREATE ACCOUNT
+    </button>
+
+    <div id="msg"></div>
   </div>
 
-  <script src="script.js"></script>
+  <!-- Character creation -->
+  <div class="card" id="c2" style="display:none">
+
+    <h1>Create Character</h1>
+
+    <p>Pick your shirt colour</p>
+
+    <div id="sws"></div>
+
+    <button id="bgo">
+      ENTER PTI
+    </button>
+
+    <div
+      id="msg2"
+      style="color:#c00;font-size:13px"
+    ></div>
+
+  </div>
+
+</div>
+
+<!-- Controls -->
+<div id="joy">
+  <div id="knob"></div>
+</div>
+
+<div class="btn" id="run">
+  RUN
+</div>
+
+<div class="btn" id="act">
+  ENTER
+</div>
+
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+
+<!-- Three.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+
+/* =========================================================
+   THREE.JS SETUP
+========================================================= */
+
+const scene = new THREE.Scene();
+
+scene.background = new THREE.Color(0x87ceeb);
+
+scene.fog = new THREE.Fog(
+  0x87ceeb,
+  50,
+  130
+);
+
+const cam = new THREE.PerspectiveCamera(
+  60,
+  innerWidth / innerHeight,
+  0.1,
+  220
+);
+
+const ren = new THREE.WebGLRenderer({
+  antialias: false
+});
+
+ren.setPixelRatio(
+  Math.min(devicePixelRatio, 1.5)
+);
+
+ren.setSize(
+  innerWidth,
+  innerHeight
+);
+
+document.body.appendChild(
+  ren.domElement
+);
+
+
+/* =========================================================
+   LIGHTING
+========================================================= */
+
+scene.add(
+  new THREE.HemisphereLight(
+    0xffffff,
+    0x88aa66,
+    0.9
+  )
+);
+
+const sun =
+  new THREE.DirectionalLight(
+    0xffffff,
+    0.6
+  );
+
+sun.position.set(
+  30,
+  50,
+  20
+);
+
+scene.add(sun);
+
+
+/* =========================================================
+   BASIC BUILDING FUNCTIONS
+========================================================= */
+
+const M = c =>
+  new THREE.MeshLambertMaterial({
+    color: c
+  });
+
+
+function box(w, h, d, c, x, y, z) {
+
+  const m =
+    new THREE.Mesh(
+      new THREE.BoxGeometry(w, h, d),
+      M(c)
+    );
+
+  m.position.set(x, y, z);
+
+  scene.add(m);
+
+  return m;
+}
+
+
+function flat(w, d, c, x, y, z) {
+
+  const r =
+    new THREE.Mesh(
+      new THREE.PlaneGeometry(w, d),
+      M(c)
+    );
+
+  r.rotation.x = -Math.PI / 2;
+
+  r.position.set(
+    x,
+    y,
+    z
+  );
+
+  scene.add(r);
+
+  return r;
+}
+
+
+/* =========================================================
+   GROUND
+========================================================= */
+
+flat(
+  320,
+  320,
+  0x4caf50,
+  0,
+  0,
+  0
+);
+
+
+/* =========================================================
+   ROADS
+========================================================= */
+
+flat(
+  10,
+  170,
+  0x444444,
+  0,
+  0.02,
+  -10
+);
+
+[-22, 14].forEach(z =>
+  flat(
+    170,
+    8,
+    0x444444,
+    0,
+    0.03,
+    z
+  )
+);
+
+
+/* Road centre lines */
+
+for (
+  let z = -90;
+  z < 75;
+  z += 8
+) {
+
+  flat(
+    0.4,
+    3,
+    0xffffff,
+    0,
+    0.05,
+    z
+  );
+
+}
+
+
+/* Pavement near gate */
+
+flat(
+  24,
+  10,
+  0xbdbdbd,
+  0,
+  0.04,
+  60
+);
+
+
+/* =========================================================
+   SIGNS
+========================================================= */
+
+function sign(
+  text,
+  x,
+  y,
+  z,
+  color
+) {
+
+  const c =
+    document.createElement('canvas');
+
+  c.width = 256;
+  c.height = 64;
+
+  const g =
+    c.getContext('2d');
+
+  g.fillStyle =
+    color || '#e10600';
+
+  g.fillRect(
+    0,
+    0,
+    256,
+    64
+  );
+
+  g.strokeStyle = '#fff';
+  g.lineWidth = 4;
+
+  g.strokeRect(
+    2,
+    2,
+    252,
+    60
+  );
+
+  g.fillStyle = '#fff';
+
+  g.font =
+    'bold 26px sans-serif';
+
+  g.textAlign = 'center';
+  g.textBaseline = 'middle';
+
+  g.fillText(
+    text,
+    128,
+    34
+  );
+
+  const s =
+    new THREE.Sprite(
+      new THREE.SpriteMaterial({
+        map: new THREE.CanvasTexture(c)
+      })
+    );
+
+  s.scale.set(
+    9,
+    2.25,
+    1
+  );
+
+  s.position.set(
+    x,
+    y,
+    z
+  );
+
+  scene.add(s);
+}
+
+
+/* =========================================================
+   PTI LOCATIONS
+========================================================= */
+
+const places = [
+
+  [
+    'Admin Block',
+    0x607d8b,
+    0,
+    -64,
+    22,
+    12,
+    10,
+    0xe10600
+  ],
+
+  [
+    'PNGPD Department',
+    0xff9800,
+    -26,
+    -40,
+    14,
+    10,
+    8,
+    0xe10600
+  ],
+
+  [
+    'PTI Library',
+    0x2196f3,
+    26,
+    -40,
+    14,
+    10,
+    8,
+    0xffffff
+  ],
+
+  [
+    'PGP 126 Laboratory',
+    0x9c27b0,
+    -26,
+    -8,
+    14,
+    10,
+    8,
+    0xffeb3b
+  ],
+
+  [
+    'Classrooms',
+    0x4db6ac,
+    26,
+    -8,
+    14,
+    10,
+    7,
+    0xe10600
+  ],
+
+  [
+    'Hostel A',
+    0xffeb3b,
+    -26,
+    28,
+    14,
+    10,
+    9,
+    0xe10600
+  ],
+
+  [
+    'Hostel B',
+    0xf06292,
+    26,
+    28,
+    14,
+    10,
+    9,
+    0xffffff
+  ],
+
+  [
+    'Bush Mama',
+    0xe91e63,
+    -26,
+    50,
+    11,
+    8,
+    6,
+    0xffeb3b
+  ],
+
+  [
+    'Tutu Restaurant',
+    0x00bcd4,
+    26,
+    50,
+    11,
+    8,
+    6,
+    0xe10600
+  ],
+
+  [
+    'Fellowship Hall',
+    0x7e57c2,
+    -62,
+    -22,
+    13,
+    10,
+    8,
+    0xffffff
+  ],
+
+  [
+    'UBA Bank',
+    0xd32f2f,
+    -62,
+    14,
+    13,
+    10,
+    8,
+    0xffffff
+  ],
+
+  [
+    'Garage',
+    0x8d6e63,
+    62,
+    14,
+    13,
+    10,
+    6,
+    0xffeb3b
+  ]
+
+];
+
+
+const solids = [];
+const spots = [];
+
+
+/* =========================================================
+   BUILDINGS
+========================================================= */
+
+places.forEach(
+  ([
+    n,
+    c,
+    x,
+    z,
+    w,
+    d,
+    h,
+    rc
+  ]) => {
+
+    const sx =
+      x === 0
+        ? 0
+        : Math.sign(x);
+
+    const frontX =
+      x - sx * (w / 2);
+
+    const frontZ =
+      z + d / 2;
+
+
+    /* Main building */
+
+    box(
+      w,
+      h,
+      d,
+      c,
+      x,
+      h / 2,
+      z
+    );
+
+
+    /* Roof */
+
+    box(
+      w + 1.2,
+      1,
+      d + 1.2,
+      rc,
+      x,
+      h + 0.5,
+      z
+    );
+
+
+    if (sx !== 0) {
+
+      /* Door */
+
+      box(
+        0.5,
+        4.5,
+        3,
+        0x3e2723,
+        frontX,
+        2.25,
+        z
+      );
+
+
+      /* Windows */
+
+      box(
+        0.4,
+        1.6,
+        2,
+        0xb3e5fc,
+        frontX,
+        h * 0.65,
+        z - d / 4
+      );
+
+      box(
+        0.4,
+        1.6,
+        2,
+        0xb3e5fc,
+        frontX,
+        h * 0.65,
+        z + d / 4
+      );
+
+
+      spots.push({
+        n,
+        x: frontX - sx * 3.5,
+        z
+      });
+
+    } else {
+
+      /* Admin entrance */
+
+      box(
+        3,
+        4.5,
+        0.5,
+        0x3e2723,
+        x,
+        2.25,
+        frontZ
+      );
+
+
+      /* Admin windows */
+
+      box(
+        2,
+        1.6,
+        0.4,
+        0xb3e5fc,
+        x - 6,
+        h * 0.6,
+        frontZ
+      );
+
+      box(
+        2,
+        1.6,
+        0.4,
+        0xb3e5fc,
+        x + 6,
+        h * 0.6,
+        frontZ
+      );
+
+
+      spots.push({
+        n,
+        x,
+        z: frontZ + 3.5
+      });
+
+    }
+
+
+    sign(
+      n,
+      x,
+      h + 3,
+      z
+    );
+
+
+    solids.push({
+      x,
+      z,
+      hw: w / 2 + 0.6,
+      hd: d / 2 + 0.6
+    });
+
+  }
+);
+
+
+/* =========================================================
+   FOOTBALL FIELD
+========================================================= */
+
+flat(
+  34,
+  22,
+  0x66bb6a,
+  66,
+  0.03,
+  -22
+);
+
+flat(
+  30,
+  0.3,
+  0xffffff,
+  66,
+  0.05,
+  -22
+);
+
+flat(
+  0.3,
+  18,
+  0xffffff,
+  66,
+  0.05,
+  -22
+);
+
+flat(
+  30,
+  0.3,
+  0xffffff,
+  66,
+  0.05,
+  -31
+);
+
+flat(
+  30,
+  0.3,
+  0xffffff,
+  66,
+  0.05,
+  -13
+);
+
+box(
+  0.3,
+  3,
+  6,
+  0xffffff,
+  50,
+  1.5,
+  -22
+);
+
+box(
+  0.3,
+  3,
+  6,
+  0xffffff,
+  82,
+  1.5,
+  -22
+);
+
+sign(
+  'Football Field',
+  66,
+  7,
+  -22
+);
+
+spots.push({
+  n: 'Football Field',
+  x: 66,
+  z: -22,
+  r: 12
+});
+
+
+/* =========================================================
+   PTI GATE
+========================================================= */
+
+const gz = 72;
+
+box(
+  1.4,
+  7,
+  1.4,
+  0xe10600,
+  -8,
+  3.5,
+  gz
+);
+
+box(
+  1.4,
+  7,
+  1.4,
+  0xe10600,
+  8,
+  3.5,
+  gz
+);
+
+box(
+  17,
+  1.6,
+  1.4,
+  0xe10600,
+  0,
+  7,
+  gz
+);
+
+box(
+  14,
+  0.4,
+  0.4,
+  0xffffff,
+  0,
+  5,
+  gz
+);
+
+sign(
+  'PTI EFFURUN',
+  0,
+  10.5,
+  gz
+);
+
+solids.push(
+  {
+    x: -8,
+    z: gz,
+    hw: 1,
+    hd: 1
+  },
+  {
+    x: 8,
+    z: gz,
+    hw: 1,
+    hd: 1
+  }
+);
+
+spots.push({
+  n: 'PTI Entrance',
+  x: 0,
+  z: 62,
+  r: 10
+});
+
+
+/* Back walls */
+
+for (
+  const sx of [-1, 1]
+) {
+
+  box(
+    40,
+    2.5,
+    0.8,
+    0xffccbc,
+    sx * 29,
+    1.25,
+    gz
+  );
+
+  solids.push({
+    x: sx * 29,
+    z: gz,
+    hw: 20,
+    hd: 0.8
+  });
+
+}
+
+
+/* =========================================================
+   LAMP POSTS
+========================================================= */
+
+for (
+  let z = -80;
+  z <= 66;
+  z += 18
+) {
+
+  for (
+    const sx of [-1, 1]
+  ) {
+
+    box(
+      0.3,
+      5,
+      0.3,
+      0x424242,
+      sx * 6,
+      2.5,
+      z
+    );
+
+    box(
+      0.9,
+      0.5,
+      0.9,
+      0xfff59d,
+      sx * 6,
+      5.2,
+      z
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   TREES
+========================================================= */
+
+const rnd = (a, b) =>
+  a + Math.random() * (b - a);
+
+
+for (
+  let i = 0;
+  i < 55;
+  i++
+) {
+
+  const x =
+    rnd(-120, 120);
+
+  const z =
+    rnd(-100, 95);
+
+
+  if (
+    Math.abs(x) < 8 ||
+    Math.abs(z + 22) < 7 ||
+    Math.abs(z - 14) < 7
+  ) continue;
+
+
+  if (
+    places.some(
+      p =>
+        Math.abs(x - p[2]) <
+          p[4] / 2 + 5 &&
+        Math.abs(z - p[3]) <
+          p[5] / 2 + 5
+    )
+  ) continue;
+
+
+  if (
+    Math.abs(x - 66) < 22 &&
+    Math.abs(z + 22) < 16
+  ) continue;
+
+
+  /* Tree trunk */
+
+  box(
+    0.8,
+    3,
+    0.8,
+    0x6d4c41,
+    x,
+    1.5,
+    z
+  );
+
+
+  /* Tree top */
+
+  const t =
+    new THREE.Mesh(
+      new THREE.SphereGeometry(
+        2.2,
+        8,
+        6
+      ),
+      M(
+        [
+          0x2e7d32,
+          0x66bb6a,
+          0x43a047
+        ][i % 3]
+      )
+    );
+
+  t.position.set(
+    x,
+    4.5,
+    z
+  );
+
+  scene.add(t);
+
+
+  solids.push({
+    x,
+    z,
+    hw: 1,
+    hd: 1
+  });
+
+}
+
+
+/* =========================================================
+   FLOWERS
+========================================================= */
+
+for (
+  let i = 0;
+  i < 35;
+  i++
+) {
+
+  const x =
+    rnd(-120, 120);
+
+  const z =
+    rnd(-100, 95);
+
+  if (
+    Math.abs(x) < 8
+  ) continue;
+
+  box(
+    0.5,
+    0.5,
+    0.5,
+    [
+      0xe10600,
+      0xffeb3b,
+      0xff4081,
+      0xffffff
+    ][i % 4],
+    x,
+    0.25,
+    z
+  );
+
+}
+
+
+/* =========================================================
+   CHARACTER CREATION
+========================================================= */
+
+function makeChar(
+  shirt,
+  skin,
+  pants
+) {
+
+  const g =
+    new THREE.Group();
+
+
+  /* Body */
+
+  const b =
+    new THREE.Mesh(
+      new THREE.BoxGeometry(
+        1,
+        1.4,
+        0.6
+      ),
+      M(shirt)
+    );
+
+  b.position.y = 1.3;
+
+
+  /* Head */
+
+  const h =
+    new THREE.Mesh(
+      new THREE.SphereGeometry(
+        0.45,
+        10,
+        8
+      ),
+      M(skin)
+    );
+
+  h.position.y = 2.4;
+
+
+  /* Legs */
+
+  const l =
+    new THREE.Mesh(
+      new THREE.BoxGeometry(
+        0.9,
+        0.7,
+        0.5
+      ),
+      M(pants)
+    );
+
+  l.position.y = 0.35;
+
+
+  g.add(
+    b,
+    h,
+    l
+  );
+
+  g.userData.body = b;
+
+  scene.add(g);
+
+  return g;
+}
+
+
+/* =========================================================
+   PLAYER
+========================================================= */
+
+const player =
+  makeChar(
+    0xe10600,
+    0x8d5524,
+    0x1a237e
+  );
+
+player.position.set(
+  0,
+  0,
+  64
+);
+
+const body =
+  player.userData.body;
+
+
+/* =========================================================
+   NPCs
+========================================================= */
+
+const npcs = [];
+
+const skins = [
+  0x8d5524,
+  0x6d4c41,
+  0xa1887f,
+  0x5d4037
+];
+
+const shirts = [
+  0x2196f3,
+  0xffeb3b,
+  0x4caf50,
+  0xff9800,
+  0xab47bc,
+  0xffffff,
+  0x00bcd4,
+  0xf06292
+];
+
+
+const paths = [
+  [3, -60, 3, 55],
+  [-3, 55, -3, -60],
+  [-60, -22, 60, -22],
+  [-60, 14, 60, 14],
+  [-12, -22, -12, 14],
+  [12, 14, 12, -22],
+  [3, 30, 3, -5],
+  [-3, -5, -3, 30]
+];
+
+
+paths.forEach(
+  (p, i) => {
+
+    for (
+      let k = 0;
+      k < 2;
+      k++
+    ) {
+
+      const c =
+        makeChar(
+          shirts[(i * 2 + k) % 8],
+          skins[(i + k) % 4],
+          0x37474f
+        );
+
+      npcs.push({
+        c,
+        p,
+        t: Math.random(),
+        dir: 1,
+        sp: rnd(0.02, 0.045)
+      });
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   JOYSTICK INPUT
+========================================================= */
+
+const joy =
+  document.getElementById('joy');
+
+const knob =
+  document.getElementById('knob');
+
+let jx = 0;
+let jy = 0;
+let jid = null;
+
+
+function joyMove(t) {
+
+  const r =
+    joy.getBoundingClientRect();
+
+  const cx =
+    r.left + 65;
+
+  const cy =
+    r.top + 65;
+
+  let dx =
+    t.clientX - cx;
+
+  let dy =
+    t.clientY - cy;
+
+  const len =
+    Math.hypot(dx, dy);
+
+  const max = 50;
+
+
+  if (len > max) {
+
+    dx *= max / len;
+    dy *= max / len;
+
+  }
+
+
+  knob.style.left =
+    35 + dx + 'px';
+
+  knob.style.top =
+    35 + dy + 'px';
+
+
+  jx = dx / max;
+  jy = dy / max;
+}
+
+
+/* Touch */
+
+joy.addEventListener(
+  'touchstart',
+  e => {
+
+    e.preventDefault();
+
+    jid =
+      e.changedTouches[0].identifier;
+
+    joyMove(
+      e.changedTouches[0]
+    );
+
+  },
+  {
+    passive: false
+  }
+);
+
+
+joy.addEventListener(
+  'touchmove',
+  e => {
+
+    e.preventDefault();
+
+    for (
+      const t of e.changedTouches
+    ) {
+
+      if (
+        t.identifier === jid
+      ) {
+        joyMove(t);
+      }
+
+    }
+
+  },
+  {
+    passive: false
+  }
+);
+
+
+const joyEnd = () => {
+
+  jid = null;
+
+  jx = 0;
+  jy = 0;
+
+  knob.style.left = '35px';
+  knob.style.top = '35px';
+
+};
+
+
+joy.addEventListener(
+  'touchend',
+  joyEnd
+);
+
+joy.addEventListener(
+  'touchcancel',
+  joyEnd
+);
+
+
+/* Mouse joystick */
+
+let md = false;
+
+joy.addEventListener(
+  'mousedown',
+  e => {
+
+    md = true;
+    joyMove(e);
+
+  }
+);
+
+addEventListener(
+  'mousemove',
+  e => {
+
+    if (md) {
+      joyMove(e);
+    }
+
+  }
+);
+
+addEventListener(
+  'mouseup',
+  () => {
+
+    if (md) {
+
+      md = false;
+      joyEnd();
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   KEYBOARD INPUT
+========================================================= */
+
+const keys = {};
+
+addEventListener(
+  'keydown',
+  e => {
+    keys[e.key.toLowerCase()] = 1;
+  }
+);
+
+addEventListener(
+  'keyup',
+  e => {
+    keys[e.key.toLowerCase()] = 0;
+  }
+);
+
+
+/* =========================================================
+   RUN BUTTON
+========================================================= */
+
+const run =
+  document.getElementById('run');
+
+let running = false;
+
+run.addEventListener(
+  'touchstart',
+  e => {
+
+    e.preventDefault();
+
+    running = true;
+
+    run.style.background =
+      '#e65100';
+
+  },
+  {
+    passive: false
+  }
+);
+
+
+run.addEventListener(
+  'touchend',
+  () => {
+
+    running = false;
+
+    run.style.background =
+      '#ff9800';
+
+  }
+);
+
+
+/* =========================================================
+   CAMERA ROTATION
+========================================================= */
+
+let camAng = 0;
+let camId = null;
+let lastX = 0;
+
+
+ren.domElement.addEventListener(
+  'touchstart',
+  e => {
+
+    const t =
+      e.changedTouches[0];
+
+    if (
+      t.clientX > innerWidth * 0.4 &&
+      camId === null
+    ) {
+
+      camId =
+        t.identifier;
+
+      lastX =
+        t.clientX;
+
+    }
+
+  },
+  {
+    passive: true
+  }
+);
+
+
+ren.domElement.addEventListener(
+  'touchmove',
+  e => {
+
+    for (
+      const t of e.changedTouches
+    ) {
+
+      if (
+        t.identifier === camId
+      ) {
+
+        camAng -=
+          (t.clientX - lastX) *
+          0.008;
+
+        lastX =
+          t.clientX;
+
+      }
+
+    }
+
+  },
+  {
+    passive: true
+  }
+);
+
+
+ren.domElement.addEventListener(
+  'touchend',
+  e => {
+
+    for (
+      const t of e.changedTouches
+    ) {
+
+      if (
+        t.identifier === camId
+      ) {
+
+        camId = null;
+
+      }
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   INTERACTION
+========================================================= */
+
+const act =
+  document.getElementById('act');
+
+const toast =
+  document.getElementById('toast');
+
+const locEl =
+  document.getElementById('loc');
+
+let near = null;
+
+
+function say(t) {
+
+  toast.textContent = t;
+
+  toast.style.display =
+    'block';
+
+  clearTimeout(say.t);
+
+  say.t =
+    setTimeout(
+      () => {
+        toast.style.display =
+          'none';
+      },
+      2500
+    );
+
+}
+
+
+function doAct() {
+
+  if (!near || !P) {
+    return;
+  }
+
+
+  if (
+    !P.visited.includes(near.n)
+  ) {
+
+    P.visited.push(
+      near.n
+    );
+
+    gain(
+      20,
+      10
+    );
+
+    say(
+      'First visit to ' +
+      near.n +
+      '! +20 XP, +10 coins'
+    );
+
+    save();
+
+  } else {
+
+    say(
+      near.n +
+      ': activities coming in Phase 4!'
+    );
+
+  }
+
+}
+
+
+act.addEventListener(
+  'touchstart',
+  e => {
+
+    e.preventDefault();
+
+    doAct();
+
+  },
+  {
+    passive: false
+  }
+);
+
+act.addEventListener(
+  'click',
+  doAct
+);
+
+
+addEventListener(
+  'keydown',
+  e => {
+
+    if (e.key === 'e') {
+      doAct();
+    }
+
+  }
+);
+
+
+/* =========================================================
+   COLLISION
+========================================================= */
+
+function blocked(x, z) {
+
+  return (
+    solids.some(
+      s =>
+        Math.abs(x - s.x) < s.hw &&
+        Math.abs(z - s.z) < s.hd
+    ) ||
+    Math.abs(x) > 150 ||
+    z > 85 ||
+    z < -95
+  );
+
+}
+
+
+/* =========================================================
+   MINI MAP
+========================================================= */
+
+const mini =
+  document.getElementById('mini');
+
+const mg =
+  mini.getContext('2d');
+
+
+const mx =
+  x =>
+    (x + 100) /
+    200 *
+    220;
+
+const mz =
+  z =>
+    (z + 100) /
+    180 *
+    220;
+
+
+function drawMini() {
+
+  mg.clearRect(
+    0,
+    0,
+    220,
+    220
+  );
+
+
+  /* Roads */
+
+  mg.fillStyle =
+    '#444';
+
+  mg.fillRect(
+    mx(-5),
+    0,
+    12,
+    220
+  );
+
+  mg.fillRect(
+    0,
+    mz(-26),
+    220,
+    9
+  );
+
+  mg.fillRect(
+    0,
+    mz(10),
+    220,
+    9
+  );
+
+
+  /* Buildings */
+
+  mg.fillStyle =
+    '#ffeb3b';
+
+  places.forEach(
+    p => {
+
+      mg.fillRect(
+        mx(p[2]) - 5,
+        mz(p[3]) - 4,
+        10,
+        8
+      );
+
+    }
+  );
+
+
+  mg.fillStyle =
+    '#fff';
+
+  spots.forEach(
+    () => {}
+  );
+
+
+  /* Player */
+
+  mg.fillStyle =
+    '#fff';
+
+  mg.beginPath();
+
+  mg.arc(
+    mx(player.position.x),
+    mz(player.position.z),
+    6,
+    0,
+    7
+  );
+
+  mg.fill();
+
+
+  mg.fillStyle =
+    '#e10600';
+
+  mg.beginPath();
+
+  mg.arc(
+    mx(player.position.x),
+    mz(player.position.z),
+    4,
+    0,
+    7
+  );
+
+  mg.fill();
+
+}
+
+
+/* =========================================================
+   GAME VARIABLES
+========================================================= */
+
+let P = null;
+
+const clock =
+  new THREE.Clock();
+
+
+/* =========================================================
+   GAME LOOP
+========================================================= */
+
+function loop() {
+
+  requestAnimationFrame(loop);
+
+
+  const dt =
+    Math.min(
+      clock.getDelta(),
+      0.05
+    );
+
+
+  /* Input */
+
+  const ix =
+    jx +
+    ((keys.d || keys.arrowright) ? 1 : 0) -
+    ((keys.a || keys.arrowleft) ? 1 : 0);
+
+
+  const iy =
+    jy +
+    ((keys.s || keys.arrowdown) ? 1 : 0) -
+    ((keys.w || keys.arrowup) ? 1 : 0);
+
+
+  const mag =
+    P
+      ? Math.min(
+          1,
+          Math.hypot(ix, iy)
+        )
+      : 0;
+
+
+  /* Running */
+
+  const wantRun =
+    (running || keys.shift) &&
+    P &&
+    P.energy > 1;
+
+
+  /* Player movement */
+
+  if (mag > 0.08) {
+
+    const sp =
+      (wantRun ? 13 : 6.5) *
+      mag *
+      dt;
+
+
+    if (wantRun) {
+
+      P.energy =
+        Math.max(
+          0,
+          P.energy - 4 * dt
+        );
+
+    }
+
+
+    const fx =
+      -Math.sin(camAng);
+
+    const fz =
+      -Math.cos(camAng);
+
+    const rx =
+      Math.cos(camAng);
+
+    const rz =
+      -Math.sin(camAng);
+
+
+    const l =
+      Math.hypot(
+        ix,
+        iy
+      );
+
+
+    const dx =
+      (
+        rx * ix / l -
+        fx * iy / l
+      ) * sp;
+
+
+    const dz =
+      (
+        rz * ix / l -
+        fz * iy / l
+      ) * sp;
+
+
+    const nx =
+      player.position.x + dx;
+
+    const nz =
+      player.position.z + dz;
+
+
+    if (
+      !blocked(
+        nx,
+        player.position.z
+      )
+    ) {
+
+      player.position.x =
+        nx;
+
+    }
+
+
+    if (
+      !blocked(
+        player.position.x,
+        nz
+      )
+    ) {
+
+      player.position.z =
+        nz;
+
+    }
+
+
+    player.rotation.y =
+      Math.atan2(
+        dx,
+        dz
+      );
+
+
+    body.position.y =
+      1.3 +
+      Math.sin(
+        performance.now() / 90
+      ) *
+      0.08;
+
+  }
+
+
+  /* Energy regeneration */
+
+  if (
+    P &&
+    mag <= 0.08
+  ) {
+
+    P.energy =
+      Math.min(
+        100,
+        P.energy + 3 * dt
+      );
+
+  }
+
+
+  /* =====================================================
+     NPC MOVEMENT
+  ===================================================== */
+
+  npcs.forEach(
+    n => {
+
+      n.t +=
+        n.dir *
+        n.sp *
+        dt;
+
+
+      if (n.t > 1) {
+
+        n.t = 1;
+        n.dir = -1;
+
+      }
+
+
+      if (n.t < 0) {
+
+        n.t = 0;
+        n.dir = 1;
+
+      }
+
+
+      const [
+        a,
+        b,
+        c,
+        d
+      ] = n.p;
+
+
+      n.c.position.set(
+        a + (c - a) * n.t,
+        0,
+        b + (d - b) * n.t
+      );
+
+
+      n.c.rotation.y =
+        Math.atan2(
+          (c - a) * n.dir,
+          (d - b) * n.dir
+        );
+
+
+      n.c.userData.body.position.y =
+        1.3 +
+        Math.sin(
+          performance.now() / 110 +
+          n.sp * 300
+        ) *
+        0.06;
+
+    }
+  );
+
+
+  /* =====================================================
+     CAMERA
+  ===================================================== */
+
+  const d = 11;
+  const h = 7;
+
+
+  const tx =
+    player.position.x +
+    Math.sin(camAng) * d;
+
+
+  const tz =
+    player.position.z +
+    Math.cos(camAng) * d;
+
+
+  cam.position.x +=
+    (tx - cam.position.x) *
+    0.1;
+
+  cam.position.z +=
+    (tz - cam.position.z) *
+    0.1;
+
+  cam.position.y +=
+    (h - cam.position.y) *
+    0.1;
+
+
+  cam.lookAt(
+    player.position.x,
+    2,
+    player.position.z
+  );
+
+
+  /* =====================================================
+     NEAREST LOCATION
+  ===================================================== */
+
+  near = null;
+
+  let best = 1e9;
+
+
+  spots.forEach(
+    s => {
+
+      const dd =
+        Math.hypot(
+          player.position.x - s.x,
+          player.position.z - s.z
+        );
+
+
+      if (
+        dd <
+          (s.r || 6) &&
+        dd < best
+      ) {
+
+        best = dd;
+        near = s;
+
+      }
+
+    }
+  );
+
+
+  if (near) {
+
+    locEl.textContent =
+      near.n;
+
+    act.style.display =
+      near.r
+        ? 'none'
+        : 'flex';
+
+  } else {
+
+    locEl.textContent =
+      'PTI Campus';
+
+    act.style.display =
+      'none';
+
+  }
+
+
+  drawMini();
+
+
+  if (P) {
+    drawStats();
+  }
+
+
+  ren.render(
+    scene,
+    cam
+  );
+
+}
+
+
+/* =========================================================
+   START GAME LOOP
+========================================================= */
+
+cam.position.set(
+  0,
+  7,
+  76
+);
+
+loop();
+
+
+/* =========================================================
+   RESIZE
+========================================================= */
+
+addEventListener(
+  'resize',
+  () => {
+
+    cam.aspect =
+      innerWidth /
+      innerHeight;
+
+    cam.updateProjectionMatrix();
+
+    ren.setSize(
+      innerWidth,
+      innerHeight
+    );
+
+  }
+);
+
+
+say(
+  'Welcome to PTI! Walk up the main road. Drag the screen to turn the camera.'
+);
+
+
+/* =========================================================
+   SUPABASE + PLAYER PROFILE
+========================================================= */
+
+const SUPABASE_URL =
+  'https://xlylxyxjsvhvrnjrcvrf.supabase.co';
+
+
+const SUPABASE_ANON_KEY =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhseWx4eXhqc3ZodnJuanJjdnJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE0ODQ0NTUsImV4cCI6MjEwNzA2MDQ1NX0.sDx_VjbP30V7qo_7eUU74TgcPDUY0yxP574qFjt5liU';
+
+
+const sb =
+  supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+
+let uid = null;
+
+let pickColor =
+  '#e10600';
+
+
+const $ =
+  id =>
+    document.getElementById(id);
+
+
+/* =========================================================
+   CHARACTER COLOURS
+========================================================= */
+
+const COLORS = [
+  '#e10600',
+  '#2196f3',
+  '#ffeb3b',
+  '#4caf50',
+  '#ff9800',
+  '#ab47bc',
+  '#00bcd4',
+  '#ffffff'
+];
+
+
+$('sws').innerHTML =
+  COLORS
+    .map(
+      (c, i) =>
+        '<span class="sw' +
+        (i ? '' : ' on') +
+        '" data-c="' +
+        c +
+        '" style="background:' +
+        c +
+        '"></span>'
+    )
+    .join('');
+
+
+$('sws').addEventListener(
+  'click',
+  e => {
+
+    const c =
+      e.target.dataset.c;
+
+    if (!c) {
+      return;
+    }
+
+
+    pickColor = c;
+
+
+    [
+      ...$('sws').children
+    ].forEach(
+      x =>
+        x.classList.toggle(
+          'on',
+          x === e.target
+        )
+    );
+
+
+    body.material.color.set(c);
+
+  }
+);
+
+
+/* =========================================================
+   USERNAME → INTERNAL EMAIL
+========================================================= */
+
+const email =
+  u =>
+    u
+      .trim()
+      .toLowerCase()
+      .replace(
+        /[^a-z0-9_]/g,
+        ''
+      ) +
+    '@pngpd.game';
+
+
+/* =========================================================
+   ERROR MESSAGE
+========================================================= */
+
+function err(t) {
+
+  $('msg').textContent = t;
+
+}
+
+
+/* =========================================================
+   CREDENTIAL VALIDATION
+========================================================= */
+
+function creds() {
+
+  const u =
+    $('un').value;
+
+  const p =
+    $('pw').value;
+
+
+  if (
+    u.trim().length < 3 ||
+    p.length < 6
+  ) {
+
+    err(
+      'Username 3+ chars, password 6+ chars'
+    );
+
+    return null;
+
+  }
+
+
+  return {
+    u: u.trim(),
+    p
+  };
+
+}
+
+
+/* =========================================================
+   CREATE ACCOUNT
+========================================================= */
+
+$('br').onclick =
+  async () => {
+
+    const c =
+      creds();
+
+    if (!c) {
+      return;
+    }
+
+
+    err(
+      'Creating account...'
+    );
+
+
+    const {
+      data,
+      error
+    } =
+      await sb.auth.signUp({
+        email: email(c.u),
+        password: c.p,
+
+        options: {
+          data: {
+            username: c.u
+          }
+        }
+      });
+
+
+    if (error) {
+
+      return err(
+        error.message
+      );
+
+    }
+
+
+    if (!data.session) {
+
+      return err(
+        'Turn off "Confirm email" in Supabase Auth settings'
+      );
+
+    }
+
+
+    uid =
+      data.user.id;
+
+
+    err('');
+
+
+    $('c1').style.display =
+      'none';
+
+    $('c2').style.display =
+      'block';
+
+  };
+
+
+/* =========================================================
+   LOGIN
+========================================================= */
+
+$('bl').onclick =
+  async () => {
+
+    const c =
+      creds();
+
+    if (!c) {
+      return;
+    }
+
+
+    err(
+      'Logging in...'
+    );
+
+
+    const {
+      data,
+      error
+    } =
+      await sb.auth.signInWithPassword({
+        email: email(c.u),
+        password: c.p
+      });
+
+
+    if (error) {
+
+      return err(
+        'Wrong username or password'
+      );
+
+    }
+
+
+    uid =
+      data.user.id;
+
+
+    await loadProfile(
+      c.u
+    );
+
+  };
+
+
+/* =========================================================
+   LOAD PROFILE
+========================================================= */
+
+async function loadProfile(u) {
+
+  const {
+    data,
+    error
+  } =
+    await sb
+      .from('game_players')
+      .select('*')
+      .eq('id', uid)
+      .maybeSingle();
+
+
+  if (error) {
+
+    return err(
+      error.message
+    );
+
+  }
+
+
+  if (!data) {
+
+    $('c1').style.display =
+      'none';
+
+    $('c2').style.display =
+      'block';
+
+    return;
+
+  }
+
+
+  startGame(data);
+
+}
+
+
+/* =========================================================
+   CREATE PLAYER PROFILE
+========================================================= */
+
+$('bgo').onclick =
+  async () => {
+
+    const {
+      data: ud
+    } =
+      await sb.auth.getUser();
+
+
+    const username =
+      $('un').value.trim() ||
+      (
+        ud.user.user_metadata &&
+        ud.user.user_metadata.username
+      ) ||
+      'Player';
+
+
+    const {
+      data,
+      error
+    } =
+      await sb
+        .from('game_players')
+        .insert({
+          id: uid,
+          username,
+          shirt_color: pickColor
+        })
+        .select()
+        .single();
+
+
+    if (error) {
+
+      return (
+        $('msg2').textContent =
+          error.code === '23505'
+            ? 'Username already taken'
+            : error.message
+      );
+
+    }
+
+
+    startGame(data);
+
+  };
+
+
+/* =========================================================
+   START PLAYER GAME
+========================================================= */
+
+function startGame(d) {
+
+  P = d;
+
+
+  P.visited =
+    P.visited || [];
+
+
+  body.material.color.set(
+    P.shirt_color
+  );
+
+
+  $('ov').style.display =
+    'none';
+
+
+  $('stats').style.display =
+    'block';
+
+
+  say(
+    'Welcome ' +
+    P.username +
+    '!'
+  );
+
+}
+
+
+/* =========================================================
+   XP + COINS
+========================================================= */
+
+function gain(
+  xp,
+  coins
+) {
+
+  P.xp += xp;
+
+  P.coins += coins;
+
+
+  const l =
+    Math.floor(
+      P.xp / 100
+    ) + 1;
+
+
+  if (
+    l > P.level
+  ) {
+
+    P.level = l;
+
+    say(
+      'LEVEL UP! You are now level ' +
+      l
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   PLAYER STATS
+========================================================= */
+
+let sh = 0;
+
+
+function drawStats() {
+
+  if (
+    (sh += 1) % 10
+  ) {
+    return;
+  }
+
+
+  const b =
+    (v, c) =>
+      '<div class="bar">' +
+      '<i style="width:' +
+      Math.round(v) +
+      '%;background:' +
+      c +
+      '"></i>' +
+      '</div>';
+
+
+  $('stats').innerHTML =
+    P.username +
+    ' · Lv ' +
+    P.level +
+    '<br>XP ' +
+    (P.xp % 100) +
+    '/100' +
+    b(
+      P.xp % 100,
+      '#ffeb3b'
+    ) +
+    '🪙 ' +
+    P.coins +
+    '<br>Energy' +
+    b(
+      P.energy,
+      '#4caf50'
+    ) +
+    'Hunger' +
+    b(
+      P.hunger,
+      '#ff9800'
+    );
+
+}
+
+
+/* =========================================================
+   SAVE PLAYER
+========================================================= */
+
+async function save() {
+
+  if (!P) {
+    return;
+  }
+
+
+  await sb
+    .from('game_players')
+    .update({
+      level: P.level,
+      xp: P.xp,
+      coins: P.coins,
+      energy: Math.round(
+        P.energy
+      ),
+      hunger: Math.round(
+        P.hunger
+      ),
+      visited: P.visited,
+      updated_at:
+        new Date().toISOString()
+    })
+    .eq(
+      'id',
+      uid
+    );
+
+}
+
+
+/* =========================================================
+   HUNGER
+========================================================= */
+
+setInterval(
+  () => {
+
+    if (P) {
+
+      P.hunger =
+        Math.max(
+          0,
+          P.hunger - 1
+        );
+
+      save();
+
+    }
+
+  },
+  30000
+);
+
+
+/* =========================================================
+   SAVE WHEN LEAVING
+========================================================= */
+
+addEventListener(
+  'visibilitychange',
+  () => {
+
+    if (document.hidden) {
+      save();
+    }
+
+  }
+);
+
+
+/* =========================================================
+   RESUME EXISTING SESSION
+========================================================= */
+
+sb.auth
+  .getSession()
+  .then(
+    async ({ data }) => {
+
+      if (
+        data.session
+      ) {
+
+        uid =
+          data.session.user.id;
+
+        await loadProfile('');
+
+      }
+
+    }
+  );
+
+</script>
+
 </body>
 </html>
