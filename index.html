@@ -6,426 +6,431 @@
 <title>PNGPD LIFE 2.0</title>
 <style>
 * {
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-  user-select: none;
-  touch-action: none;
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+  touch-action:none;
 }
 
 html,body {
-  margin: 0;
-  height: 100%;
-  overflow: hidden;
-  background: #87ceeb;
-  font-family: system-ui,sans-serif;
+  margin:0;
+  height:100%;
+  overflow:hidden;
+  background:#87ceeb;
+  font-family:system-ui,sans-serif;
 }
 
 canvas {
-  display: block;
+  display:block;
 }
 
 #hud {
-  position: fixed;
-  top: 8px;
-  left: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  pointer-events: none;
-  z-index: 20;
+  position:fixed;
+  top:8px;
+  left:8px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  pointer-events:none;
+  z-index:20;
 }
 
 .pill {
-  background: #e10600;
-  color: #fff;
-  font-weight: 700;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 14px;
-  width: fit-content;
+  background:#e10600;
+  color:#fff;
+  font-weight:700;
+  padding:6px 12px;
+  border-radius:20px;
+  font-size:14px;
+  width:fit-content;
 }
 
 #loc {
-  background: #fff;
-  color: #e10600;
+  background:#fff;
+  color:#e10600;
 }
 
 #stats {
-  background: rgba(0,0,0,.55);
-  color: #fff;
-  border-radius: 12px;
-  padding: 6px 10px;
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1.5;
-  display: none;
+  background:rgba(0,0,0,.55);
+  color:#fff;
+  border-radius:12px;
+  padding:6px 10px;
+  font-size:13px;
+  font-weight:700;
+  line-height:1.5;
+  display:none;
 }
 
 .bar {
-  height: 7px;
-  border-radius: 4px;
-  background: rgba(255,255,255,.3);
-  overflow: hidden;
-  width: 110px;
+  height:7px;
+  border-radius:4px;
+  background:rgba(255,255,255,.3);
+  overflow:hidden;
+  width:110px;
 }
 
 .bar i {
-  display: block;
-  height: 100%;
+  display:block;
+  height:100%;
 }
 
 #mini {
-  position: fixed;
-  top: 8px;
-  right: 8px;
-  width: 110px;
-  height: 110px;
-  border-radius: 12px;
-  border: 3px solid #fff;
-  background: #2e7d32;
-  pointer-events: none;
-  z-index: 20;
+  position:fixed;
+  top:8px;
+  right:8px;
+  width:110px;
+  height:110px;
+  border-radius:12px;
+  border:3px solid #fff;
+  background:#2e7d32;
+  pointer-events:none;
+  z-index:20;
 }
 
 #joy {
-  position: fixed;
-  left: 24px;
-  bottom: 30px;
-  width: 130px;
-  height: 130px;
-  border-radius: 50%;
-  background: rgba(255,255,255,.35);
-  border: 3px solid rgba(255,255,255,.8);
-  z-index: 20;
+  position:fixed;
+  left:24px;
+  bottom:30px;
+  width:130px;
+  height:130px;
+  border-radius:50%;
+  background:rgba(255,255,255,.35);
+  border:3px solid rgba(255,255,255,.8);
+  z-index:20;
 }
 
 #knob {
-  position: absolute;
-  left: 35px;
-  top: 35px;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: #e10600;
-  border: 3px solid #fff;
+  position:absolute;
+  left:35px;
+  top:35px;
+  width:60px;
+  height:60px;
+  border-radius:50%;
+  background:#e10600;
+  border:3px solid #fff;
 }
 
 .btn {
-  position: fixed;
-  border-radius: 50%;
-  border: 3px solid #fff;
-  color: #fff;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 20;
+  position:fixed;
+  border-radius:50%;
+  border:3px solid #fff;
+  color:#fff;
+  font-weight:800;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:20;
 }
 
 #run {
-  right: 24px;
-  bottom: 30px;
-  width: 76px;
-  height: 76px;
-  background: #ff9800;
-  font-size: 14px;
+  right:24px;
+  bottom:30px;
+  width:76px;
+  height:76px;
+  background:#ff9800;
+  font-size:14px;
 }
 
 #act {
-  right: 112px;
-  bottom: 90px;
-  width: 84px;
-  height: 84px;
-  background: #e10600;
-  font-size: 15px;
-  display: none;
+  right:112px;
+  bottom:90px;
+  width:84px;
+  height:84px;
+  background:#e10600;
+  font-size:15px;
+  display:none;
 }
 
 #toast {
-  position: fixed;
-  top: 70px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0,0,0,.75);
-  color: #fff;
-  padding: 10px 16px;
-  border-radius: 12px;
-  display: none;
-  max-width: 70%;
-  text-align: center;
-  z-index: 60;
+  position:fixed;
+  top:70px;
+  left:50%;
+  transform:translateX(-50%);
+  background:rgba(0,0,0,.75);
+  color:#fff;
+  padding:10px 16px;
+  border-radius:12px;
+  display:none;
+  max-width:70%;
+  text-align:center;
+  z-index:60;
 }
 
 #ov {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  background: linear-gradient(160deg,#e10600,#ff9800 60%,#ffeb3b);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  touch-action: auto;
+  position:fixed;
+  inset:0;
+  z-index:50;
+  background:linear-gradient(160deg,#e10600,#ff9800 60%,#ffeb3b);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  touch-action:auto;
 }
 
 #ov * {
-  touch-action: auto;
-  user-select: auto;
+  touch-action:auto;
+  user-select:auto;
 }
 
 .card {
-  background: #fff;
-  border-radius: 20px;
-  padding: 22px;
-  width: 100%;
-  max-width: 340px;
-  text-align: center;
+  background:#fff;
+  border-radius:20px;
+  padding:22px;
+  width:100%;
+  max-width:340px;
+  text-align:center;
 }
 
 .card h1 {
-  margin: 0 0 4px;
-  color: #e10600;
-  font-size: 26px;
+  margin:0 0 4px;
+  color:#e10600;
+  font-size:26px;
 }
 
 .card p {
-  margin: 0 0 14px;
-  color: #555;
-  font-size: 14px;
+  margin:0 0 14px;
+  color:#555;
+  font-size:14px;
 }
 
 .card button {
-  width: 100%;
-  padding: 13px;
-  margin-top: 8px;
-  border: 0;
-  border-radius: 10px;
-  font-size: 16px;
-  font-weight: 800;
-  color: #fff;
-  background: #e10600;
+  width:100%;
+  padding:13px;
+  margin-top:8px;
+  border:0;
+  border-radius:10px;
+  font-size:16px;
+  font-weight:800;
+  color:#fff;
+  background:#e10600;
 }
 
 #msg2 {
-  color: #c00;
-  font-size: 13px;
-  min-height: 18px;
-  margin-top: 6px;
+  color:#c00;
+  font-size:13px;
+  min-height:18px;
+  margin-top:6px;
 }
 
 .sw {
-  display: inline-block;
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  margin: 5px;
-  border: 4px solid #fff;
-  box-shadow: 0 0 0 2px #ccc;
-  cursor: pointer;
+  display:inline-block;
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  margin:5px;
+  border:4px solid #fff;
+  box-shadow:0 0 0 2px #ccc;
+  cursor:pointer;
 }
 
 .sw.on {
-  box-shadow: 0 0 0 3px #000;
+  box-shadow:0 0 0 3px #000;
 }
 
 #panel {
-  position: fixed;
-  inset: 0;
-  z-index: 40;
-  background: rgba(0,0,0,.6);
-  display: none;
-  align-items: flex-end;
-  justify-content: center;
+  position:fixed;
+  inset:0;
+  z-index:40;
+  background:rgba(0,0,0,.6);
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
 }
 
 #panel * {
-  touch-action: auto;
+  touch-action:auto;
 }
 
 #pbox {
-  background: #fff;
-  width: 100%;
-  max-width: 480px;
-  max-height: 90%;
-  border-radius: 20px 20px 0 0;
-  display: flex;
-  flex-direction: column;
+  background:#fff;
+  width:100%;
+  max-width:480px;
+  max-height:90%;
+  border-radius:20px 20px 0 0;
+  display:flex;
+  flex-direction:column;
 }
 
 #phead {
-  padding: 14px 16px;
-  background: #e10600;
-  color: #fff;
-  font-weight: 800;
-  border-radius: 20px 20px 0 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  padding:14px 16px;
+  background:#e10600;
+  color:#fff;
+  font-weight:800;
+  border-radius:20px 20px 0 0;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
 
 #pclose {
-  background: #fff;
-  color: #e10600;
-  border: 0;
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  font-weight: 900;
-  font-size: 16px;
+  background:#fff;
+  color:#e10600;
+  border:0;
+  border-radius:50%;
+  width:32px;
+  height:32px;
+  font-weight:900;
+  font-size:16px;
 }
 
 #pbody {
-  padding: 14px 16px 24px;
-  overflow-y: auto;
-  color: #222;
-  font-size: 15px;
-  line-height: 1.45;
-  user-select: text;
+  padding:14px 16px 24px;
+  overflow-y:auto;
+  color:#222;
+  font-size:15px;
+  line-height:1.45;
+  user-select:text;
 }
 
 #pbody ul {
-  padding-left: 20px;
-  margin: 8px 0;
+  padding-left:20px;
+  margin:8px 0;
 }
 
 #pbody li {
-  margin: 6px 0;
+  margin:6px 0;
 }
 
 .pbtn {
-  display: block;
-  width: 100%;
-  padding: 12px;
-  margin: 7px 0;
-  border: 2px solid #e10600;
-  border-radius: 10px;
-  background: #fff;
-  color: #e10600;
-  font-weight: 700;
-  font-size: 15px;
-  text-align: left;
+  display:block;
+  width:100%;
+  padding:12px;
+  margin:7px 0;
+  border:2px solid #e10600;
+  border-radius:10px;
+  background:#fff;
+  color:#e10600;
+  font-weight:700;
+  font-size:15px;
+  text-align:left;
 }
 
 .pbtn.solid {
-  background: #e10600;
-  color: #fff;
-  text-align: center;
+  background:#e10600;
+  color:#fff;
+  text-align:center;
 }
 
 .pbtn.good {
-  background: #4caf50;
-  border-color: #4caf50;
-  color: #fff;
+  background:#4caf50;
+  border-color:#4caf50;
+  color:#fff;
 }
 
 .pbtn.bad {
-  background: #e53935;
-  border-color: #e53935;
-  color: #fff;
+  background:#e53935;
+  border-color:#e53935;
+  color:#fff;
 }
 
 .note {
-  background: #fff3e0;
-  border-radius: 10px;
-  padding: 8px 10px;
-  font-size: 13px;
-  margin: 8px 0;
+  background:#fff3e0;
+  border-radius:10px;
+  padding:8px 10px;
+  font-size:13px;
+  margin:8px 0;
 }
 
 .fb {
-  margin-top: 10px;
-  font-weight: 600;
+  margin-top:10px;
+  font-weight:600;
 }
 
 .card input {
-  width: 100%;
-  padding: 12px;
-  margin: 5px 0;
-  border: 2px solid #ddd;
-  border-radius: 10px;
-  font-size: 16px;
+  width:100%;
+  padding:12px;
+  margin:5px 0;
+  border:2px solid #ddd;
+  border-radius:10px;
+  font-size:16px;
 }
 
 .card button.alt {
-  background: #fff;
-  color: #e10600;
-  border: 2px solid #e10600;
+  background:#fff;
+  color:#e10600;
+  border:2px solid #e10600;
 }
 
 #msg {
-  color: #c00;
-  font-size: 13px;
-  min-height: 18px;
-  margin-top: 6px;
+  color:#c00;
+  font-size:13px;
+  min-height:18px;
+  margin-top:6px;
 }
 
 .pbtn.dim {
-  opacity: .35;
-  pointer-events: none;
-  text-decoration: line-through;
+  opacity:.35;
+  pointer-events:none;
+  text-decoration:line-through;
 }
 
 .expl {
-  background: #e8f5e9;
-  border-radius: 10px;
-  padding: 8px 10px;
-  margin-top: 8px;
-  font-size: 14px;
-  font-weight: 500;
+  background:#e8f5e9;
+  border-radius:10px;
+  padding:8px 10px;
+  margin-top:8px;
+  font-size:14px;
+  font-weight:500;
 }
 
 .calcdisp {
-  background: #212121;
-  color: #fff;
-  border-radius: 12px;
-  padding: 10px;
-  text-align: right;
-  margin-bottom: 8px;
-  min-height: 68px;
-  word-break: break-all;
+  background:#212121;
+  color:#fff;
+  border-radius:12px;
+  padding:10px;
+  text-align:right;
+  margin-bottom:8px;
+  min-height:68px;
+  word-break:break-all;
 }
 
 #cexp {
-  font-size: 20px;
+  font-size:20px;
 }
 
 #cres {
-  font-size: 26px;
-  font-weight: 800;
-  color: #ffeb3b;
+  font-size:26px;
+  font-weight:800;
+  color:#ffeb3b;
 }
 
 .calcgrid {
-  display: grid;
-  grid-template-columns: repeat(5,1fr);
-  gap: 6px;
-  margin-bottom: 8px;
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:6px;
+  margin-bottom:8px;
 }
 
 .ck {
-  padding: 14px 0;
-  border: 2px solid #e10600;
-  border-radius: 10px;
-  background: #fff;
-  color: #e10600;
-  font-weight: 800;
-  font-size: 16px;
+  padding:14px 0;
+  border:2px solid #e10600;
+  border-radius:10px;
+  background:#fff;
+  color:#e10600;
+  font-weight:800;
+  font-size:16px;
 }
 
 .row {
-  display: flex;
-  justify-content: space-between;
-  padding: 6px 0;
-  border-bottom: 1px solid #eee;
-  font-size: 14px;
+  display:flex;
+  justify-content:space-between;
+  padding:6px 0;
+  border-bottom:1px solid #eee;
+  font-size:14px;
 }
 
 .memo {
-  background: #fff8e1;
-  border-left: 4px solid #e10600;
-  border-radius: 8px;
-  padding: 8px 10px;
-  margin: 8px 0;
+  background:#fff8e1;
+  border-left:4px solid #e10600;
+  border-radius:8px;
+  padding:8px 10px;
+  margin:8px 0;
+}
+
+#clk {
+  background:#fff;
+  color:#333;
 }
 
 </style>
@@ -434,6 +439,7 @@ canvas {
 <div id="hud">
   <div class="pill">PNGPD LIFE 2.0</div>
   <div class="pill" id="loc">PTI Entrance</div>
+  <div class="pill" id="clk">Day 1 - 08:00</div>
   <div id="stats"></div>
 </div>
 <canvas id="mini" width="220" height="220"></canvas>
@@ -474,8 +480,8 @@ window.COURSES = {};
 
 // ===== PGP 121 - Fluid Kinematics =====
 window.COURSES["PGP 121"] = {
-title: "PGP 121 - Fluid Kinematics", place: "library", reward: 10,
-notes: [
+ title: "PGP 121 - Fluid Kinematics", place: "library", reward: 10,
+ notes: [
   "Fluid - a substance capable of continuous deformation when subjected to shear stress.",
   "Fluid mechanics - study of fluids at rest and in motion.",
   "Fluid kinematics - study of fluid motion without considering the forces causing the motion.",
@@ -506,8 +512,8 @@ notes: [
   "Flow direction can be represented using velocity vectors and streamlines.",
   "Fluid kinematics is important in pipelines, pumps, compressors and petroleum-processing systems.",
   "Understanding flow behaviour helps engineers predict how fluids move through equipment."
-],
-quiz: [
+ ],
+ quiz: [
   {id:"PGP121-Q01", cat:"Concepts", q:"Define fluid kinematics.", o:["The study of fluid motion without considering the forces causing the motion", "Study of fluid motion together with the forces producing the motion", "Smooth, orderly flow in layers", "Rate of change of displacement with time"], a:0},
   {id:"PGP121-Q02", cat:"Concepts", q:"Define fluid dynamics.", o:["Flow properties at a fixed point remain constant with time", "The study of fluid motion without considering the forces causing the motion", "Study of fluid motion together with the forces producing the motion", "Mass flowing through a section per unit time"], a:2},
   {id:"PGP121-Q03", cat:"Concepts", q:"What is fluid statics?", o:["Kinematics describes motion; dynamics considers forces", "Flow varying significantly in three spatial directions", "Study of fluids at rest", "Direction of the velocity vector at a particular point and time"], a:2},
@@ -578,13 +584,13 @@ quiz: [
   {id:"PGP121-Q68", cat:"Concepts", q:"Why is acceleration important in fluid flow?", o:["Changes in velocity influence forces and energy requirements", "It promotes mixing and heat/mass transfer", "It increases energy losses and can produce vibration or erosion", "It helps describe and predict fluid motion in petroleum-processing equipment and pipelines"], a:0},
   {id:"PGP121-Q69", cat:"Concepts", q:"What is meant by instantaneous flow direction?", o:["Particles that have passed through a particular point", "Flow in which fluid elements have no net rotation", "Direction of the velocity vector at a particular point and time", "Flow in which fluid elements rotate"], a:2},
   {id:"PGP121-Q70", cat:"Concepts", q:"Explain why PGP 121 is important to PNGPD.", o:["Petroleum processing involves movement of liquids and gases through pipes and equipment, so understanding their motion is fundamental", "Continuity requires the same mass/volume flow to pass through the smaller area", "At a fixed point in the pipeline, velocity and other flow properties remain constant with time", "They help control material balance and process operation"], a:0}
-]
+ ]
 };
 
 // ===== PGP 122 - Separation Process I =====
 window.COURSES["PGP 122"] = {
-title: "PGP 122 - Separation Process I", place: "library", reward: 10,
-notes: [
+ title: "PGP 122 - Separation Process I", place: "library", reward: 10,
+ notes: [
   "Separation - division of a mixture into distinct components/phases.",
   "Separation process - operation used to distribute a mixture into separate phases.",
   "Process - change from one equilibrium condition to another.",
@@ -615,8 +621,8 @@ notes: [
   "Extraction - transfer of a component between phases.",
   "Evaporation - concentration by vaporizing solvent.",
   "Separation cost - separation can represent a major portion of chemical plant capital and operating cost."
-],
-quiz: [
+ ],
+ quiz: [
   {id:"PGP122-Q01", cat:"Concepts", q:"Define separation.", o:["Random distribution of two or more initially separate phases through one another", "Transfer of soluble material from a solid into a liquid solvent", "Division of a mixture into distinct components or phases", "Transfer of a desired component from one phase into another phase"], a:2},
   {id:"PGP122-Q02", cat:"Concepts", q:"What is a separation process?", o:["Vaporization of solvent to concentrate a solution", "A process that divides or distributes a mixture into separate phases", "Liquid/fluid mixing and solid/powder mixing", "Layer of retained solids formed on the filter"], a:1},
   {id:"PGP122-Q03", cat:"Concepts", q:"Why are separation processes important?", o:["To improve circulation and mixing in deeper vessels", "It provides the driving force for filtration", "They purify raw materials, separate products and enable recycling", "Plugging reduces filtration performance"], a:2},
@@ -687,13 +693,13 @@ quiz: [
   {id:"PGP122-Q68", cat:"Concepts", q:"Explain why separation equipment is common around reactors.", o:["Layer of retained solids formed on the filter", "Solvent is removed as vapour while less volatile dissolved material remains", "Feed purification and product recovery require separation before and after reaction", "Vaporization of solvent to concentrate a solution"], a:2},
   {id:"PGP122-Q69", cat:"Concepts", q:"Give two mechanical separation operations.", o:["One producing flow parallel to the shaft axis", "Separation based on differences in molecular/particle size", "It generally increases", "Filtration and screening"], a:3},
   {id:"PGP122-Q70", cat:"Concepts", q:"Why is PGP 122 important to petroleum processing?", o:["It can reduce effective mixing and promote unwanted surface rotation", "Their selective barriers can operate at molecular and ionic scales", "It improves contact between phases", "Petroleum plants continuously separate, purify and concentrate process streams"], a:3}
-]
+ ]
 };
 
 // ===== PGP 123 - Wastewater, Steam and Energy =====
 window.COURSES["PGP 123"] = {
-title: "PGP 123 - Wastewater, Steam and Energy", place: "library", reward: 10,
-notes: [
+ title: "PGP 123 - Wastewater, Steam and Energy", place: "library", reward: 10,
+ notes: [
   "Wastewater - water contaminated by domestic, industrial or other activities.",
   "Industrial wastewater - wastewater generated by industrial processes.",
   "Untreated wastewater can damage aquatic ecosystems and human health.",
@@ -724,8 +730,8 @@ notes: [
   "Treated wastewater can be reused industrially or agriculturally.",
   "Steam is vaporized water carrying thermal energy.",
   "Energy is the capacity to do work."
-],
-quiz: [
+ ],
+ quiz: [
   {id:"PGP123-Q01", cat:"Concepts", q:"Define wastewater.", o:["Vaporized water containing thermal energy", "Shallow pond where microorganisms decompose organics with aeration", "Biological treatment of dissolved and colloidal organic matter", "Contaminated water resulting from human or industrial activities"], a:3},
   {id:"PGP123-Q02", cat:"Concepts", q:"What is industrial wastewater?", o:["Heat absorbed/released during phase change", "Wastewater produced from industrial processes", "Biological removal of organic pollutants", "Further removal of water from stabilized sludge"], a:1},
   {id:"PGP123-Q03", cat:"Concepts", q:"State two environmental effects of untreated wastewater.", o:["Biological removal of organic pollutants", "It rejects dissolved salts through a semipermeable membrane", "Heat causing temperature change without phase change", "Aquatic ecosystem disruption and thermal pollution"], a:3},
@@ -796,13 +802,13 @@ quiz: [
   {id:"PGP123-Q68", cat:"Calculations", q:"Calculate sensible heat if m = 10 kg, Cp = 4 kJ/kgK and ΔT = 20 K.", o:["1000 kJ", "1600 kJ", "800 kJ", "480 kJ"], a:2},
   {id:"PGP123-Q69", cat:"Concepts", q:"What is the difference between sensible and latent heat?", o:["Concentration of sludge by reducing water content", "SI unit of energy", "Sensible heat changes temperature; latent heat changes phase", "Total suspended solids"], a:2},
   {id:"PGP123-Q70", cat:"Concepts", q:"Why are wastewater treatment and energy concepts important to PNGPD?", o:["Petroleum processing requires environmental protection and large quantities of process energy", "To reduce volume, stabilize organic matter and enable safe disposal/reuse", "To destroy pathogens", "It supplies thermal energy for heating and process operations"], a:0}
-]
+ ]
 };
 
 // ===== PGP 124 - Calculus and Mathematical Methods =====
 window.COURSES["PGP 124"] = {
-title: "PGP 124 - Calculus and Mathematical Methods", place: "library", reward: 10,
-notes: [
+ title: "PGP 124 - Calculus and Mathematical Methods", place: "library", reward: 10,
+ notes: [
   "Function - relationship assigning an output to an input.",
   "Limit - value approached by a function as the independent variable approaches a point.",
   "Continuity - absence of a break/discontinuity in a function.",
@@ -833,8 +839,8 @@ notes: [
   "Differentiation generally measures change.",
   "Integration generally measures accumulation.",
   "Calculus is useful for process modelling, optimization and engineering calculations."
-],
-quiz: [
+ ],
+ quiz: [
   {id:"PGP124-Q01", cat:"Concepts", q:"Define a function.", o:["Rule for differentiating composite functions", "A relationship assigning an output to each permitted input", "Because differentiation of any constant gives zero", "Value a function approaches as the variable approaches a point"], a:1},
   {id:"PGP124-Q02", cat:"Concepts", q:"Define a limit.", o:["It models change, accumulation and optimization", "A relationship assigning an output to each permitted input", "Quantities such as area and accumulated change", "Value a function approaches as the variable approaches a point"], a:3},
   {id:"PGP124-Q03", cat:"Concepts", q:"What is continuity?", o:["A function is continuous where it has no break and its limiting value agrees with its value", "Integral evaluated between specified limits", "Function formed by applying one function to another", "Reverse operation of differentiation"], a:0},
@@ -905,13 +911,13 @@ quiz: [
   {id:"PGP124-Q68", cat:"Calculations", q:"What is the derivative of ln x?", o:["-sin x", "14x + 3", "5x⁴", "1/x"], a:3},
   {id:"PGP124-Q69", cat:"Concepts", q:"Why should engineering students learn calculus?", o:["Because differentiation of any constant gives zero", "It can represent accumulated physical quantities", "Rate of change of the first derivative", "Many physical and process relationships involve rates and accumulated quantities"], a:3},
   {id:"PGP124-Q70", cat:"Concepts", q:"Give two petroleum-processing applications of calculus.", o:["Minimizing energy consumption or maximizing process output", "Rate of change of the first derivative", "Process optimization and modelling changes in flow/temperature/composition", "Local high point"], a:2}
-]
+ ]
 };
 
 // ===== PGP 125 - Petroleum and Petrochemical Chemistry =====
 window.COURSES["PGP 125"] = {
-title: "PGP 125 - Petroleum and Petrochemical Chemistry", place: "library", reward: 10,
-notes: [
+ title: "PGP 125 - Petroleum and Petrochemical Chemistry", place: "library", reward: 10,
+ notes: [
   "Petroleum is derived largely from ancient organic matter transformed over geological time.",
   "Lipids are important petroleum precursors because of their carbon/hydrogen-rich nature.",
   "Proteins contribute nitrogen-containing compounds.",
@@ -942,8 +948,8 @@ notes: [
   "Catalyst activity measures conversion rate.",
   "Catalyst selectivity measures preference for desired products.",
   "Catalytic reforming produces high-octane reformate and hydrogen."
-],
-quiz: [
+ ],
+ quiz: [
   {id:"PGP125-Q01", cat:"Concepts", q:"What is the accepted broad origin of petroleum?", o:["Thermal agglomeration of catalyst particles reducing active surface area", "Organic matter transformed through geological processes", "They promote reactions such as isomerization and cyclization", "It can hydrolyse to Mg(OH)₂ and HCl"], a:1},
   {id:"PGP125-Q02", cat:"Concepts", q:"Name four major organic raw-material classes.", o:["High-octane aromatics-rich reformate and hydrogen", "Lipids, proteins, carbohydrates and lignin", "Coking, poisoning and sintering", "Density, specific gravity, molecular weight, viscosity index and fractional composition"], a:1},
   {id:"PGP125-Q03", cat:"Concepts", q:"Why are lipids important?", o:["To react with/remove heteroatom compounds and saturate certain hydrocarbons", "It can form corrosive hydrochloric acid in the overhead system", "They generally yield more valuable light products", "They are relatively rich in carbon and hydrogen and are important petroleum precursors"], a:3},
@@ -1014,13 +1020,13 @@ quiz: [
   {id:"PGP125-Q68", cat:"Concepts", q:"Why are petroleum characterization tests performed?", o:["It can be used in hydrotreating and other refinery processes", "To determine quality and predict processing/product behaviour", "It changes molecular shape and intermolecular contact", "It is used in thermodynamic and process calculations"], a:1},
   {id:"PGP125-Q69", cat:"Concepts", q:"Name five fundamental petroleum characterization parameters.", o:["Coking, poisoning and sintering", "High-octane aromatics-rich reformate and hydrogen", "Density, specific gravity, molecular weight, viscosity index and fractional composition", "Saturated and aromatic hydrocarbons"], a:2},
   {id:"PGP125-Q70", cat:"Concepts", q:"Why is petroleum chemistry important to PNGPD?", o:["Branching reduces effective molecular contact area", "It increases desired products and suppresses unwanted products", "It affects pumping and flow behaviour", "Processing petroleum requires understanding its composition, reactions, impurities and product properties"], a:3}
-]
+ ]
 };
 
 // ===== PGP 126 - Petroleum Practicals =====
 window.COURSES["PGP 126"] = {
-title: "PGP 126 - Petroleum Practicals", place: "lab", reward: 15,
-notes: [
+ title: "PGP 126 - Petroleum Practicals", place: "lab", reward: 15,
+ notes: [
   "Practical aim states exactly what the experiment is intended to determine.",
   "Apparatus are the instruments/equipment required.",
   "Procedure must be written in correct sequence.",
@@ -1052,8 +1058,8 @@ notes: [
   "Safety precautions are part of a proper practical report.",
   "A good conclusion must directly relate to the experimental aim.",
   "Formulas: SG = density of substance / density of reference substance; API = (141.5 / SG at 60°F/60°F) - 131.5; density = m/V; Q = mCp ΔT."
-],
-quiz: [
+ ],
+ quiz: [
   {id:"PGP126-Q01", cat:"Practical", q:"What is the aim of a practical experiment?", o:["A measured or noticed experimental occurrence", "Density has units; relative density is a dimensionless ratio", "The specific purpose the experiment intends to achieve", "Consistent bias in measurement"], a:2},
   {id:"PGP126-Q02", cat:"Practical", q:"What is an apparatus?", o:["Density has units; relative density is a dimensionless ratio", "Relatively light petroleum", "Equipment/instrument used to perform an experiment", "Consistent bias in measurement"], a:2},
   {id:"PGP126-Q03", cat:"Practical", q:"What is an observation?", o:["Action taken to prevent error or danger", "To show how measured data produced the final result", "A measured or noticed experimental occurrence", "Reading error caused by viewing a scale from the wrong angle"], a:2},
@@ -1087,7 +1093,7 @@ quiz: [
   {id:"PGP126-Q31", cat:"Practical", q:"What is systematic error?", o:["Poorer flow at low temperatures", "Value or conclusion obtained from observations and calculations", "Consistent bias in measurement", "Relatively heavy petroleum"], a:2},
   {id:"PGP126-Q32", cat:"Practical", q:"What is random error?", o:["Unpredictable variation in measurements", "Heavy petroleum", "The specific purpose the experiment intends to achieve", "Dimensionless density ratio relative to water at a specified reference condition"], a:0},
   {id:"PGP126-Q33", cat:"Practical", q:"Why should abnormal results be investigated?", o:["It allows them to explain why the procedure works", "A non-representative sample produces misleading results", "It can yield more valuable light products", "They may indicate procedural, instrument or sample problems"], a:3},
-  {id:"PGP126-Q34", cat:"Practical", q:"What should a practical conclusion contain?", o:["A statement linking the result to the aim", "Unpredictable variation in measurements", "Any factor that causes measured value to deviate from expected value", "Approximately 0"], a:0},
+  {id:"PGP126-Q34", cat:"Practical", q:"What should a practical conclusion contain?", o:["A statement linking the result to the aim", "Unpredictable variation in measurements", "Any factor that causes measured value to deviate from expected value", "Approximately 1"], a:0},
   {id:"PGP126-Q35", cat:"Practical", q:"Why is a procedure written sequentially?", o:["To ensure it is clean, intact and suitable", "To test whether the student understands the experiment rather than memorized steps", "To make the experiment reproducible", "To avoid forgetting or altering observations"], a:2},
   {id:"PGP126-Q36", cat:"Practical", q:"What is the difference between observation and conclusion?", o:["Observation is what was measured/seen; conclusion interprets the result", "Consistent bias in measurement", "Action taken to prevent error or danger", "Check the calculation, compare with expected values and write a proper conclusion"], a:0},
   {id:"PGP126-Q37", cat:"Practical", q:"What is the purpose of a calculation section?", o:["Consistent bias in measurement", "Light petroleum", "To show how measured data produced the final result", "Relatively heavy petroleum"], a:2},
@@ -1099,9 +1105,2258 @@ quiz: [
   {id:"PGP126-Q43", cat:"Practical", q:"Name three petroleum properties that can be experimentally determined.", o:["Approximately 45.4°API", "Incorrect reading, contaminated apparatus and poor temperature control", "Relatively heavy petroleum", "Density, specific gravity and pour point"], a:3},
   {id:"PGP126-Q44", cat:"Practical", q:"Why is petroleum characterization important?", o:["To avoid forgetting or altering observations", "It improves measurement accuracy", "It helps predict processing and handling behaviour", "To ensure it is clean, intact and suitable"], a:2},
   {id:"PGP126-Q45", cat:"Practical", q:"Why should readings be recorded immediately?", o:["Crystallization of wax can restrict low-temperature flow", "To verify dimensional consistency", "To avoid forgetting or altering observations", "To test whether the student understands the experiment rather than memorized steps"], a:2},
-  {id:"PGP126-Q46", cat:"Practical", q:"What happens if a measuring cylinder is contaminated?", o:["Oral question used to test practical understanding", "The sample measurement can be altered or inaccurate", "To ensure it is clean, intact and suitable", "It indicates low-temperature flow behaviour"], a:1}
-]
+  {id:"PGP126-Q46", cat:"Practical", q:"What happens if a measuring cylinder is contaminated?", o:["Oral question used to test practical understanding", "The sample measurement may be affected", "A statement linking the result to the aim", "It helps characterize crude quality/lightness and influences value"], a:1},
+  {id:"PGP126-Q47", cat:"Practical", q:"Why should the same reference temperature be used when comparing densities?", o:["Crystallization of wax can restrict low-temperature flow", "It indicates low-temperature flow behaviour", "Density changes with temperature", "To ensure it is clean, intact and suitable"], a:2},
+  {id:"PGP126-Q48", cat:"Practical", q:"What is the relationship between mass, density and volume?", o:["It helps characterize crude quality/lightness and influences value", "Oral question used to test practical understanding", "Mass = density x volume", "Any factor that causes measured value to deviate from expected value"], a:2},
+  {id:"PGP126-Q49", cat:"Calculations", q:"If density is 800 kg/m³ and volume is 2 m³, find mass.", o:["1600 kg", "2000 kg", "3200 kg", "960 kg"], a:0},
+  {id:"PGP126-Q50", cat:"Calculations", q:"If mass is 500 kg and volume is 1 m³, find density.", o:["625 kg/m³", "250 kg/m³", "375 kg/m³", "500 kg/m³"], a:3},
+  {id:"PGP126-Q51", cat:"Practical", q:"What is the significance of API gravity in crude trading?", o:["Relatively heavy petroleum", "Any factor that causes measured value to deviate from expected value", "It helps characterize crude quality/lightness and influences value", "To develop practical ability to determine and interpret petroleum/process properties safely and accurately"], a:2},
+  {id:"PGP126-Q52", cat:"Practical", q:"Why may lighter crude attract higher value?", o:["It indicates low-temperature flow behaviour", "A non-representative sample produces misleading results", "It can yield more valuable light products", "To ensure it is clean, intact and suitable"], a:2},
+  {id:"PGP126-Q53", cat:"Practical", q:"Why can wax affect pour point?", o:["It characterizes petroleum lightness/heaviness", "Crystallization of wax can restrict low-temperature flow", "It helps predict processing and handling behaviour", "To avoid forgetting or altering observations"], a:1},
+  {id:"PGP126-Q54", cat:"Practical", q:"What is the purpose of a pour-point test?", o:["Unpredictable variation in measurements", "The specific purpose the experiment intends to achieve", "To determine low-temperature flow behaviour", "A statement linking the result to the aim"], a:2},
+  {id:"PGP126-Q55", cat:"Practical", q:"What should be done if an unexpected practical result is obtained?", o:["Check apparatus, procedure, sample, temperature, calculation and repeat where appropriate", "Relatively light petroleum", "Heavy petroleum", "To show how measured data produced the final result"], a:0},
+  {id:"PGP126-Q56", cat:"Practical", q:"Why should safety precautions be included in a report?", o:["Petroleum properties can depend strongly on temperature", "Density changes with temperature", "It helps predict processing and handling behaviour", "They demonstrate safe laboratory practice"], a:3},
+  {id:"PGP126-Q57", cat:"Practical", q:"What is a viva question?", o:["Light petroleum", "Any factor that causes measured value to deviate from expected value", "Oral question used to test practical understanding", "A statement linking the result to the aim"], a:2},
+  {id:"PGP126-Q58", cat:"Practical", q:"Why might an examiner ask the function of an apparatus?", o:["To test whether the student understands the experiment rather than memorized steps", "To verify dimensional consistency", "They improve confidence and help identify anomalous readings", "It improves measurement accuracy"], a:0},
+  {id:"PGP126-Q59", cat:"Practical", q:"Why should students understand the principle of an experiment?", o:["Contamination can change measurements", "Temperature directly controls wax crystallization and flow behaviour", "API is inversely related to SG", "It allows them to explain why the procedure works"], a:3},
+  {id:"PGP126-Q60", cat:"Practical", q:"What is the difference between relative density and density?", o:["Consistent bias in measurement", "Light petroleum", "Density has units; relative density is a dimensionless ratio", "To determine low-temperature flow behaviour"], a:2},
+  {id:"PGP126-Q61", cat:"Practical", q:"What does a very high API generally indicate?", o:["Check the calculation, compare with expected values and write a proper conclusion", "The sample measurement may be affected", "Light petroleum", "Consistent bias in measurement"], a:2},
+  {id:"PGP126-Q62", cat:"Practical", q:"What does a very low API generally indicate?", o:["The specific purpose the experiment intends to achieve", "Heavy petroleum", "Unpredictable variation in measurements", "Comparison/adjustment of an instrument against a known standard"], a:1},
+  {id:"PGP126-Q63", cat:"Practical", q:"Why can temperature affect pour point measurement?", o:["They may indicate procedural, instrument or sample problems", "It helps predict processing and handling behaviour", "Temperature directly controls wax crystallization and flow behaviour", "To avoid forgetting or altering observations"], a:2},
+  {id:"PGP126-Q64", cat:"Practical", q:"What is a source of experimental error?", o:["A statement linking the result to the aim", "To develop practical ability to determine and interpret petroleum/process properties safely and accurately", "Understand the aim, principle, apparatus, procedure and safety precautions", "Any factor that causes measured value to deviate from expected value"], a:3},
+  {id:"PGP126-Q65", cat:"Practical", q:"Name three common practical errors.", o:["They demonstrate safe laboratory practice", "Value or conclusion obtained from observations and calculations", "Density, specific gravity and pour point", "Incorrect reading, contaminated apparatus and poor temperature control"], a:3},
+  {id:"PGP126-Q66", cat:"Practical", q:"Why should the experimental apparatus be inspected before starting?", o:["It helps predict processing and handling behaviour", "They improve confidence and help identify anomalous readings", "To ensure it is clean, intact and suitable", "A non-representative sample produces misleading results"], a:2},
+  {id:"PGP126-Q67", cat:"Practical", q:"What makes a practical report good?", o:["Clear aim, principle, apparatus, procedure, observations, calculations, results, precautions and conclusion", "Oral question used to test practical understanding", "Value or conclusion obtained from observations and calculations", "Observation is what was measured/seen; conclusion interprets the result"], a:0},
+  {id:"PGP126-Q68", cat:"Practical", q:"What should you do before performing a practical?", o:["Understand the aim, principle, apparatus, procedure and safety precautions", "Comparison/adjustment of an instrument against a known standard", "A measured or noticed experimental occurrence", "It helps characterize crude quality/lightness and influences value"], a:0},
+  {id:"PGP126-Q69", cat:"Practical", q:"What should you do after obtaining the result?", o:["A statement linking the result to the aim", "Difference between an experimental measurement and the accepted/true value", "The specific purpose the experiment intends to achieve", "Check the calculation, compare with expected values and write a proper conclusion"], a:3},
+  {id:"PGP126-Q70", cat:"Practical", q:"What is the main purpose of PGP 126?", o:["A measured or noticed experimental occurrence", "To develop practical ability to determine and interpret petroleum/process properties safely and accurately", "Consistent bias in measurement", "Dimensionless density ratio relative to water at a specified reference condition"], a:1}
+ ]
 };
+
+// ===== PGP 127 - Technical Report Writing =====
+window.COURSES["PGP 127"] = {
+ title: "PGP 127 - Technical Report Writing", place: "library", reward: 10,
+ notes: [
+  "Technical report - structured document communicating technical information.",
+  "Formal report - highly structured report used for official/technical purposes.",
+  "Semi-formal report - less rigid than a formal report but still structured.",
+  "Informal report - simpler report for less formal communication.",
+  "Scientific research - systematic investigation aimed at producing reliable knowledge.",
+  "Research integrity - honesty and responsibility in research.",
+  "Plagiarism - presenting another person's work/ideas as one's own.",
+  "Copyright protects original creative/intellectual work.",
+  "Problem statement clearly identifies the issue being investigated.",
+  "Research objectives state what the study intends to achieve.",
+  "Hypothesis is a testable proposition.",
+  "Literature review examines relevant existing knowledge.",
+  "Research design is the framework for conducting research.",
+  "Sampling selects part of a population for study.",
+  "Primary data are collected directly for the study.",
+  "Secondary data already exist and are obtained from existing sources.",
+  "Experimental data come from controlled experiments.",
+  "Observation is a method of collecting information by watching/measuring phenomena.",
+  "Data processing prepares collected information for analysis.",
+  "Data analysis interprets collected information.",
+  "Nominal scale classifies without ranking.",
+  "Ordinal scale classifies and ranks.",
+  "Interval scale has ordered equal intervals but arbitrary zero.",
+  "Ratio scale has equal intervals and a meaningful zero.",
+  "Theoretical framework connects research with existing theories/concepts.",
+  "Literature can be primary or secondary.",
+  "Primary literature reports original research.",
+  "Referencing gives credit to sources.",
+  "Oral presentation communicates research findings verbally.",
+  "A good technical report should be clear, objective, organized and evidence-based."
+ ],
+ quiz: [
+  {id:"PGP127-Q01", cat:"Concepts", q:"Define technical report.", o:["Structured document communicating technical information", "Data obtained from existing sources", "Using another person's work or ideas without proper acknowledgement", "Data collected directly by the researcher for the study"], a:0},
+  {id:"PGP127-Q02", cat:"Concepts", q:"Name three types of technical report.", o:["Data collected directly by the researcher for the study", "Formal, semi-formal and informal", "Clarity and confidence", "Ability for findings/processes to be checked or confirmed"], a:1},
+  {id:"PGP127-Q03", cat:"Concepts", q:"What is scientific research?", o:["Numerical measurable information", "Verbal communication of a report/research finding to an audience", "Systematic investigation aimed at developing reliable knowledge", "Ordinal data have an order/rank; nominal data do not"], a:2},
+  {id:"PGP127-Q04", cat:"Concepts", q:"What is research integrity?", o:["Non-numerical descriptive information", "Verbal communication of a report/research finding to an audience", "Characteristic that can take different values", "Honest and responsible conduct of research"], a:3},
+  {id:"PGP127-Q05", cat:"Concepts", q:"Define plagiarism.", o:["Data collected directly by the researcher for the study", "Data obtained from existing sources", "Structured document communicating technical information", "Using another person's work or ideas without proper acknowledgement"], a:3},
+  {id:"PGP127-Q06", cat:"Concepts", q:"What is copyright?", o:["Verbal communication of a report/research finding to an audience", "Area where existing knowledge is incomplete or insufficient", "Legal protection for original intellectual/creative work", "Collecting data through controlled experimental procedures"], a:2},
+  {id:"PGP127-Q07", cat:"Concepts", q:"What is a research problem?", o:["Issue or question requiring systematic investigation", "Classification without ranking", "Verbal communication of a report/research finding to an audience", "Ability for findings/processes to be checked or confirmed"], a:0},
+  {id:"PGP127-Q08", cat:"Concepts", q:"What is a problem statement?", o:["Missing or insufficient knowledge identified through literature review", "Classification without ranking", "Clear description of the problem being investigated", "Classification with ranking"], a:2},
+  {id:"PGP127-Q09", cat:"Concepts", q:"What are research objectives?", o:["Acknowledgement of information taken from a source", "Specific things a study intends to achieve", "Providing source details for cited material", "Clear description of the problem being investigated"], a:1},
+  {id:"PGP127-Q10", cat:"Concepts", q:"What is a hypothesis?", o:["Acknowledgement of information taken from a source", "Freedom from personal bias in research", "Ratio has a meaningful zero", "Testable proposition about expected relationships or outcomes"], a:3},
+  {id:"PGP127-Q11", cat:"Concepts", q:"What is literature review?", o:["Testable proposition about expected relationships or outcomes", "Critical examination of existing relevant literature", "Unauthorized use of protected material", "Overall framework guiding research data collection and analysis"], a:1},
+  {id:"PGP127-Q12", cat:"Concepts", q:"Why is literature review important?", o:["So the study can be evaluated and potentially reproduced", "It identifies existing knowledge, gaps and relevant theories", "To evaluate evidence, methods, theories and research gaps", "They determine how variables can be classified and analysed"], a:1},
+  {id:"PGP127-Q13", cat:"Concepts", q:"What is research design?", o:["Engineers need to communicate technical investigations and results professionally", "Overall framework guiding research data collection and analysis", "Legal protection for original intellectual/creative work", "Classification with ranking"], a:1},
+  {id:"PGP127-Q14", cat:"Concepts", q:"What is sampling?", o:["Providing source details for cited material", "Systematic gathering of information", "Missing or insufficient knowledge identified through literature review", "Selection of a subset of a population for study"], a:3},
+  {id:"PGP127-Q15", cat:"Concepts", q:"What is sample size?", o:["Ability for findings/processes to be checked or confirmed", "Legal protection for original intellectual/creative work", "Number of units/participants included in a sample", "Honest and responsible conduct of research"], a:2},
+  {id:"PGP127-Q16", cat:"Concepts", q:"Define primary data.", o:["Using another person's work or ideas without proper acknowledgement", "Data obtained from existing sources", "Data collected directly by the researcher for the study", "Structured document communicating technical information"], a:2},
+  {id:"PGP127-Q17", cat:"Concepts", q:"Define secondary data.", o:["Data collected directly by the researcher for the study", "Using another person's work or ideas without proper acknowledgement", "Structured document communicating technical information", "Data obtained from existing sources"], a:3},
+  {id:"PGP127-Q18", cat:"Concepts", q:"Give two primary-data collection methods.", o:["Gender category", "Celsius temperature", "Experiment and observation", "Non-numerical descriptive information"], a:2},
+  {id:"PGP127-Q19", cat:"Concepts", q:"What is data processing?", o:["Ratio has a meaningful zero", "Organizing and preparing collected data for analysis", "Testable proposition about expected relationships or outcomes", "Collecting data through controlled experimental procedures"], a:1},
+  {id:"PGP127-Q20", cat:"Concepts", q:"What is data analysis?", o:["Selection of a subset of a population for study", "Examination and interpretation of data", "To communicate technical findings clearly", "Less rigid report intended for simpler communication"], a:1},
+  {id:"PGP127-Q21", cat:"Concepts", q:"What is nominal scale?", o:["Structured official report with established sections and style", "Collecting information through systematic watching/measuring", "Structure connecting a study to relevant theories and concepts", "Classification without ranking"], a:3},
+  {id:"PGP127-Q22", cat:"Concepts", q:"What is ordinal scale?", o:["Characteristic that can take different values", "Clear description of the problem being investigated", "Classification with ranking", "Collecting data through controlled experimental procedures"], a:2},
+  {id:"PGP127-Q23", cat:"Concepts", q:"What is interval scale?", o:["Material that reviews or discusses existing research", "Legal protection for original intellectual/creative work", "Unauthorized use of protected material", "Ordered scale with equal intervals but arbitrary zero"], a:3},
+  {id:"PGP127-Q24", cat:"Concepts", q:"What is ratio scale?", o:["Specific things a study intends to achieve", "Scale with equal intervals and a meaningful fixed zero", "Number of units/participants included in a sample", "Freedom from personal bias in research"], a:1},
+  {id:"PGP127-Q25", cat:"Concepts", q:"Give an example of nominal data.", o:["Gender category", "Organization makes information easy to understand", "Celsius temperature", "Experiment and observation"], a:0},
+  {id:"PGP127-Q26", cat:"Concepts", q:"Give an example of ordinal data.", o:["Gender category", "Age or weight", "Ranking", "Experiment and observation"], a:2},
+  {id:"PGP127-Q27", cat:"Concepts", q:"Give an example of interval data.", o:["Experiment and observation", "Gender category", "Celsius temperature", "Engineers often need to defend and explain their technical work"], a:2},
+  {id:"PGP127-Q28", cat:"Concepts", q:"Give an example of ratio data.", o:["Celsius temperature", "Age or weight", "Ranking", "Experiment and observation"], a:1},
+  {id:"PGP127-Q29", cat:"Concepts", q:"What is theoretical framework?", o:["Scale with equal intervals and a meaningful fixed zero", "Structure connecting a study to relevant theories and concepts", "Engineers need to communicate technical investigations and results professionally", "To communicate technical information accurately, clearly and effectively"], a:1},
+  {id:"PGP127-Q30", cat:"Concepts", q:"Why is referencing important?", o:["Literature identifies theories/concepts relevant to the framework", "It credits sources and supports academic integrity", "To give credit and allow readers to trace information", "They determine how variables can be classified and analysed"], a:1},
+  {id:"PGP127-Q31", cat:"Concepts", q:"What is primary literature?", o:["Classification without ranking", "Systematic approach used to conduct a study", "Evidence-based language without unnecessary personal bias", "Original research containing first-hand research findings/data"], a:3},
+  {id:"PGP127-Q32", cat:"Concepts", q:"What is secondary literature?", o:["Material that reviews or discusses existing research", "Examination and interpretation of data", "To communicate technical findings clearly", "Numerical measurable information"], a:0},
+  {id:"PGP127-Q33", cat:"Concepts", q:"Why must researchers read critically?", o:["It affects representativeness and quality of results", "To evaluate evidence, methods, theories and research gaps", "Literature identifies theories/concepts relevant to the framework", "It converts collected information into meaningful findings"], a:1},
+  {id:"PGP127-Q34", cat:"Concepts", q:"What is a research gap?", o:["Missing or insufficient knowledge identified through literature review", "Area where existing knowledge is incomplete or insufficient", "Structured official report with established sections and style", "To communicate technical information accurately, clearly and effectively"], a:1},
+  {id:"PGP127-Q35", cat:"Concepts", q:"What is objectivity?", o:["Honest and responsible conduct of research", "Overall framework guiding research data collection and analysis", "Freedom from personal bias in research", "Specific question the study seeks to answer"], a:2},
+  {id:"PGP127-Q36", cat:"Concepts", q:"What is precision?", o:["Original research containing first-hand research findings/data", "Degree of exactness/consistency in measurement or description", "Systematic approach used to conduct a study", "Engineers need to communicate technical investigations and results professionally"], a:1},
+  {id:"PGP127-Q37", cat:"Concepts", q:"What is verifiability?", o:["Testable proposition about expected relationships or outcomes", "Systematic investigation aimed at developing reliable knowledge", "Ability for findings/processes to be checked or confirmed", "Structured official report with established sections and style"], a:2},
+  {id:"PGP127-Q38", cat:"Concepts", q:"Why are research objectives important?", o:["Organization makes information easy to understand", "They guide the study", "It identifies existing knowledge, gaps and relevant theories", "It credits sources and supports academic integrity"], a:1},
+  {id:"PGP127-Q39", cat:"Concepts", q:"What is a research question?", o:["Specific question the study seeks to answer", "Clear description of the problem being investigated", "Organizing and preparing collected data for analysis", "To communicate technical findings clearly"], a:0},
+  {id:"PGP127-Q40", cat:"Concepts", q:"Why is a literature review related to a theoretical framework?", o:["Engineers often need to defend and explain their technical work", "It credits sources and supports academic integrity", "To give credit and allow readers to trace information", "Literature identifies theories/concepts relevant to the framework"], a:3},
+  {id:"PGP127-Q41", cat:"Concepts", q:"What is data collection?", o:["Verbal communication of a report/research finding to an audience", "Classification with ranking", "Ordinal data have an order/rank; nominal data do not", "Systematic gathering of information"], a:3},
+  {id:"PGP127-Q42", cat:"Concepts", q:"What is an experimental method?", o:["Collecting data through controlled experimental procedures", "Verbal communication of a report/research finding to an audience", "Clear description of the problem being investigated", "Less rigid report intended for simpler communication"], a:0},
+  {id:"PGP127-Q43", cat:"Concepts", q:"What is observation as a data-collection method?", o:["Numerical measurable information", "Collecting information through systematic watching/measuring", "Structured official report with established sections and style", "Area where existing knowledge is incomplete or insufficient"], a:1},
+  {id:"PGP127-Q44", cat:"Concepts", q:"Why is sample design important?", o:["It affects representativeness and quality of results", "So the study can be evaluated and potentially reproduced", "Organization makes information easy to understand", "They determine how variables can be classified and analysed"], a:0},
+  {id:"PGP127-Q45", cat:"Concepts", q:"What is a technical report's purpose?", o:["To communicate technical findings clearly", "Verbal communication of a report/research finding to an audience", "Acknowledgement of information taken from a source", "Original research containing first-hand research findings/data"], a:0},
+  {id:"PGP127-Q46", cat:"Concepts", q:"What makes a report objective?", o:["Evidence-based language without unnecessary personal bias", "Ordered scale with equal intervals but arbitrary zero", "Overall framework guiding research data collection and analysis", "Scale with equal intervals and a meaningful fixed zero"], a:0},
+  {id:"PGP127-Q47", cat:"Concepts", q:"Why should reports be organized?", o:["It violates academic/research integrity", "To give credit and allow readers to trace information", "It credits sources and supports academic integrity", "Organization makes information easy to understand"], a:3},
+  {id:"PGP127-Q48", cat:"Concepts", q:"What is oral presentation?", o:["Acknowledgement of information taken from a source", "Specific question the study seeks to answer", "Verbal communication of a report/research finding to an audience", "Ordinal data have an order/rank; nominal data do not"], a:2},
+  {id:"PGP127-Q49", cat:"Concepts", q:"Name two qualities of a good oral presentation.", o:["Original research containing first-hand research findings/data", "Clarity and confidence", "Collecting data through controlled experimental procedures", "Formal, semi-formal and informal"], a:1},
+  {id:"PGP127-Q50", cat:"Concepts", q:"What is citation?", o:["Acknowledgement of information taken from a source", "Scale with equal intervals and a meaningful fixed zero", "Critical examination of existing relevant literature", "Legal protection for original intellectual/creative work"], a:0},
+  {id:"PGP127-Q51", cat:"Concepts", q:"What is referencing?", o:["Numerical measurable information", "Providing source details for cited material", "Collecting data through controlled experimental procedures", "Ratio has a meaningful zero"], a:1},
+  {id:"PGP127-Q52", cat:"Concepts", q:"Why is plagiarism unacceptable?", o:["Organization makes information easy to understand", "Literature identifies theories/concepts relevant to the framework", "So the study can be evaluated and potentially reproduced", "It violates academic/research integrity"], a:3},
+  {id:"PGP127-Q53", cat:"Concepts", q:"What is copyright infringement?", o:["Unauthorized use of protected material", "Providing source details for cited material", "Structured official report with established sections and style", "Testable proposition about expected relationships or outcomes"], a:0},
+  {id:"PGP127-Q54", cat:"Concepts", q:"What is a formal report?", o:["Engineers need to communicate technical investigations and results professionally", "Degree of exactness/consistency in measurement or description", "Structured official report with established sections and style", "Clear description of the problem being investigated"], a:2},
+  {id:"PGP127-Q55", cat:"Concepts", q:"What is an informal report?", o:["Number of units/participants included in a sample", "Characteristic that can take different values", "Less rigid report intended for simpler communication", "Numerical measurable information"], a:2},
+  {id:"PGP127-Q56", cat:"Concepts", q:"Why is data analysis important?", o:["It identifies existing knowledge, gaps and relevant theories", "Literature identifies theories/concepts relevant to the framework", "It converts collected information into meaningful findings", "Organization makes information easy to understand"], a:2},
+  {id:"PGP127-Q57", cat:"Concepts", q:"What is qualitative data?", o:["Structure connecting a study to relevant theories and concepts", "It provides a proposition that can be tested", "Number of units/participants included in a sample", "Non-numerical descriptive information"], a:3},
+  {id:"PGP127-Q58", cat:"Concepts", q:"What is quantitative data?", o:["Overall framework guiding research data collection and analysis", "Systematic gathering of information", "Numerical measurable information", "Structured official report with established sections and style"], a:2},
+  {id:"PGP127-Q59", cat:"Concepts", q:"What is a variable?", o:["Numerical measurable information", "Testable proposition about expected relationships or outcomes", "Missing or insufficient knowledge identified through literature review", "Characteristic that can take different values"], a:3},
+  {id:"PGP127-Q60", cat:"Concepts", q:"Why are measurement scales important?", o:["Organization makes information easy to understand", "To evaluate evidence, methods, theories and research gaps", "They determine how variables can be classified and analysed", "It converts collected information into meaningful findings"], a:2},
+  {id:"PGP127-Q61", cat:"Concepts", q:"What distinguishes ordinal from nominal measurement?", o:["Legal protection for original intellectual/creative work", "Unauthorized use of protected material", "Selection of a subset of a population for study", "Ordinal data have an order/rank; nominal data do not"], a:3},
+  {id:"PGP127-Q62", cat:"Concepts", q:"What distinguishes ratio from interval scale?", o:["Collecting information through systematic watching/measuring", "Ratio has a meaningful zero", "Evidence-based language without unnecessary personal bias", "Material that reviews or discusses existing research"], a:1},
+  {id:"PGP127-Q63", cat:"Concepts", q:"What is the role of a hypothesis?", o:["Collecting data through controlled experimental procedures", "It provides a proposition that can be tested", "Acknowledgement of information taken from a source", "Systematic investigation aimed at developing reliable knowledge"], a:1},
+  {id:"PGP127-Q64", cat:"Concepts", q:"Why should research methods be stated?", o:["They determine how variables can be classified and analysed", "So the study can be evaluated and potentially reproduced", "Literature identifies theories/concepts relevant to the framework", "To evaluate evidence, methods, theories and research gaps"], a:1},
+  {id:"PGP127-Q65", cat:"Concepts", q:"What is a research methodology?", o:["Systematic approach used to conduct a study", "Engineers need to communicate technical investigations and results professionally", "Systematic gathering of information", "Ordinal data have an order/rank; nominal data do not"], a:0},
+  {id:"PGP127-Q66", cat:"Concepts", q:"Why should sources be acknowledged?", o:["So the study can be evaluated and potentially reproduced", "Literature identifies theories/concepts relevant to the framework", "Organization makes information easy to understand", "To give credit and allow readers to trace information"], a:3},
+  {id:"PGP127-Q67", cat:"Concepts", q:"What is a literature gap?", o:["Characteristic that can take different values", "Providing source details for cited material", "Verbal communication of a report/research finding to an audience", "Missing or insufficient knowledge identified through literature review"], a:3},
+  {id:"PGP127-Q68", cat:"Concepts", q:"What is the importance of project writing to PNGPD?", o:["Area where existing knowledge is incomplete or insufficient", "Less rigid report intended for simpler communication", "Engineers need to communicate technical investigations and results professionally", "Missing or insufficient knowledge identified through literature review"], a:2},
+  {id:"PGP127-Q69", cat:"Concepts", q:"Why is oral presentation part of technical reporting?", o:["Engineers often need to defend and explain their technical work", "To give credit and allow readers to trace information", "It credits sources and supports academic integrity", "They determine how variables can be classified and analysed"], a:0},
+  {id:"PGP127-Q70", cat:"Concepts", q:"What is the ultimate purpose of technical communication?", o:["Scale with equal intervals and a meaningful fixed zero", "Ability for findings/processes to be checked or confirmed", "To communicate technical information accurately, clearly and effectively", "Critical examination of existing relevant literature"], a:2}
+ ]
+};
+
+// ===== CHE - Petrochemical Process Chemistry =====
+window.COURSES["CHE"] = {
+ title: "CHE - Petrochemical Process Chemistry", place: "library", reward: 10,
+ notes: [],
+ quiz: [
+  {id:"CHE-Q01", cat:"Concepts", q:"What is the biogenic theory of petroleum origin?", o:["Branched-chain paraffins", "Saturated hydrocarbons", "Petroleum originated mainly from ancient organic matter transformed under geological conditions", "Distribution of petroleum components into fractions"], a:2},
+  {id:"CHE-Q02", cat:"Concepts", q:"Name four major organic precursors.", o:["Coking, poisoning and sintering", "Lipids, proteins, carbohydrates and lignin", "Mass per mole of a substance", "Sulfur, nitrogen and oxygen"], a:1},
+  {id:"CHE-Q03", cat:"Concepts", q:"What is kerogen?", o:["Branched-chain paraffins", "Petroleum originated mainly from ancient organic matter transformed under geological conditions", "Solid organic matter capable of generating hydrocarbons during maturation", "Mass per mole of a substance"], a:2},
+  {id:"CHE-Q04", cat:"Concepts", q:"Define diagenesis.", o:["Thermal maturation stage during which significant petroleum generation occurs", "Early transformation of deposited organic matter", "Mass per unit volume", "Later high-maturity stage"], a:1},
+  {id:"CHE-Q05", cat:"Concepts", q:"Define catagenesis.", o:["Later high-maturity stage", "Early transformation of deposited organic matter", "Mass per unit volume", "Thermal maturation stage during which significant petroleum generation occurs"], a:3},
+  {id:"CHE-Q06", cat:"Concepts", q:"Define metagenesis.", o:["Thermal maturation stage during which significant petroleum generation occurs", "Mass per unit volume", "Later high-maturity stage", "Ratio of density to reference-water density"], a:2},
+  {id:"CHE-Q07", cat:"Concepts", q:"What are paraffins?", o:["Rate of desired conversion", "Mass per mole of a substance", "Saturated hydrocarbons", "Catalytic hydrogen treatment for impurity removal and product improvement"], a:2},
+  {id:"CHE-Q08", cat:"Concepts", q:"What are isoparaffins?", o:["Branched-chain paraffins", "Catalytic hydrogen treatment for impurity removal and product improvement", "Preference for desired products", "Mass per mole of a substance"], a:0},
+  {id:"CHE-Q09", cat:"Concepts", q:"Why does branching affect boiling point?", o:["To withstand aggressive refinery environments", "It can form corrosive acid in refinery overhead systems", "Petroleum processing depends on chemical composition and reactions", "It reduces molecular contact area"], a:3},
+  {id:"CHE-Q10", cat:"Concepts", q:"Define density.", o:["Later high-maturity stage", "Thermal maturation stage during which significant petroleum generation occurs", "Mass per unit volume", "Early transformation of deposited organic matter"], a:2},
+  {id:"CHE-Q11", cat:"Concepts", q:"Define specific gravity.", o:["Ratio of density to reference-water density", "Early transformation of deposited organic matter", "Thermal maturation stage during which significant petroleum generation occurs", "Later high-maturity stage"], a:0},
+  {id:"CHE-Q12", cat:"Concepts", q:"Give the API formula.", o:["Rate of desired conversion", "Coking, poisoning and sintering", "API = 141.5/SG - 131.5", "They contribute to high-octane reformate and petrochemical feedstocks"], a:2},
+  {id:"CHE-Q13", cat:"Concepts", q:"Why is API important?", o:["It indicates petroleum lightness/heaviness", "To remove salts/water that cause corrosion, fouling and catalyst problems", "Petroleum processing depends on chemical composition and reactions", "It reduces molecular contact area"], a:0},
+  {id:"CHE-Q14", cat:"Concepts", q:"What is molecular weight?", o:["Preference for desired products", "Mass per mole of a substance", "Saturated hydrocarbons", "Conversion of low-octane naphtha into high-octane reformate"], a:1},
+  {id:"CHE-Q15", cat:"Concepts", q:"What is fractional composition?", o:["Unit using an electric field to promote water-droplet coalescence", "Rate of desired conversion", "Solid organic matter capable of generating hydrocarbons during maturation", "Distribution of petroleum components into fractions"], a:3},
+  {id:"CHE-Q16", cat:"Concepts", q:"Why is crude desalted?", o:["To remove salts/water that cause corrosion, fouling and catalyst problems", "It indicates petroleum lightness/heaviness", "Petroleum processing depends on chemical composition and reactions", "It can form corrosive acid in refinery overhead systems"], a:0},
+  {id:"CHE-Q17", cat:"Concepts", q:"What can MgCl₂ produce during hydrolysis?", o:["Rate of desired conversion", "Mass per mole of a substance", "Mg(OH)₂ and HCl", "Catalytic hydrogen treatment for impurity removal and product improvement"], a:2},
+  {id:"CHE-Q18", cat:"Concepts", q:"Why is HCl dangerous?", o:["It can form corrosive acid in refinery overhead systems", "Petroleum processing depends on chemical composition and reactions", "It reduces molecular contact area", "It indicates petroleum lightness/heaviness"], a:0},
+  {id:"CHE-Q19", cat:"Concepts", q:"What is an electrostatic desalter?", o:["Saturated hydrocarbons", "Branched-chain paraffins", "Unit using an electric field to promote water-droplet coalescence", "Mg(OH)₂ and HCl"], a:2},
+  {id:"CHE-Q20", cat:"Concepts", q:"What is hydrotreating?", o:["Rate of desired conversion", "Catalytic hydrogen treatment for impurity removal and product improvement", "Mg(OH)₂ and HCl", "Conversion of low-octane naphtha into high-octane reformate"], a:1},
+  {id:"CHE-Q21", cat:"Concepts", q:"Name heteroatoms commonly removed by hydrotreating.", o:["Coking, poisoning and sintering", "It indicates petroleum lightness/heaviness", "Lipids, proteins, carbohydrates and lignin", "Sulfur, nitrogen and oxygen"], a:3},
+  {id:"CHE-Q22", cat:"Concepts", q:"What is catalyst activity?", o:["Conversion of low-octane naphtha into high-octane reformate", "Petroleum originated mainly from ancient organic matter transformed under geological conditions", "Rate of desired conversion", "Catalytic hydrogen treatment for impurity removal and product improvement"], a:2},
+  {id:"CHE-Q23", cat:"Concepts", q:"What is selectivity?", o:["Distribution of petroleum components into fractions", "Preference for desired products", "Unit using an electric field to promote water-droplet coalescence", "Mass per mole of a substance"], a:1},
+  {id:"CHE-Q24", cat:"Concepts", q:"Name catalyst deactivation mechanisms.", o:["Petroleum processing depends on chemical composition and reactions", "Coking, poisoning and sintering", "Sulfur, nitrogen and oxygen", "Lipids, proteins, carbohydrates and lignin"], a:1},
+  {id:"CHE-Q25", cat:"Concepts", q:"What is catalytic reforming?", o:["Unit using an electric field to promote water-droplet coalescence", "Conversion of low-octane naphtha into high-octane reformate", "Mass per mole of a substance", "Distribution of petroleum components into fractions"], a:1},
+  {id:"CHE-Q26", cat:"Concepts", q:"What valuable by-product is produced in reforming?", o:["Hydrogen", "Rate of desired conversion", "Unit using an electric field to promote water-droplet coalescence", "Distribution of petroleum components into fractions"], a:0},
+  {id:"CHE-Q27", cat:"Concepts", q:"Why are aromatics important?", o:["To withstand aggressive refinery environments", "They contribute to high-octane reformate and petrochemical feedstocks", "It can form corrosive acid in refinery overhead systems", "It reduces molecular contact area"], a:1},
+  {id:"CHE-Q28", cat:"Concepts", q:"What is naphthenic acid corrosion?", o:["Preference for desired products", "Corrosion caused by naphthenic acids under refinery conditions", "Mass per mole of a substance", "Catalytic hydrogen treatment for impurity removal and product improvement"], a:1},
+  {id:"CHE-Q29", cat:"Concepts", q:"Why are corrosion-resistant alloys used?", o:["It reduces molecular contact area", "It can form corrosive acid in refinery overhead systems", "To withstand aggressive refinery environments", "They contribute to high-octane reformate and petrochemical feedstocks"], a:2},
+  {id:"CHE-Q30", cat:"Concepts", q:"Why is petroleum chemistry essential?", o:["To remove salts/water that cause corrosion, fouling and catalyst problems", "They contribute to high-octane reformate and petrochemical feedstocks", "Petroleum processing depends on chemical composition and reactions", "It can form corrosive acid in refinery overhead systems"], a:2}
+ ]
+};
+
+// ===== GNS 102 - Communication in English I =====
+window.COURSES["GNS 102"] = {
+ title: "GNS 102 - Communication in English I", place: "library", reward: 10,
+ notes: [
+  "Communication - exchange/transmission of information, ideas, thoughts or feelings.",
+  "Communication should involve understandable information.",
+  "Verbal communication uses spoken or written words.",
+  "Oral communication includes speech, interviews and conversations.",
+  "Written communication includes letters, reports, emails and articles.",
+  "Non-verbal communication communicates without words.",
+  "Kinesics refers to body movement.",
+  "Paralanguage involves tone, pitch and speed.",
+  "Proxemics concerns physical space.",
+  "Haptics concerns communication through touch.",
+  "Chronemics concerns the use of time.",
+  "Interpersonal communication occurs between people.",
+  "Intrapersonal communication occurs within an individual.",
+  "Stimulus starts communication.",
+  "Sender/encoder initiates and encodes the message.",
+  "Message is the information being communicated.",
+  "Channel is the medium used.",
+  "Receiver/decoder interprets the message.",
+  "Feedback is receiver response.",
+  "Noise/interference can disrupt communication.",
+  "Effective communication requires accurate transmission and understanding.",
+  "Mother tongue interference occurs when L1 influences L2.",
+  "Phonological interference affects sounds/pronunciation.",
+  "Semantic interference affects meaning.",
+  "Syntactic interference affects sentence structure.",
+  "Word stress emphasizes a syllable.",
+  "Sentence stress emphasizes important words.",
+  "Falling intonation commonly occurs in statements and WH-questions.",
+  "Rising intonation commonly occurs in yes/no questions.",
+  "Comprehension involves understanding and interpreting written material."
+ ],
+ quiz: [
+  {id:"GNS102-Q01", cat:"Concepts", q:"Define communication.", o:["Formal, informal and semi-formal", "\"He came yesterday.\"", "Process of exchanging/transmitting information, ideas, thoughts or feelings", "\"think\" pronounced as \"tink\""], a:2},
+  {id:"GNS102-Q02", cat:"Concepts", q:"What are the two broad methods of communication?", o:["Use of physical space in communication", "Verbal and non-verbal", "Pitch falls toward the end", "Phonological affects sounds; syntactic affects sentence structure"], a:1},
+  {id:"GNS102-Q03", cat:"Concepts", q:"What is verbal communication?", o:["Communication using spoken or written words", "Response showing the message was received/understood", "Communication related to use of time", "Ability to read, understand and interpret text"], a:0},
+  {id:"GNS102-Q04", cat:"Concepts", q:"What is non-verbal communication?", o:["Emphasis placed on important words in a sentence", "How an individual perceives themselves", "Communication without words", "Influence of L1 on use of L2"], a:2},
+  {id:"GNS102-Q05", cat:"Concepts", q:"Give three examples of oral communication.", o:["Body movement in communication", "L1 influence on English sentence structure", "\"think\" pronounced as \"tink\"", "Conversation, interview and speech"], a:3},
+  {id:"GNS102-Q06", cat:"Concepts", q:"Give three examples of written communication.", o:["Influence of L1 on use of L2", "\"think\" pronounced as \"tink\"", "Letter, report and email", "It can communicate attitude, emotion and grammatical function"], a:2},
+  {id:"GNS102-Q07", cat:"Concepts", q:"What is interpersonal communication?", o:["Pitch rises toward the end", "Exchange of information between two or more people", "Ability to read, understand and interpret text", "Variation in pitch while speaking"], a:1},
+  {id:"GNS102-Q08", cat:"Concepts", q:"What is intrapersonal communication?", o:["Official letter following conventional structure", "Influence of L1 on use of L2", "Anything that interferes with communication", "Communication within an individual"], a:3},
+  {id:"GNS102-Q09", cat:"Concepts", q:"What is stimulus?", o:["Situation/reason that starts communication", "Alternating between languages/codes in communication", "Use of physical space in communication", "Ability to read, understand and interpret text"], a:0},
+  {id:"GNS102-Q10", cat:"Concepts", q:"Who is the sender?", o:["Phonological affects sounds; syntactic affects sentence structure", "Person/group initiating communication", "Person who receives/interprets the message", "Information, idea, feeling or thought being transmitted"], a:1},
+  {id:"GNS102-Q11", cat:"Concepts", q:"What is encoding?", o:["Influence of L1 on use of L2", "Converting an idea into symbols/message", "Verbal and non-verbal", "Response showing the intended effect was not achieved"], a:1},
+  {id:"GNS102-Q12", cat:"Concepts", q:"What is the message?", o:["Information, idea, feeling or thought being transmitted", "Verbal and non-verbal", "Communication related to use of time", "Converting an idea into symbols/message"], a:0},
+  {id:"GNS102-Q13", cat:"Concepts", q:"What is a channel?", o:["Verbal and non-verbal", "Pitch falls toward the end", "Medium through which the message travels", "Response showing the intended effect was not achieved"], a:2},
+  {id:"GNS102-Q14", cat:"Concepts", q:"Who is the receiver?", o:["Person/group initiating communication", "Response showing the message was received/understood", "Immediate feedback", "Person who receives/interprets the message"], a:3},
+  {id:"GNS102-Q15", cat:"Concepts", q:"What is feedback?", o:["Receiver's response to the message", "Confusion/misuse caused by differences in meaning", "Official letter following conventional structure", "Vocal features such as pitch, tone and speed"], a:0},
+  {id:"GNS102-Q16", cat:"Concepts", q:"Why is feedback important?", o:["It can be reviewed and preserved", "It requires preparation and does not provide immediate exchange", "Engineers must communicate technical information, reports, instructions and ideas effectively", "It confirms whether the message was understood"], a:3},
+  {id:"GNS102-Q17", cat:"Concepts", q:"What is noise?", o:["Communication using spoken or written words", "Personal letter written to someone familiar", "Body movement in communication", "Anything that interferes with communication"], a:3},
+  {id:"GNS102-Q18", cat:"Concepts", q:"What is kinesics?", o:["L1 influence on pronunciation/speech sounds", "Sentence expressing the main idea of a paragraph", "Body movement in communication", "Communication between two people"], a:2},
+  {id:"GNS102-Q19", cat:"Concepts", q:"What is paralanguage?", o:["Communication related to use of time", "Receiver's response to the message", "Personal letter written to someone familiar", "Vocal features such as pitch, tone and speed"], a:3},
+  {id:"GNS102-Q20", cat:"Concepts", q:"What is proxemics?", o:["Use of physical space in communication", "Communication using spoken or written words", "Confusion/misuse caused by differences in meaning", "Ability to read, understand and interpret text"], a:0},
+  {id:"GNS102-Q21", cat:"Concepts", q:"What is haptics?", o:["Pitch falls toward the end", "Emphasis placed on important words in a sentence", "Communication through touch", "Influence of L1 on use of L2"], a:2},
+  {id:"GNS102-Q22", cat:"Concepts", q:"What is chronemics?", o:["Communication related to use of time", "Vocal features such as pitch, tone and speed", "Use of physical space in communication", "Pitch rises toward the end"], a:0},
+  {id:"GNS102-Q23", cat:"Concepts", q:"Give one advantage of written communication.", o:["Yes/no questions", "\"think\" pronounced as \"tink\"", "It provides a permanent record", "Engineers must accurately understand technical documents and instructions"], a:2},
+  {id:"GNS102-Q24", cat:"Concepts", q:"Give one disadvantage of written communication.", o:["\"think\" pronounced as \"tink\"", "Variation in pitch while speaking", "Ability to read, understand and interpret text", "Immediate feedback may not be available"], a:3},
+  {id:"GNS102-Q25", cat:"Concepts", q:"Give one advantage of oral communication.", o:["Alternating between languages/codes in communication", "Immediate feedback", "To know what information to look for", "\"think\" pronounced as \"tink\""], a:1},
+  {id:"GNS102-Q26", cat:"Concepts", q:"Give one disadvantage of oral communication.", o:["Communication through touch", "\"think\" pronounced as \"tink\"", "It can be difficult to control group discussion", "Anything that interferes with communication"], a:2},
+  {id:"GNS102-Q27", cat:"Concepts", q:"What is mother tongue interference?", o:["Sentence expressing the main idea of a paragraph", "Influence of L1 on use of L2", "Anything that interferes with communication", "Communication related to use of time"], a:1},
+  {id:"GNS102-Q28", cat:"Concepts", q:"What is phonological interference?", o:["Communication may fail or become ineffective", "Situation/reason that starts communication", "L1 influence on pronunciation/speech sounds", "Alternating between languages/codes in communication"], a:2},
+  {id:"GNS102-Q29", cat:"Concepts", q:"Give an example of phonological interference.", o:["\"think\" pronounced as \"tink\"", "It provides a permanent record", "Conversation, interview and speech", "Immediate feedback may not be available"], a:0},
+  {id:"GNS102-Q30", cat:"Concepts", q:"What is semantic interference?", o:["Response showing the message was received/understood", "Variation in pitch while speaking", "Confusion/misuse caused by differences in meaning", "Exchange of information between two or more people"], a:2},
+  {id:"GNS102-Q31", cat:"Concepts", q:"What is syntactic interference?", o:["Emphasis placed on a syllable", "One person communicating to a larger audience", "Anything that interferes with communication", "L1 influence on English sentence structure"], a:3},
+  {id:"GNS102-Q32", cat:"Concepts", q:"Correct this sentence: \"She is having two brothers.\"", o:["It can support, contradict or reinforce spoken words", "\"She has two brothers.\"", "Response showing the intended effect was not achieved", "It allows immediate interaction and feedback"], a:1},
+  {id:"GNS102-Q33", cat:"Concepts", q:"Correct this sentence: \"He come yesterday.\"", o:["Personal letter written to someone familiar", "It can be reviewed and preserved", "Person who receives/interprets the message", "\"He came yesterday.\""], a:3},
+  {id:"GNS102-Q34", cat:"Concepts", q:"What is code switching?", o:["Personal letter written to someone familiar", "Alternating between languages/codes in communication", "Information, idea, feeling or thought being transmitted", "One person communicating to a larger audience"], a:1},
+  {id:"GNS102-Q35", cat:"Concepts", q:"What is word stress?", o:["How an individual perceives themselves", "Variation in pitch while speaking", "Emphasis placed on a syllable", "Verbal and non-verbal"], a:2},
+  {id:"GNS102-Q36", cat:"Concepts", q:"How is \"PREsent\" different from \"preSENT\"?", o:["Communication using spoken or written words", "It can support, contradict or reinforce spoken words", "The first commonly functions as a noun; the second as a verb", "Sentence expressing the main idea of a paragraph"], a:2},
+  {id:"GNS102-Q37", cat:"Concepts", q:"What is sentence stress?", o:["Emphasis placed on important words in a sentence", "Pitch rises toward the end", "L1 influence on pronunciation/speech sounds", "Receiver's response to the message"], a:0},
+  {id:"GNS102-Q38", cat:"Concepts", q:"What is intonation?", o:["Response showing the intended effect was not achieved", "Response showing the message was received/understood", "Variation in pitch while speaking", "Communication without words"], a:2},
+  {id:"GNS102-Q39", cat:"Concepts", q:"What is falling intonation?", o:["Pitch falls toward the end", "Ability to read, understand and interpret text", "Converting an idea into symbols/message", "Use of physical space in communication"], a:0},
+  {id:"GNS102-Q40", cat:"Concepts", q:"Where is falling intonation commonly used?", o:["Statements, commands and WH-questions", "\"She has two brothers.\"", "Body movement in communication", "Structures/sounds/meanings from L1 influence L2"], a:0},
+  {id:"GNS102-Q41", cat:"Concepts", q:"What is rising intonation?", o:["Emphasis placed on a syllable", "Body movement in communication", "Pitch rises toward the end", "Emphasis placed on important words in a sentence"], a:2},
+  {id:"GNS102-Q42", cat:"Concepts", q:"Where is rising intonation commonly used?", o:["Yes", "No"], a:0},
+  {id:"GNS102-Q43", cat:"Concepts", q:"What is correspondence?", o:["Written communication between people or organizations", "Going beyond literal meaning to infer and analyse", "L1 influence on pronunciation/speech sounds", "Communication may fail or become ineffective"], a:0},
+  {id:"GNS102-Q44", cat:"Concepts", q:"Name three types of letters.", o:["Formal, informal and semi-formal", "It enables sender and receiver to understand symbols", "Information, idea, feeling or thought being transmitted", "\"think\" pronounced as \"tink\""], a:0},
+  {id:"GNS102-Q45", cat:"Concepts", q:"What is a formal letter?", o:["L1 influence on English sentence structure", "Phonological affects sounds; syntactic affects sentence structure", "Situation/reason that starts communication", "Official letter following conventional structure"], a:3},
+  {id:"GNS102-Q46", cat:"Concepts", q:"What is an informal letter?", o:["Written communication between people or organizations", "Personal letter written to someone familiar", "Vocal features such as pitch, tone and speed", "Verbal and non-verbal"], a:1},
+  {id:"GNS102-Q47", cat:"Concepts", q:"What is comprehension?", o:["Going beyond literal meaning to infer and analyse", "Pitch rises toward the end", "Ability to read, understand and interpret text", "Communication within a small group"], a:2},
+  {id:"GNS102-Q48", cat:"Concepts", q:"What is interpretation?", o:["Receiver's response to the message", "Personal letter written to someone familiar", "Going beyond literal meaning to infer and analyse", "Emphasis placed on important words in a sentence"], a:2},
+  {id:"GNS102-Q49", cat:"Concepts", q:"What is a topic sentence?", o:["Sentence expressing the main idea of a paragraph", "Situation/reason that starts communication", "Alternating between languages/codes in communication", "Use of physical space in communication"], a:0},
+  {id:"GNS102-Q50", cat:"Concepts", q:"Why should students read questions before a comprehension passage?", o:["To know what information to look for", "Structures/sounds/meanings from L1 influence L2", "It requires preparation and does not provide immediate exchange", "It enables sender and receiver to understand symbols"], a:0},
+  {id:"GNS102-Q51", cat:"Concepts", q:"Why is non-verbal communication important?", o:["It confirms whether the message was understood", "It enables sender and receiver to understand symbols", "Structures/sounds/meanings from L1 influence L2", "It can support, contradict or reinforce spoken words"], a:3},
+  {id:"GNS102-Q52", cat:"Concepts", q:"What is dyadic communication?", o:["Communication between two people", "Alternating between languages/codes in communication", "Response showing the message was received/understood", "Situation/reason that starts communication"], a:0},
+  {id:"GNS102-Q53", cat:"Concepts", q:"What is group communication?", o:["Communication through touch", "Sentence expressing the main idea of a paragraph", "Body movement in communication", "Communication within a small group"], a:3},
+  {id:"GNS102-Q54", cat:"Concepts", q:"What is public communication?", o:["Communication related to use of time", "One person communicating to a larger audience", "Pitch falls toward the end", "Alternating between languages/codes in communication"], a:1},
+  {id:"GNS102-Q55", cat:"Concepts", q:"Give two examples of intrapersonal communication.", o:["\"think\" pronounced as \"tink\"", "Alternating between languages/codes in communication", "Self-talk and reflection", "It can communicate attitude, emotion and grammatical function"], a:2},
+  {id:"GNS102-Q56", cat:"Concepts", q:"What is self-concept?", o:["How an individual perceives themselves", "Pitch rises toward the end", "Communication using spoken or written words", "Anything that interferes with communication"], a:0},
+  {id:"GNS102-Q57", cat:"Concepts", q:"Why is communication receiver-centred?", o:["Structures/sounds/meanings from L1 influence L2", "It confirms whether the message was understood", "Success depends on the receiver correctly interpreting the message", "It enables sender and receiver to understand symbols"], a:2},
+  {id:"GNS102-Q58", cat:"Concepts", q:"What happens when the wrong channel is selected?", o:["L1 influence on pronunciation/speech sounds", "Emphasis placed on important words in a sentence", "Communication may fail or become ineffective", "Ability to read, understand and interpret text"], a:2},
+  {id:"GNS102-Q59", cat:"Concepts", q:"Why is shared language important?", o:["It requires preparation and does not provide immediate exchange", "It allows immediate interaction and feedback", "It confirms whether the message was understood", "It enables sender and receiver to understand symbols"], a:3},
+  {id:"GNS102-Q60", cat:"Concepts", q:"What is positive feedback?", o:["Response showing the message was received/understood", "Written communication between people or organizations", "Phonological affects sounds; syntactic affects sentence structure", "Use of physical space in communication"], a:0},
+  {id:"GNS102-Q61", cat:"Concepts", q:"What is negative feedback?", o:["Emphasis placed on a syllable", "Pitch falls toward the end", "L1 influence on pronunciation/speech sounds", "Response showing the intended effect was not achieved"], a:3},
+  {id:"GNS102-Q62", cat:"Concepts", q:"Why is oral communication often persuasive?", o:["It allows immediate interaction and feedback", "Structures/sounds/meanings from L1 influence L2", "It can communicate attitude, emotion and grammatical function", "To know what information to look for"], a:0},
+  {id:"GNS102-Q63", cat:"Concepts", q:"Why is written communication useful for complex ideas?", o:["It confirms whether the message was understood", "It can be reviewed and preserved", "Structures/sounds/meanings from L1 influence L2", "To know what information to look for"], a:1},
+  {id:"GNS102-Q64", cat:"Concepts", q:"Why can written communication be slower?", o:["It requires preparation and does not provide immediate exchange", "Structures/sounds/meanings from L1 influence L2", "It enables sender and receiver to understand symbols", "It can communicate attitude, emotion and grammatical function"], a:0},
+  {id:"GNS102-Q65", cat:"Concepts", q:"Why does mother tongue interference occur?", o:["Engineers must communicate technical information, reports, instructions and ideas effectively", "Engineers must accurately understand technical documents and instructions", "To know what information to look for", "Structures/sounds/meanings from L1 influence L2"], a:3},
+  {id:"GNS102-Q66", cat:"Concepts", q:"What is the difference between phonological and syntactic interference?", o:["Alternating between languages/codes in communication", "Written communication between people or organizations", "Personal letter written to someone familiar", "Phonological affects sounds; syntactic affects sentence structure"], a:3},
+  {id:"GNS102-Q67", cat:"Concepts", q:"What is the difference between oral and written communication?", o:["Alternating between languages/codes in communication", "Communication related to use of time", "Oral communication usually provides immediate feedback; written communication provides permanence", "Going beyond literal meaning to infer and analyse"], a:2},
+  {id:"GNS102-Q68", cat:"Concepts", q:"Why is intonation important?", o:["Engineers must accurately understand technical documents and instructions", "Structures/sounds/meanings from L1 influence L2", "Engineers must communicate technical information, reports, instructions and ideas effectively", "It can communicate attitude, emotion and grammatical function"], a:3},
+  {id:"GNS102-Q69", cat:"Concepts", q:"Why is comprehension important to engineering students?", o:["It can communicate attitude, emotion and grammatical function", "Engineers must accurately understand technical documents and instructions", "It confirms whether the message was understood", "It can support, contradict or reinforce spoken words"], a:1},
+  {id:"GNS102-Q70", cat:"Concepts", q:"Why is communication important to PNGPD students?", o:["It enables sender and receiver to understand symbols", "It confirms whether the message was understood", "Engineers must communicate technical information, reports, instructions and ideas effectively", "Structures/sounds/meanings from L1 influence L2"], a:2}
+ ]
+};
+
+// ===== GLT - General Laboratory / Technical Practice =====
+window.COURSES["GLT"] = {
+ title: "GLT - General Laboratory / Technical Practice", place: "library", reward: 10, soon: true,
+ notes: [],
+ quiz: []
+};
+
+// ===== Restaurant menus (n = food, p = price in coins, h = hunger restored) =====
+window.MENUS = {
+ "Bush Mama": [
+  {n:"Pounded yam and egusi", p:60, h:45},
+  {n:"Eba and okra soup", p:45, h:40},
+  {n:"Boiled yam and fish stew", p:40, h:35},
+  {n:"Suya", p:25, h:20},
+  {n:"Zobo drink", p:10, h:8},
+  {n:"Bottle of water", p:5, h:3}
+ ],
+ "Tutu Restaurant": [
+  {n:"Jollof rice and chicken", p:55, h:45},
+  {n:"Fried rice and plantain", p:50, h:42},
+  {n:"Amala and ewedu", p:40, h:38},
+  {n:"Indomie and egg", p:25, h:25},
+  {n:"Moi moi", p:15, h:15},
+  {n:"Malt drink", p:12, h:8}
+ ]
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const COURSES = window.COURSES || {}, MENUS = window.MENUS || {};
+const PROFILE_KEY = "pngpd_profile_v1", DEFAULT_NAME = "Player";
+const HOSTELS = [
+  "Kokori Hostel",
+  "PTDF Hostel",
+  "Noble Hostel",
+  "NDDC Hostel"
+];
+const VEHICLES = [
+  {
+    id: "bike",
+    n: "Bicycle",
+    p: 200,
+    spd: 1.2,
+    col: 6323595,
+    type: "bike"
+  },
+  {
+    id: "okada",
+    n: "Okada (motorbike)",
+    p: 600,
+    spd: 1.5,
+    col: 16750592,
+    type: "moto"
+  },
+  {
+    id: "keke",
+    n: "Keke (tricycle)",
+    p: 1200,
+    spd: 1.7,
+    col: 16771899,
+    type: "keke"
+  },
+  {
+    id: "saloon",
+    n: "Used saloon car",
+    p: 2500,
+    spd: 1.9,
+    col: 2001125,
+    type: "car"
+  },
+  {
+    id: "suv",
+    n: "Brand new SUV",
+    p: 6000,
+    spd: 2.2,
+    col: 2503224,
+    type: "car"
+  }
+];
+const SHOP = [
+  {
+    id: "idcard",
+    n: "Student ID card",
+    p: 30,
+    d: "A student ID for your profile. Some missions need it."
+  },
+  {
+    id: "studypass",
+    n: "Study Pass",
+    p: 120,
+    d: "Earn 20% more coins on every new correct answer."
+  },
+  {
+    id: "hintpack",
+    n: "Hint Pack",
+    p: 100,
+    d: "Hints cost you only 25% of the coins instead of 50%."
+  },
+  {
+    id: "backpack",
+    n: "Backpack",
+    p: 80,
+    d: "Your energy recovers 50% faster."
+  },
+  {
+    id: "boots",
+    n: "Running shoes",
+    p: 150,
+    d: "Running drains your energy 30% slower."
+  }
+];
+const NPC_NAMES = [
+  "Chioma",
+  "Emeka",
+  "Ovie",
+  "Tega",
+  "Ngozi",
+  "Ibrahim",
+  "Blessing",
+  "Efe",
+  "Tunde",
+  "Amaka",
+  "Ese",
+  "Femi",
+  "Hauwa",
+  "Kelvin",
+  "Jennifer",
+  "Samuel"
+];
+const NPC_LINES = [
+  "Have you checked the notice board in the department today?",
+  "The library has notes for every course. Revise before your tests.",
+  "Try the PGP 126 lab quiz. It will help with your practicals.",
+  "Eat something before you run around campus all day.",
+  "Join a fellowship if you have not yet, and attend for daily XP.",
+  "Save some coins at UBA Bank. They grow every day.",
+  "Stuck on a calculation? Open the calculator inside the question.",
+  "Finish your missions in the department for bonus coins."
+];
+let profile = null, pickColor = "#e10600", P = null, inPanel = false;
+function loadProfile() {
+  try {
+    return JSON.parse(localStorage.getItem(PROFILE_KEY));
+  } catch (e) {
+    return null;
+  }
+}
+function saveProfile(d) {
+  try {
+    localStorage.setItem(PROFILE_KEY, JSON.stringify(d));
+  } catch (e) {
+  }
+  if (typeof queueRemote === "function")
+    queueRemote();
+}
+function getDefaultProfile() {
+  return {
+    username: DEFAULT_NAME,
+    shirt_color: "#e10600",
+    level: 1,
+    xp: 0,
+    coins: 0,
+    energy: 100,
+    hunger: 100,
+    visited: [],
+    done: [],
+    fellowship: null,
+    stats: {
+      courses: {},
+      fdate: ""
+    }
+  };
+}
+function buildColorChoices() {
+  const sws = $("sws");
+  if (sws.children.length)
+    return;
+  const COLORS = [
+    "#e10600",
+    "#2196f3",
+    "#ffeb3b",
+    "#4caf50",
+    "#ff9800",
+    "#ab47bc",
+    "#00bcd4",
+    "#ffffff"
+  ];
+  sws.innerHTML = COLORS.map((c, i) => "<span class=\"sw" + (i === 0 ? " on" : "") + "\" data-color=\"" + c + "\" style=\"background:" + c + "\"></span>").join("");
+  sws.addEventListener("click", e => {
+    const color = e.target.dataset.color;
+    if (!color)
+      return;
+    pickColor = color;
+    [...sws.children].forEach(x => x.classList.toggle("on", x === e.target));
+    body.material.color.set(color);
+  });
+}
+function startGame(d) {
+  P = d;
+  if (!P.visited)
+    P.visited = [];
+  if (!P.done)
+    P.done = [];
+  if (!P.stats || !P.stats.courses)
+    P.stats = {
+      courses: {},
+      fdate: ""
+    };
+  if (!P.stats.cars)
+    P.stats.cars = [];
+  if (!P.stats.items)
+    P.stats.items = [];
+  if (P.stats.car === undefined)
+    P.stats.car = null;
+  if (!P.stats.att)
+    P.stats.att = {};
+  setVehicle(P.stats.car);
+  body.material.color.set(P.shirt_color || pickColor);
+  $("ov").style.display = "none";
+  $("stats").style.display = "block";
+  say("Welcome " + P.username + "!");
+}
+$("bgo").addEventListener("click", async () => {
+  const sel = document.querySelector(".sw.on");
+  if (!sel) {
+    $("msg2").textContent = "Please choose a shirt colour.";
+    return;
+  }
+  const name = ($("pname").value.trim() || "Player").slice(0, 16);
+  const p = {
+    ...getDefaultProfile(),
+    username: name,
+    shirt_color: sel.dataset.color || pickColor
+  };
+  if (ONLINE && uid && sb) {
+    const {error} = await sb.from("game_players").insert({
+      id: uid,
+      username: name,
+      ...toRow(p)
+    });
+    if (error) {
+      $("msg2").textContent = error.code === "23505" ? "That name is already taken. Choose another." : error.message;
+      return;
+    }
+  }
+  profile = p;
+  saveProfile(p);
+  startGame(p);
+});
+
+// ===== WORLD =====
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(8900331);
+scene.fog = new THREE.Fog(8900331, 50, 130);
+const cam = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 220);
+const ren = new THREE.WebGLRenderer({ antialias: false });
+ren.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+ren.setSize(innerWidth, innerHeight);
+document.body.appendChild(ren.domElement);
+const hemi = new THREE.HemisphereLight(16777215, 8956518, 0.9);
+scene.add(hemi);
+const sun = new THREE.DirectionalLight(16777215, 0.6);
+sun.position.set(30, 50, 20);
+scene.add(sun);
+const clouds = [];
+for (let i = 0; i < 10; i++) {
+  const cm = new THREE.MeshBasicMaterial({
+    color: 16777215,
+    transparent: true,
+    opacity: 0.85
+  });
+  const c = new THREE.Mesh(new THREE.BoxGeometry(14 + Math.random() * 10, 2, 6 + Math.random() * 4), cm);
+  c.position.set((Math.random() - 0.5) * 300, 45 + Math.random() * 10, (Math.random() - 0.5) * 300);
+  scene.add(c);
+  clouds.push(c);
+}
+const M = c => new THREE.MeshLambertMaterial({ color: c });
+function box(w, h, d, c, x, y, z) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), M(c));
+  m.position.set(x, y, z);
+  scene.add(m);
+  return m;
+}
+function flat(w, d, c, x, y, z) {
+  const r = new THREE.Mesh(new THREE.PlaneGeometry(w, d), M(c));
+  r.rotation.x = -Math.PI / 2;
+  r.position.set(x, y, z);
+  scene.add(r);
+  return r;
+}
+flat(320, 320, 5025616, 0, 0, 0);
+flat(10, 170, 4473924, 0, 0.02, -10);
+[
+  -22,
+  14
+].forEach(z => flat(170, 8, 4473924, 0, 0.03, z));
+for (let z = -90; z < 75; z += 8)
+  flat(0.4, 3, 16777215, 0, 0.05, z);
+flat(24, 10, 12434877, 0, 0.04, 60);
+function sign(text, x, y, z, color) {
+  const c = document.createElement("canvas");
+  c.width = 256;
+  c.height = 64;
+  const g = c.getContext("2d");
+  g.fillStyle = color || "#e10600";
+  g.fillRect(0, 0, 256, 64);
+  g.strokeStyle = "#fff";
+  g.lineWidth = 4;
+  g.strokeRect(2, 2, 252, 60);
+  g.fillStyle = "#fff";
+  g.font = "bold 24px sans-serif";
+  g.textAlign = "center";
+  g.textBaseline = "middle";
+  g.fillText(text, 128, 34);
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c) }));
+  s.scale.set(9, 2.25, 1);
+  s.position.set(x, y, z);
+  scene.add(s);
+}
+const places = [
+  [
+    "Admin Block",
+    6323595,
+    0,
+    -64,
+    22,
+    12,
+    10,
+    14747136
+  ],
+  [
+    "PNGPD Department",
+    16750592,
+    -26,
+    -40,
+    14,
+    10,
+    8,
+    14747136
+  ],
+  [
+    "PTI Library",
+    2201331,
+    26,
+    -40,
+    14,
+    10,
+    8,
+    16777215
+  ],
+  [
+    "PGP 126 Laboratory",
+    10233776,
+    -26,
+    -8,
+    14,
+    10,
+    8,
+    16771899
+  ],
+  [
+    "Classrooms",
+    5093036,
+    26,
+    -8,
+    14,
+    10,
+    7,
+    14747136
+  ],
+  [
+    "Kokori Hostel",
+    16771899,
+    -26,
+    28,
+    14,
+    10,
+    9,
+    14747136
+  ],
+  [
+    "PTDF Hostel",
+    15753874,
+    26,
+    28,
+    14,
+    10,
+    9,
+    16777215
+  ],
+  [
+    "Noble Hostel",
+    16740419,
+    -62,
+    30,
+    14,
+    10,
+    9,
+    16777215
+  ],
+  [
+    "NDDC Hostel",
+    6732650,
+    62,
+    30,
+    14,
+    10,
+    9,
+    14747136
+  ],
+  [
+    "Bush Mama",
+    15277667,
+    -26,
+    50,
+    11,
+    8,
+    6,
+    16771899
+  ],
+  [
+    "Tutu Restaurant",
+    48340,
+    26,
+    50,
+    11,
+    8,
+    6,
+    14747136
+  ],
+  [
+    "Fellowship Hall",
+    8280002,
+    -62,
+    -22,
+    13,
+    10,
+    8,
+    16777215
+  ],
+  [
+    "UBA Bank",
+    13840175,
+    -62,
+    14,
+    13,
+    10,
+    8,
+    16777215
+  ],
+  [
+    "Garage",
+    9268835,
+    62,
+    14,
+    13,
+    10,
+    6,
+    16771899
+  ]
+];
+const solids = [], spots = [];
+places.forEach(([n, c, x, z, w, d, h, rc]) => {
+  const sx = x === 0 ? 0 : Math.sign(x), frontX = x - sx * (w / 2), frontZ = z + d / 2;
+  box(w, h, d, c, x, h / 2, z);
+  box(w + 1.2, 1, d + 1.2, rc, x, h + 0.5, z);
+  if (sx !== 0) {
+    box(0.5, 4.5, 3, 4073251, frontX, 2.25, z);
+    box(0.4, 1.6, 2, 11789820, frontX, h * 0.65, z - d / 4);
+    box(0.4, 1.6, 2, 11789820, frontX, h * 0.65, z + d / 4);
+    spots.push({
+      n,
+      x: frontX - sx * 3.5,
+      z
+    });
+  } else {
+    box(3, 4.5, 0.5, 4073251, x, 2.25, frontZ);
+    box(2, 1.6, 0.4, 11789820, x - 6, h * 0.6, frontZ);
+    box(2, 1.6, 0.4, 11789820, x + 6, h * 0.6, frontZ);
+    spots.push({
+      n,
+      x,
+      z: frontZ + 3.5
+    });
+  }
+  sign(n, x, h + 3, z);
+  solids.push({
+    x,
+    z,
+    hw: w / 2 + 0.6,
+    hd: d / 2 + 0.6
+  });
+});
+flat(34, 22, 6732650, 66, 0.03, -22);
+flat(30, 0.3, 16777215, 66, 0.05, -22);
+flat(0.3, 18, 16777215, 66, 0.05, -22);
+flat(30, 0.3, 16777215, 66, 0.05, -31);
+flat(30, 0.3, 16777215, 66, 0.05, -13);
+box(0.3, 3, 6, 16777215, 50, 1.5, -22);
+box(0.3, 3, 6, 16777215, 82, 1.5, -22);
+sign("Football Field", 66, 7, -22);
+spots.push({
+  n: "Football Field",
+  x: 66,
+  z: -22,
+  r: 12
+});
+const gz = 72;
+box(1.4, 7, 1.4, 14747136, -8, 3.5, gz);
+box(1.4, 7, 1.4, 14747136, 8, 3.5, gz);
+box(17, 1.6, 1.4, 14747136, 0, 7, gz);
+box(14, 0.4, 0.4, 16777215, 0, 5, gz);
+sign("PTI EFFURUN", 0, 10.5, gz);
+solids.push({
+  x: -8,
+  z: gz,
+  hw: 1,
+  hd: 1
+}, {
+  x: 8,
+  z: gz,
+  hw: 1,
+  hd: 1
+});
+spots.push({
+  n: "PTI Entrance",
+  x: 0,
+  z: 62,
+  r: 10
+});
+for (const sx of [
+    -1,
+    1
+  ]) {
+  box(40, 2.5, 0.8, 16764092, sx * 29, 1.25, gz);
+  solids.push({
+    x: sx * 29,
+    z: gz,
+    hw: 20,
+    hd: 0.8
+  });
+}
+for (let z = -80; z <= 66; z += 18)
+  for (const sx of [
+      -1,
+      1
+    ]) {
+    box(0.3, 5, 0.3, 4342338, sx * 6, 2.5, z);
+    box(0.9, 0.5, 0.9, 16774557, sx * 6, 5.2, z);
+  }
+const rnd = (a, b) => a + Math.random() * (b - a);
+for (let i = 0; i < 55; i++) {
+  const x = rnd(-120, 120), z = rnd(-100, 95);
+  if (Math.abs(x) < 8 || Math.abs(z + 22) < 7 || Math.abs(z - 14) < 7)
+    continue;
+  if (places.some(p => Math.abs(x - p[2]) < p[4] / 2 + 5 && Math.abs(z - p[3]) < p[5] / 2 + 5))
+    continue;
+  if (Math.abs(x - 66) < 22 && Math.abs(z + 22) < 16)
+    continue;
+  box(0.8, 3, 0.8, 7162945, x, 1.5, z);
+  const t = new THREE.Mesh(new THREE.SphereGeometry(2.2, 8, 6), M([
+    3046706,
+    6732650,
+    4431943
+  ][i % 3]));
+  t.position.set(x, 4.5, z);
+  scene.add(t);
+  solids.push({
+    x,
+    z,
+    hw: 1,
+    hd: 1
+  });
+}
+for (let i = 0; i < 35; i++) {
+  const x = rnd(-120, 120), z = rnd(-100, 95);
+  if (Math.abs(x) < 8)
+    continue;
+  box(0.5, 0.5, 0.5, [
+    14747136,
+    16771899,
+    16728193,
+    16777215
+  ][i % 4], x, 0.25, z);
+}
+function makeChar(shirt, skin, pants) {
+  const g = new THREE.Group();
+  const b = new THREE.Mesh(new THREE.BoxGeometry(1, 1.4, 0.6), M(shirt));
+  b.position.y = 1.3;
+  const h = new THREE.Mesh(new THREE.SphereGeometry(0.45, 10, 8), M(skin));
+  h.position.y = 2.4;
+  const l = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.7, 0.5), M(pants));
+  l.position.y = 0.35;
+  g.add(b, h, l);
+  g.userData.body = b;
+  scene.add(g);
+  return g;
+}
+const player = makeChar(14747136, 9262372, 1713022);
+player.position.set(0, 0, 64);
+let vehGroup = null;
+function setVehicle(id) {
+  if (vehGroup) {
+    player.remove(vehGroup);
+    vehGroup = null;
+  }
+  const v = VEHICLES.find(x => x.id === id), legs = player.children[2];
+  player.userData.body.visible = true;
+  legs.visible = true;
+  if (!v)
+    return;
+  const g = new THREE.Group();
+  const add = (w, h, d, c, x, y, z) => {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), M(c));
+    m.position.set(x, y, z);
+    g.add(m);
+  };
+  const wheel = (r, w, x, y, z) => {
+    const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, w, 10), M(2171169));
+    m.rotation.z = Math.PI / 2;
+    m.position.set(x, y, z);
+    g.add(m);
+  };
+  if (v.type === "bike") {
+    wheel(0.45, 0.15, 0, 0.45, 0.9);
+    wheel(0.45, 0.15, 0, 0.45, -0.9);
+    add(0.12, 0.12, 1.8, v.col, 0, 0.8, 0);
+    add(0.8, 0.1, 0.1, 4342338, 0, 1.35, 0.8);
+  } else if (v.type === "moto") {
+    wheel(0.45, 0.25, 0, 0.45, 1);
+    wheel(0.45, 0.25, 0, 0.45, -1);
+    add(0.6, 0.5, 1.8, v.col, 0, 0.85, 0);
+    add(0.9, 0.1, 0.1, 4342338, 0, 1.45, 0.8);
+  } else if (v.type === "keke") {
+    wheel(0.4, 0.2, -0.7, 0.4, -0.9);
+    wheel(0.4, 0.2, 0.7, 0.4, -0.9);
+    wheel(0.4, 0.2, 0, 0.4, 1.1);
+    add(1.5, 0.9, 2.4, v.col, 0, 0.95, 0);
+    add(1.5, 0.12, 2, 2236962, 0, 2.05, -0.1);
+    player.userData.body.visible = false;
+    legs.visible = false;
+  } else {
+    wheel(0.42, 0.3, -0.95, 0.42, 1);
+    wheel(0.42, 0.3, 0.95, 0.42, 1);
+    wheel(0.42, 0.3, -0.95, 0.42, -1);
+    wheel(0.42, 0.3, 0.95, 0.42, -1);
+    add(2, 0.8, 3.6, v.col, 0, 0.85, 0);
+    add(1.7, 0.7, 1.8, 9489145, 0, 1.6, -0.2);
+    player.userData.body.visible = false;
+    legs.visible = false;
+  }
+  player.add(g);
+  vehGroup = g;
+}
+const body = player.userData.body;
+const npcs = [], skins = [
+    9262372,
+    7162945,
+    10586239,
+    6111287
+  ], shirts = [
+    2201331,
+    16771899,
+    5025616,
+    16750592,
+    11225020,
+    16777215,
+    48340,
+    15753874
+  ];
+const paths = [
+  [
+    3,
+    -60,
+    3,
+    55
+  ],
+  [
+    -3,
+    55,
+    -3,
+    -60
+  ],
+  [
+    -60,
+    -22,
+    60,
+    -22
+  ],
+  [
+    -60,
+    14,
+    60,
+    14
+  ],
+  [
+    -12,
+    -22,
+    -12,
+    14
+  ],
+  [
+    12,
+    14,
+    12,
+    -22
+  ],
+  [
+    3,
+    30,
+    3,
+    -5
+  ],
+  [
+    -3,
+    -5,
+    -3,
+    30
+  ]
+];
+paths.forEach((p, i) => {
+  for (let k = 0; k < 2; k++) {
+    npcs.push({
+      c: makeChar(shirts[(i * 2 + k) % 8], skins[(i + k) % 4], 3622735),
+      p,
+      t: Math.random(),
+      dir: 1,
+      sp: rnd(0.02, 0.045),
+      name: NPC_NAMES[npcs.length % NPC_NAMES.length]
+    });
+  }
+});
+
+// ===== CONTROLS =====
+const joy = $("joy"), knob = $("knob");
+let jx = 0, jy = 0, jid = null, running = false;
+function joyMove(t) {
+  const r = joy.getBoundingClientRect(), cx = r.left + 65, cy = r.top + 65;
+  let dx = t.clientX - cx, dy = t.clientY - cy;
+  const len = Math.hypot(dx, dy), max = 50;
+  if (len > max) {
+    dx *= max / len;
+    dy *= max / len;
+  }
+  knob.style.left = 35 + dx + "px";
+  knob.style.top = 35 + dy + "px";
+  jx = dx / max;
+  jy = dy / max;
+}
+joy.addEventListener("touchstart", e => {
+  e.preventDefault();
+  jid = e.changedTouches[0].identifier;
+  joyMove(e.changedTouches[0]);
+}, { passive: false });
+joy.addEventListener("touchmove", e => {
+  e.preventDefault();
+  for (const t of e.changedTouches)
+    if (t.identifier === jid)
+      joyMove(t);
+}, { passive: false });
+const joyEnd = () => {
+  jid = null;
+  jx = 0;
+  jy = 0;
+  knob.style.left = "35px";
+  knob.style.top = "35px";
+};
+joy.addEventListener("touchend", joyEnd);
+joy.addEventListener("touchcancel", joyEnd);
+let md = false;
+joy.addEventListener("mousedown", e => {
+  md = true;
+  joyMove(e);
+});
+addEventListener("mousemove", e => {
+  if (md)
+    joyMove(e);
+});
+addEventListener("mouseup", () => {
+  if (md) {
+    md = false;
+    joyEnd();
+  }
+});
+const keys = {};
+addEventListener("keydown", e => {
+  keys[e.key.toLowerCase()] = 1;
+});
+addEventListener("keyup", e => {
+  keys[e.key.toLowerCase()] = 0;
+});
+const runBtn = $("run");
+runBtn.addEventListener("touchstart", e => {
+  e.preventDefault();
+  running = true;
+  runBtn.style.background = "#e65100";
+}, { passive: false });
+runBtn.addEventListener("touchend", () => {
+  running = false;
+  runBtn.style.background = "#ff9800";
+});
+let camAng = 0, camId = null, lastX = 0;
+ren.domElement.addEventListener("touchstart", e => {
+  const t = e.changedTouches[0];
+  if (t.clientX > innerWidth * 0.4 && camId === null) {
+    camId = t.identifier;
+    lastX = t.clientX;
+  }
+}, { passive: true });
+ren.domElement.addEventListener("touchmove", e => {
+  for (const t of e.changedTouches)
+    if (t.identifier === camId) {
+      camAng -= (t.clientX - lastX) * 0.008;
+      lastX = t.clientX;
+    }
+}, { passive: true });
+ren.domElement.addEventListener("touchend", e => {
+  for (const t of e.changedTouches)
+    if (t.identifier === camId)
+      camId = null;
+});
+const actBtn = $("act"), toast = $("toast"), locEl = $("loc");
+let near = null, nearNpc = null;
+function say(t) {
+  toast.textContent = t;
+  toast.style.display = "block";
+  clearTimeout(say.t);
+  say.t = setTimeout(() => {
+    toast.style.display = "none";
+  }, 2500);
+}
+function gain(xp, coins) {
+  P.xp += xp;
+  P.coins += coins;
+  const l = Math.floor(P.xp / 100) + 1;
+  if (l > P.level) {
+    P.level = l;
+    say("LEVEL UP! You are now level " + l);
+  }
+}
+
+// ===== BUILDING PANELS =====
+const panel = $("panel"), pbody = $("pbody");
+const esc = s => String(s).replace(/[&<>"]/g, c => ({
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  "\"": "&quot;"
+}[c]));
+const shuffle = a => {
+  a = a.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [
+      a[j],
+      a[i]
+    ];
+  }
+  return a;
+};
+function openPanel(title, html) {
+  $("ptitle").textContent = title;
+  pbody.innerHTML = html;
+  pbody.scrollTop = 0;
+  panel.style.display = "flex";
+  inPanel = true;
+}
+function closePanel() {
+  panel.style.display = "none";
+  inPanel = false;
+  Q = null;
+  if (P)
+    saveProfile(P);
+}
+$("pclose").addEventListener("click", closePanel);
+const coinLine = () => "<div class=\"note\">Coins: <b>" + P.coins + "</b> &nbsp; Hunger: <b>" + Math.round(P.hunger) + "%</b> &nbsp; Energy: <b>" + Math.round(P.energy) + "%</b></div>";
+let curPlace = null, Q = null;
+function enter(n) {
+  curPlace = n;
+  if (n === "PTI Library")
+    return libraryMenu();
+  if (n === "PGP 126 Laboratory")
+    return labMenu();
+  if (n === "PNGPD Department")
+    return deptMenu();
+  if (n === "Garage")
+    return garageMenu("");
+  if (n === "Admin Block")
+    return adminMenu("");
+  if (n === "Classrooms")
+    return classMenu("");
+  if (n === "UBA Bank")
+    return bankMenu("");
+  if (n === "Fellowship Hall")
+    return fellowshipMenu("");
+  if (MENUS[n])
+    return restaurant(n, "");
+  if (HOSTELS.includes(n))
+    return hostel(n, "");
+  say(n + ": coming soon!");
+}
+function courseButtons(place) {
+  return Object.keys(COURSES).filter(k => COURSES[k].place === place).map(k => "<button class=\"pbtn\" data-a=\"course\" data-v=\"" + esc(k) + "\">" + esc(COURSES[k].title) + "</button>").join("") || "<p>No courses added yet.</p>";
+}
+function libraryMenu() {
+  openPanel("PTI Library", coinLine() + "<p>Pick a course to read key notes or take a quiz. Each new correct answer earns coins.</p>" + courseButtons("library"));
+}
+function labMenu() {
+  openPanel("PGP 126 Laboratory", coinLine() + "<p>Welcome to the lab. Study the notes, then test yourself on formulas and apparatus.</p>" + courseButtons("lab"));
+}
+function courseScreen(code) {
+  const c = COURSES[code];
+  if (!c)
+    return;
+  if (c.soon || !c.quiz.length && !c.notes.length)
+    return openPanel(c.title, coinLine() + "<p>This course is not loaded yet. Send your handouts and it will be added soon.</p>" + "<button class=\"pbtn\" data-a=\"home\">Back</button>");
+  const cats = [...new Set(c.quiz.map(q => q.cat))];
+  const done = c.quiz.filter(q => P.done.includes(q.id)).length;
+  openPanel(c.title, coinLine() + "<div class=\"note\">Rewarded questions: " + done + "/" + c.quiz.length + ". Each new correct answer earns coins.</div>" + (c.notes.length ? "<button class=\"pbtn\" data-a=\"notes\" data-v=\"" + esc(code) + "\">Study key notes (" + c.notes.length + ")</button>" : "<div class=\"note\">Notes for this course are coming soon.</div>") + cats.map(k => "<button class=\"pbtn solid\" data-a=\"quiz\" data-v=\"" + esc(code) + "\" data-c=\"" + esc(k) + "\">Quiz: " + esc(k) + "</button>").join("") + (cats.length > 1 ? "<button class=\"pbtn solid\" data-a=\"quiz\" data-v=\"" + esc(code) + "\" data-c=\"\">Quiz: Mixed</button>" : "") + "<button class=\"pbtn\" data-a=\"home\">Back</button>");
+}
+function notesScreen(code) {
+  const c = COURSES[code];
+  openPanel(c.title + " - Notes", "<ul>" + c.notes.map(n => "<li>" + esc(n) + "</li>").join("") + "</ul><button class=\"pbtn solid\" data-a=\"course\" data-v=\"" + esc(code) + "\">Back to course</button>");
+}
+function startQuiz(code, cat) {
+  const c = COURSES[code];
+  const pool = shuffle(c.quiz.filter(q => !cat || q.cat === cat));
+  Q = {
+    code,
+    cat,
+    list: pool.slice(0, 10),
+    i: 0,
+    right: 0,
+    earned: 0,
+    locked: false
+  };
+  showQ();
+}
+function showQ(keep) {
+  const c = COURSES[Q.code], q = Q.list[Q.i];
+  if (!keep || Q.optsFor !== Q.i) {
+    Q.opts = shuffle(q.o.map((t, i) => ({
+      t,
+      i
+    })));
+    Q.optsFor = Q.i;
+    Q.hint = false;
+    Q.dim = [];
+    Q.locked = false;
+  }
+  const canHint = Q.opts.length >= 4 && !Q.hint;
+  openPanel(c.title + " - Quiz", coinLine() + "<div>Question " + (Q.i + 1) + " of " + Q.list.length + " &middot; " + esc(q.cat) + "</div><p><b>" + esc(q.q) + "</b></p>" + Q.opts.map((o, k) => "<button class=\"pbtn" + (Q.dim.includes(k) ? " dim" : "") + "\" data-a=\"opt\" data-v=\"" + k + "\">" + esc(o.t) + "</button>").join("") + "<div id=\"tools\">" + (canHint ? "<button class=\"pbtn\" data-a=\"hint\">Hint: remove 2 wrong options (you earn " + (has("hintpack") ? "75%" : "half") + " of the coins)</button>" : "") + (q.cat === "Calculations" ? "<button class=\"pbtn\" data-a=\"calc\" data-v=\"quiz\">Open calculator</button>" : "") + "</div><div class=\"fb\" id=\"fb\"></div>");
+}
+function useHint() {
+  if (!Q || Q.locked || Q.hint)
+    return;
+  const q = Q.list[Q.i];
+  const wrong = Q.opts.map((o, k) => k).filter(k => Q.opts[k].i !== q.a);
+  Q.dim = shuffle(wrong).slice(0, 2);
+  Q.hint = true;
+  showQ(true);
+}
+function explain(code, q) {
+  const ans = q.o[q.a];
+  const words = t => new Set(t.toLowerCase().match(/[a-z]{4,}/g) || []);
+  const qw = words(q.q + " " + ans);
+  const own = COURSES[code] && COURSES[code].notes || [];
+  const pools = [own].concat(Object.keys(COURSES).filter(k => k !== code).map(k => COURSES[k].notes || []));
+  let best = null, bs = 1;
+  for (const notes of pools) {
+    for (const n of notes) {
+      let sc = 0;
+      const nw = words(n);
+      qw.forEach(w => {
+        if (nw.has(w))
+          sc++;
+      });
+      if (sc > bs) {
+        bs = sc;
+        best = n;
+      }
+    }
+    if (best)
+      break;
+  }
+  let html = "<div class=\"expl\"><b>Correct answer:</b> " + esc(ans) + (best ? "<br><b>Revise this:</b> " + esc(best) : "");
+  if (q.cat === "Calculations") {
+    const f = own.filter(n => n.includes("=")).slice(0, 4);
+    if (f.length)
+      html += "<br><b>Formulas for this course:</b><br>" + f.map(esc).join("<br>");
+  }
+  return html + "</div>";
+}
+function answer(k) {
+  if (!Q || Q.locked || Q.dim.includes(k))
+    return;
+  Q.locked = true;
+  const c = COURSES[Q.code], q = Q.list[Q.i], ok = Q.opts[k].i === q.a;
+  const bs = [...pbody.querySelectorAll("[data-a=\"opt\"]")];
+  bs.forEach((b, j) => {
+    if (Q.opts[j].i === q.a)
+      b.classList.add("good");
+  });
+  if (!ok)
+    bs[k].classList.add("bad");
+  pbody.querySelectorAll("[data-a=\"hint\"],[data-a=\"calc\"]").forEach(x => x.remove());
+  const sc = P.stats.courses[Q.code] = P.stats.courses[Q.code] || {
+    a: 0,
+    c: 0
+  };
+  sc.a++;
+  if (ok)
+    sc.c++;
+  let msg;
+  if (ok) {
+    Q.right++;
+    let rw = q.r || (c.reward || 10) + (q.cat === "Calculations" ? 5 : 0);
+    if (has("studypass"))
+      rw = Math.round(rw * 1.2);
+    rw = Math.round(rw * (Q.mult || 1));
+    if (Q.hint)
+      rw = Math.max(1, Math.floor(rw * (has("hintpack") ? 0.75 : 0.5)));
+    if (!P.done.includes(q.id)) {
+      P.done.push(q.id);
+      gain(5, rw);
+      Q.earned += rw;
+      msg = "Correct! +" + rw + " coins" + (Q.hint ? " (hint used, reduced coins)" : "") + (Q.mult > 1 ? " (class test bonus)" : "");
+    } else
+      msg = "Correct! (already rewarded - practice only)";
+  } else
+    msg = "Not quite. Here is the explanation:";
+  saveProfile(P);
+  const last = Q.i >= Q.list.length - 1;
+  $("fb").innerHTML = esc(msg) + explain(Q.code, q) + "<button class=\"pbtn solid\" data-a=\"next\">" + (last ? "FINISH" : "NEXT") + "</button>";
+}
+function finishQuiz() {
+  const code = Q.code, cat = Q.cat, r = Q.right, n = Q.list.length, e = Q.earned;
+  openPanel("Quiz result", coinLine() + "<p><b>You got " + r + " of " + n + " correct.</b><br>Coins earned: " + e + "</p>" + "<button class=\"pbtn solid\" data-a=\"quiz\" data-v=\"" + esc(code) + "\" data-c=\"" + esc(cat || "") + "\">Another quiz</button>" + "<button class=\"pbtn\" data-a=\"course\" data-v=\"" + esc(code) + "\">Back to course</button>");
+  Q = null;
+}
+function restaurant(n, msg) {
+  const items = MENUS[n];
+  openPanel(n, coinLine() + (msg ? "<div class=\"fb\">" + esc(msg) + "</div>" : "") + "<p>Menu (price in coins)</p>" + items.map((it, i) => "<button class=\"pbtn\" data-a=\"buy\" data-v=\"" + i + "\">" + esc(it.n) + " - " + it.p + " coins (+" + it.h + " hunger)</button>").join("") + "<div class=\"note\">Low on coins? Answer questions in the library or lab to earn more.</div>");
+}
+function buy(i) {
+  const it = MENUS[curPlace][i];
+  if (P.coins < it.p)
+    return restaurant(curPlace, "Not enough coins for " + it.n + ".");
+  if (P.hunger >= 100)
+    return restaurant(curPlace, "You are not hungry right now.");
+  P.coins -= it.p;
+  P.hunger = Math.min(100, P.hunger + it.h);
+  P.stats.ate = (P.stats.ate || 0) + 1;
+  saveProfile(P);
+  restaurant(curPlace, "You bought " + it.n + ".");
+}
+function hostel(n, msg) {
+  openPanel(n, coinLine() + (msg ? "<div class=\"fb\">" + esc(msg) + "</div>" : "") + "<p>Welcome to " + esc(n) + ". Rest here to restore your energy.</p>" + "<button class=\"pbtn solid\" data-a=\"rest\">Rest and recover energy</button>");
+}
+
+// ===== DEPARTMENT, FELLOWSHIP, CALCULATOR =====
+const MEMOS = [
+  {
+    t: "Welcome to PNGPD LIFE 2.0",
+    b: "Walk around campus and press ENTER at buildings. Answer course questions correctly to earn coins."
+  },
+  {
+    t: "Library and Laboratory",
+    b: "Revise key notes in the PTI Library and practise PGP 126 in the Laboratory. If you get a question wrong, the explanation is shown."
+  },
+  {
+    t: "Hints and calculator",
+    b: "Stuck on a question? Use the hint to remove two wrong options (you earn half the coins). The calculator is here in the department and also appears inside calculation questions."
+  },
+  {
+    t: "New services",
+    b: "Buy vehicles at the Garage to move faster. The Admin Block sells study items. Attend lectures and class tests in the Classrooms between 07:00 and 18:00 game time."
+  },
+  {
+    t: "Missions and bank",
+    b: "Open Missions in this department for bonus coins and a daily reward. Save coins at UBA Bank and they grow by 2% a day. Talk to students walking on campus for quick questions."
+  },
+  {
+    t: "Fellowships",
+    b: "Visit the Fellowship Hall to join CASOR, NIFES, RCF, WSF or BSF and attend once a day for XP."
+  },
+  {
+    t: "Class notices",
+    b: "Real department notices can be added to the MEMOS list inside index.html."
+  }
+];
+const FELLOWSHIPS = [
+  "CASOR",
+  "NIFES",
+  "RCF",
+  "WSF",
+  "BSF"
+];
+function deptMenu() {
+  openPanel("PNGPD Department", coinLine() + "<p>Check your results, read notices, use the calculator or see the leaderboard.</p>" + "<button class=\"pbtn solid\" data-a=\"missions\">Missions and daily reward</button><button class=\"pbtn\" data-a=\"results\">My results</button><button class=\"pbtn\" data-a=\"memos\">Notices and memos</button>" + "<button class=\"pbtn\" data-a=\"calc\" data-v=\"dept\">Calculator</button><button class=\"pbtn\" data-a=\"board\">Leaderboard</button>" + "<button class=\"pbtn\" data-a=\"logout\">" + (ONLINE ? "Log out" : "Back to start screen") + "</button>");
+}
+function resultsScreen() {
+  const rows = Object.keys(COURSES).filter(k => COURSES[k].quiz.length).map(k => {
+    const c = COURSES[k], st = P.stats.courses[k] || {
+        a: 0,
+        c: 0
+      }, pct = st.a ? Math.round(st.c / st.a * 100) : 0;
+    const rewarded = c.quiz.filter(q => P.done.includes(q.id)).length;
+    const tag = !st.a ? "Not started" : pct >= 70 ? "Good" : pct >= 50 ? "Fair" : "Needs revision";
+    return "<div class=\"row\"><span><b>" + esc(k) + "</b><br>" + st.c + "/" + st.a + " correct (" + pct + "%) &middot; " + rewarded + "/" + c.quiz.length + " questions mastered</span><span>" + tag + "</span></div>";
+  }).join("");
+  openPanel("My results", "<div class=\"note\">" + esc(P.username) + " &middot; Level " + P.level + " &middot; XP " + P.xp + " &middot; Coins " + P.coins + (P.fellowship ? " &middot; " + esc(P.fellowship) : "") + "</div>" + "<div class=\"note\">Lectures attended: " + (P.stats.lectures || 0) + " &middot; Vehicle: " + esc(vehName()) + " &middot; Items: " + (P.stats.items.length ? P.stats.items.map(i => (SHOP.find(x => x.id === i) || { n: i }).n).join(", ") : "none") + "</div>" + (rows || "<p>No results yet.</p>") + "<button class=\"pbtn solid\" data-a=\"home\">Back</button>");
+}
+function memosScreen() {
+  openPanel("Notices and memos", MEMOS.map(m => "<div class=\"memo\"><b>" + esc(m.t) + "</b><br>" + esc(m.b) + "</div>").join("") + "<button class=\"pbtn solid\" data-a=\"home\">Back</button>");
+}
+async function boardScreen() {
+  if (!ONLINE || !sb)
+    return openPanel("Leaderboard", "<p>Log in with an account to see the leaderboard. Offline play is not ranked.</p>" + "<button class=\"pbtn solid\" data-a=\"home\">Back</button>");
+  openPanel("Leaderboard", "<p>Loading...</p>");
+  try {
+    const {data, error} = await sb.from("game_players").select("username,level,xp,coins").order("xp", { ascending: false }).limit(10);
+    if (error)
+      throw error;
+    pbody.innerHTML = (data || []).map((r, i) => "<div class=\"row\"><span>" + (i + 1) + ". <b>" + esc(r.username) + "</b>" + (r.username === P.username ? " (you)" : "") + "</span><span>Lv " + r.level + " &middot; " + r.xp + " XP &middot; " + r.coins + " coins</span></div>").join("") + "<button class=\"pbtn solid\" data-a=\"home\">Back</button>";
+  } catch (e) {
+    pbody.innerHTML = "<p>Could not load the leaderboard.</p>" + "<button class=\"pbtn solid\" data-a=\"home\">Back</button>";
+  }
+}
+async function logout() {
+  try {
+    if (sb && ONLINE)
+      await sb.auth.signOut();
+  } catch (e) {
+  }
+  location.reload();
+}
+function fellowshipMenu(msg) {
+  openPanel("Fellowship Hall", coinLine() + (msg ? "<div class=\"fb\">" + esc(msg) + "</div>" : "") + "<p>" + (P.fellowship ? "Your fellowship: <b>" + esc(P.fellowship) + "</b>" : "You have not joined a fellowship yet.") + "</p>" + FELLOWSHIPS.map(f => "<button class=\"pbtn\" data-a=\"fel\" data-v=\"" + f + "\">" + f + (P.fellowship === f ? " (your fellowship)" : "") + "</button>").join(""));
+}
+function fellowshipScreen(f, msg) {
+  curFel = f;
+  openPanel(f, coinLine() + (msg ? "<div class=\"fb\">" + esc(msg) + "</div>" : "") + (P.fellowship === f ? "<p>You are a member of " + f + ". Attend once a day to earn XP.</p>" : "<p>Join " + f + " to attend its meetings.</p>") + (P.fellowship === f ? "<button class=\"pbtn solid\" data-a=\"attendfel\">Attend meeting today</button>" : "<button class=\"pbtn solid\" data-a=\"joinfel\">Join " + f + "</button>") + "<button class=\"pbtn\" data-a=\"home\">Back</button>");
+}
+let curFel = null;
+function joinFel() {
+  P.fellowship = curFel;
+  saveProfile(P);
+  fellowshipScreen(curFel, "You joined " + curFel + ".");
+}
+function attendFel() {
+  const today = new Date().toISOString().slice(0, 10);
+  if (P.stats.fdate === today)
+    return fellowshipScreen(curFel, "You have already attended today. Come back tomorrow.");
+  P.stats.fdate = today;
+  gain(15, 5);
+  saveProfile(P);
+  fellowshipScreen(curFel, "You attended " + curFel + ": +15 XP and +5 coins.");
+}
+let calcTokens = [], calcFrom = "dept";
+const CALC_KEYS = [
+  "7",
+  "8",
+  "9",
+  "\xF7",
+  "DEL",
+  "4",
+  "5",
+  "6",
+  "\xD7",
+  "C",
+  "1",
+  "2",
+  "3",
+  "\u2212",
+  "(",
+  "0",
+  ".",
+  "^",
+  "+",
+  ")",
+  "\u221A(",
+  "ln(",
+  "log(",
+  "π",
+  "="
+];
+function calcScreen(from) {
+  calcFrom = from || calcFrom;
+  openPanel("Calculator", "<div class=\"calcdisp\"><div id=\"cexp\">" + esc(calcTokens.join("") || "0") + "</div><div id=\"cres\"></div></div><div class=\"calcgrid\">" + CALC_KEYS.map(k => "<button class=\"ck\" data-a=\"ck\" data-v=\"" + esc(k) + "\">" + esc(k) + "</button>").join("") + "</div><button class=\"pbtn solid\" data-a=\"calcback\">Back</button>");
+}
+function calcKey(k) {
+  const exp = $("cexp"), res = $("cres");
+  if (k === "C") {
+    calcTokens = [];
+    res.textContent = "";
+  } else if (k === "DEL")
+    calcTokens.pop();
+  else if (k === "=") {
+    const map = {
+      "\xF7": "/",
+      "\xD7": "*",
+      "\u2212": "-",
+      "^": "**",
+      "π": "Math.PI",
+      "\u221A(": "Math.sqrt(",
+      "ln(": "Math.log(",
+      "log(": "Math.log10("
+    };
+    let js = calcTokens.map(t => map[t] || t).join("");
+    const open = (js.match(/\(/g) || []).length - (js.match(/\)/g) || []).length;
+    if (open > 0)
+      js += ")".repeat(open);
+    try {
+      const r = new Function("return (" + js + ")")();
+      if (typeof r !== "number" || !isFinite(r))
+        throw 0;
+      const out = String(+r.toPrecision(10));
+      res.textContent = "= " + out;
+      calcTokens = [out];
+    } catch (e) {
+      res.textContent = "Error";
+    }
+  } else {
+    calcTokens.push(k);
+    res.textContent = "";
+  }
+  exp.textContent = calcTokens.join("") || "0";
+}
+
+// ===== MISSIONS, DAILY REWARD, BANK, NPC TALK =====
+const todayStr = () => new Date().toISOString().slice(0, 10);
+const MISSIONS = [
+  {
+    id: "m1",
+    t: "Visit the PTI Library",
+    coins: 10,
+    xp: 10,
+    test: () => P.visited.includes("PTI Library")
+  },
+  {
+    id: "m2",
+    t: "Visit the PGP 126 Laboratory",
+    coins: 10,
+    xp: 10,
+    test: () => P.visited.includes("PGP 126 Laboratory")
+  },
+  {
+    id: "m3",
+    t: "Buy food at Bush Mama or Tutu Restaurant",
+    coins: 10,
+    xp: 10,
+    test: () => (P.stats.ate || 0) > 0
+  },
+  {
+    id: "m4",
+    t: "Answer 10 questions correctly",
+    coins: 30,
+    xp: 30,
+    test: () => P.done.length >= 10,
+    prog: () => Math.min(P.done.length, 10) + "/10"
+  },
+  {
+    id: "m5",
+    t: "Visit all four hostels",
+    coins: 40,
+    xp: 30,
+    test: () => HOSTELS.every(h => P.visited.includes(h)),
+    prog: () => HOSTELS.filter(h => P.visited.includes(h)).length + "/4"
+  },
+  {
+    id: "m6",
+    t: "Join a fellowship and attend a meeting",
+    coins: 20,
+    xp: 20,
+    test: () => !!P.fellowship && !!P.stats.fdate
+  },
+  {
+    id: "m7",
+    t: "Save coins at UBA Bank",
+    coins: 15,
+    xp: 15,
+    test: () => !!(P.stats.bank && P.stats.bank.dep > 0)
+  },
+  {
+    id: "m8",
+    t: "Answer 50 questions correctly",
+    coins: 100,
+    xp: 80,
+    test: () => P.done.length >= 50,
+    prog: () => Math.min(P.done.length, 50) + "/50"
+  },
+  {
+    id: "m9",
+    t: "Reach Level 3",
+    coins: 50,
+    xp: 0,
+    test: () => P.level >= 3,
+    prog: () => "Level " + P.level
+  },
+  {
+    id: "m10",
+    t: "Attend a lecture in the Classrooms",
+    coins: 20,
+    xp: 20,
+    test: () => (P.stats.lectures || 0) > 0
+  },
+  {
+    id: "m11",
+    t: "Buy something at the Admin Block",
+    coins: 20,
+    xp: 15,
+    test: () => P.stats.items.length > 0
+  },
+  {
+    id: "m12",
+    t: "Buy your first vehicle at the Garage",
+    coins: 50,
+    xp: 40,
+    test: () => P.stats.cars.length > 0
+  },
+  {
+    id: "m13",
+    t: "Attend 5 lectures",
+    coins: 60,
+    xp: 50,
+    test: () => (P.stats.lectures || 0) >= 5,
+    prog: () => Math.min(P.stats.lectures || 0, 5) + "/5"
+  }
+];
+function missionsScreen(msg) {
+  const cl = P.stats.claimed || [], today = todayStr(), got = P.stats.dday === today, streak = P.stats.streak || 0;
+  const rows = MISSIONS.map(m => {
+    const done = cl.includes(m.id), ok = m.test();
+    const right = done ? "Claimed" : ok ? "<button class=\"pbtn solid\" style=\"width:auto;margin:0;padding:6px 10px\" data-a=\"claim\" data-v=\"" + m.id + "\">Claim</button>" : m.prog ? m.prog() : "In progress";
+    return "<div class=\"row\"><span>" + esc(m.t) + "<br><small>+" + m.coins + " coins" + (m.xp ? ", +" + m.xp + " XP" : "") + "</small></span><span>" + right + "</span></div>";
+  }).join("");
+  openPanel("Missions", coinLine() + (msg ? "<div class=\"fb\">" + esc(msg) + "</div>" : "") + "<div class=\"memo\"><b>Daily reward</b> (streak: " + streak + " days)<br>" + (got ? "You have claimed today's reward." : "<button class=\"pbtn solid\" data-a=\"dailyclaim\">Claim daily reward</button>") + "</div>" + rows + "<button class=\"pbtn\" data-a=\"home\">Back</button>");
+}
+function claimMission(id) {
+  const m = MISSIONS.find(x => x.id === id);
+  P.stats.claimed = P.stats.claimed || [];
+  if (!m || P.stats.claimed.includes(id) || !m.test())
+    return missionsScreen("Not ready yet.");
+  P.stats.claimed.push(id);
+  gain(m.xp, m.coins);
+  saveProfile(P);
+  missionsScreen("Mission complete: +" + m.coins + " coins" + (m.xp ? " and +" + m.xp + " XP" : "") + ".");
+}
+function claimDaily() {
+  const today = todayStr();
+  if (P.stats.dday === today)
+    return missionsScreen("Already claimed today.");
+  const yest = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  P.stats.streak = P.stats.dday === yest ? (P.stats.streak || 0) + 1 : 1;
+  P.stats.dday = today;
+  const coins = 10 + 5 * Math.min(P.stats.streak - 1, 6);
+  gain(10, coins);
+  saveProfile(P);
+  missionsScreen("Daily reward: +" + coins + " coins and +10 XP. Streak: " + P.stats.streak + " day(s).");
+}
+function bankData() {
+  const t = todayStr();
+  let b = P.stats.bank;
+  if (!b)
+    b = P.stats.bank = {
+      bal: 0,
+      last: t,
+      dep: 0
+    };
+  const days = Math.max(0, Math.min(30, Math.round((new Date(t) - new Date(b.last)) / 86400000)));
+  if (days > 0 && b.bal > 0) {
+    b.bal = Math.floor(b.bal * Math.pow(1.02, days));
+  }
+  b.last = t;
+  return b;
+}
+function bankMenu(msg) {
+  const b = bankData();
+  openPanel("UBA Bank", coinLine() + (msg ? "<div class=\"fb\">" + esc(msg) + "</div>" : "") + "<div class=\"note\">Savings: <b>" + b.bal + "</b> coins. Savings grow by 2% per day (game money only).</div>" + "<p>Deposit</p>" + [
+    10,
+    50,
+    100
+  ].map(n => "<button class=\"pbtn\" data-a=\"bank\" data-v=\"d" + n + "\">Deposit " + n + "</button>").join("") + "<button class=\"pbtn\" data-a=\"bank\" data-v=\"dall\">Deposit all</button>" + "<p>Withdraw</p>" + [
+    10,
+    50,
+    100
+  ].map(n => "<button class=\"pbtn\" data-a=\"bank\" data-v=\"w" + n + "\">Withdraw " + n + "</button>").join("") + "<button class=\"pbtn\" data-a=\"bank\" data-v=\"wall\">Withdraw all</button>");
+}
+function bankDo(v) {
+  const b = bankData();
+  const all = v.endsWith("all"), n = all ? 0 : +v.slice(1);
+  if (v[0] === "d") {
+    const amt = all ? P.coins : n;
+    if (amt <= 0 || P.coins < amt)
+      return bankMenu("Not enough coins to deposit.");
+    P.coins -= amt;
+    b.bal += amt;
+    b.dep = (b.dep || 0) + 1;
+    saveProfile(P);
+    return bankMenu("Deposited " + amt + " coins.");
+  }
+  const amt = all ? b.bal : n;
+  if (amt <= 0 || b.bal < amt)
+    return bankMenu("Not enough savings to withdraw.");
+  b.bal -= amt;
+  P.coins += amt;
+  saveProfile(P);
+  bankMenu("Withdrew " + amt + " coins.");
+}
+function talkNpc(n) {
+  const line = NPC_LINES[Math.floor(Math.random() * NPC_LINES.length)];
+  openPanel(n.name, "<p><b>" + esc(n.name) + ":</b> \"" + esc(line) + "\"</p><button class=\"pbtn solid\" data-a=\"npcq\">Take a quick question (earn coins)</button><button class=\"pbtn\" data-a=\"npcbye\">Goodbye</button>");
+}
+function npcQuestion() {
+  const codes = Object.keys(COURSES).filter(k => COURSES[k].quiz.length);
+  if (!codes.length)
+    return closePanel();
+  const code = codes[Math.floor(Math.random() * codes.length)], c = COURSES[code];
+  const fresh = c.quiz.filter(q => !P.done.includes(q.id)), pool = fresh.length ? fresh : c.quiz;
+  const q = pool[Math.floor(Math.random() * pool.length)];
+  curPlace = null;
+  Q = {
+    code,
+    cat: "",
+    list: [q],
+    i: 0,
+    right: 0,
+    earned: 0,
+    locked: false
+  };
+  showQ();
+}
+
+// ===== GARAGE, ADMIN BLOCK, CLASSROOMS =====
+const has = id => !!(P && P.stats && P.stats.items && P.stats.items.includes(id));
+const vehName = () => {
+  const v = P && VEHICLES.find(x => x.id === P.stats.car);
+  return v ? v.n : "none (walking)";
+};
+const vehMult = () => {
+  const v = P && P.stats && VEHICLES.find(x => x.id === P.stats.car);
+  return v ? v.spd : 1;
+};
+function garageMenu(msg) {
+  openPanel("Garage", coinLine() + (msg ? "<div class=\"fb\">" + esc(msg) + "</div>" : "") + "<p>Current vehicle: <b>" + esc(vehName()) + "</b></p>" + VEHICLES.map(v => {
+    const own = P.stats.cars.includes(v.id), on = P.stats.car === v.id;
+    const label = esc(v.n) + " - speed x" + v.spd + (own ? "" : " - " + v.p + " coins");
+    if (!own)
+      return "<button class=\"pbtn\" data-a=\"vbuy\" data-v=\"" + v.id + "\">Buy: " + label + "</button>";
+    if (on)
+      return "<button class=\"pbtn solid\" data-a=\"vunequip\">" + label + " (using - tap to park)</button>";
+    return "<button class=\"pbtn\" data-a=\"vequip\" data-v=\"" + v.id + "\">Use: " + label + " (owned)</button>";
+  }).join("") + "<div class=\"note\">Vehicles are game items bought with game coins.</div>");
+}
+function vehicleAction(a, id) {
+  const v = VEHICLES.find(x => x.id === id);
+  if (a === "vunequip") {
+    P.stats.car = null;
+    setVehicle(null);
+    saveProfile(P);
+    return garageMenu("Vehicle parked. You are walking again.");
+  }
+  if (!v)
+    return;
+  if (a === "vbuy") {
+    if (P.stats.cars.includes(id))
+      return garageMenu("You already own this.");
+    if (P.coins < v.p)
+      return garageMenu("Not enough coins for the " + v.n + ". Earn more by answering questions.");
+    P.coins -= v.p;
+    P.stats.cars.push(id);
+  }
+  P.stats.car = id;
+  setVehicle(id);
+  saveProfile(P);
+  garageMenu((a === "vbuy" ? "You bought the " : "Now using the ") + v.n + ". Speed x" + v.spd + ".");
+}
+function adminMenu(msg) {
+  openPanel("Admin Block", coinLine() + (msg ? "<div class=\"fb\">" + esc(msg) + "</div>" : "") + "<p>Student services and supplies.</p>" + SHOP.map(it => {
+    const own = P.stats.items.includes(it.id);
+    return "<div class=\"memo\"><b>" + esc(it.n) + "</b> - " + it.p + " coins<br>" + esc(it.d) + "<br>" + (own ? "<i>Owned</i>" : "<button class=\"pbtn solid\" data-a=\"sbuy\" data-v=\"" + it.id + "\">Buy</button>") + "</div>";
+  }).join(""));
+}
+function shopBuy(id) {
+  const it = SHOP.find(x => x.id === id);
+  if (!it)
+    return;
+  if (P.stats.items.includes(id))
+    return adminMenu("You already own this.");
+  if (P.coins < it.p)
+    return adminMenu("Not enough coins for " + it.n + ".");
+  P.coins -= it.p;
+  P.stats.items.push(id);
+  saveProfile(P);
+  adminMenu("You bought: " + it.n + ".");
+}
+function classMenu(msg) {
+  const codes = Object.keys(COURSES).filter(k => COURSES[k].notes.length || COURSES[k].quiz.length);
+  openPanel("Classrooms", coinLine() + (msg ? "<div class=\"fb\">" + esc(msg) + "</div>" : "") + "<div class=\"note\">Lectures run from 07:00 to 18:00 game time. Each lecture costs 20 energy and 5 hunger, once per course per day.</div>" + codes.map(k => "<button class=\"pbtn\" data-a=\"cclass\" data-v=\"" + esc(k) + "\">" + esc(COURSES[k].title) + "</button>").join(""));
+}
+function classCourse(code, msg) {
+  const c = COURSES[code];
+  curClass = code;
+  openPanel(c.title, coinLine() + (msg ? "<div class=\"fb\">" + esc(msg) + "</div>" : "") + "<button class=\"pbtn solid\" data-a=\"lecture\">Attend lecture</button>" + (c.quiz.length ? "<button class=\"pbtn solid\" data-a=\"ctest\">Class test (5 questions, +50% coins)</button>" : "") + "<button class=\"pbtn\" data-a=\"home\">Back</button>");
+}
+let curClass = null;
+function attendLecture() {
+  const c = COURSES[curClass], today = new Date().toISOString().slice(0, 10), hr = gameMin / 60 % 24;
+  if (hr < 7 || hr >= 18)
+    return classCourse(curClass, "Classes are closed. Come back between 07:00 and 18:00.");
+  if (!c.notes.length)
+    return classCourse(curClass, "No lecture notes for this course yet.");
+  if (P.stats.att[curClass] === today)
+    return classCourse(curClass, "You already attended this lecture today.");
+  if (P.energy < 20)
+    return classCourse(curClass, "You are too tired. Rest in a hostel first.");
+  if (P.hunger < 10)
+    return classCourse(curClass, "You are too hungry to concentrate. Eat first.");
+  P.energy -= 20;
+  P.hunger = Math.max(0, P.hunger - 5);
+  P.stats.att[curClass] = today;
+  P.stats.lectures = (P.stats.lectures || 0) + 1;
+  gain(15, 0);
+  saveProfile(P);
+  const pts = shuffle(c.notes.filter(n => !/^SAMPLE/.test(n))).slice(0, 4);
+  openPanel(c.title + " - Lecture", "<div class=\"fb\">You attended the lecture: +15 XP</div><p>Today's key points:</p><ul>" + pts.map(n => "<li>" + esc(n) + "</li>").join("") + "</ul><button class=\"pbtn solid\" data-a=\"cclass\" data-v=\"" + esc(curClass) + "\">Back</button>");
+}
+function classTest() {
+  startQuiz(curClass, "");
+  Q.list = Q.list.slice(0, 5);
+  Q.mult = 1.5;
+  showQ();
+}
+pbody.addEventListener("click", e => {
+  const b = e.target.closest("button");
+  if (!b || !b.dataset.a)
+    return;
+  const a = b.dataset.a, v = b.dataset.v;
+  if (a === "course")
+    courseScreen(v);
+  else if (a === "notes")
+    notesScreen(v);
+  else if (a === "quiz")
+    startQuiz(v, b.dataset.c);
+  else if (a === "opt")
+    answer(+v);
+  else if (a === "next") {
+    Q.i++;
+    if (Q.i >= Q.list.length)
+      finishQuiz();
+    else
+      showQ();
+  } else if (a === "buy")
+    buy(+v);
+  else if (a === "rest") {
+    P.energy = 100;
+    saveProfile(P);
+    hostel(curPlace, "You feel fully rested.");
+  } else if (a === "home")
+    enter(curPlace);
+  else if (a === "hint")
+    useHint();
+  else if (a === "vbuy" || a === "vequip" || a === "vunequip")
+    vehicleAction(a, v);
+  else if (a === "sbuy")
+    shopBuy(v);
+  else if (a === "cclass")
+    classCourse(v, "");
+  else if (a === "lecture")
+    attendLecture();
+  else if (a === "ctest")
+    classTest();
+  else if (a === "missions")
+    missionsScreen("");
+  else if (a === "claim")
+    claimMission(v);
+  else if (a === "dailyclaim")
+    claimDaily();
+  else if (a === "bank")
+    bankDo(v);
+  else if (a === "npcq")
+    npcQuestion();
+  else if (a === "npcbye")
+    closePanel();
+  else if (a === "calc")
+    calcScreen(v);
+  else if (a === "ck")
+    calcKey(v);
+  else if (a === "calcback") {
+    if (calcFrom === "quiz" && Q)
+      showQ(true);
+    else
+      deptMenu();
+  } else if (a === "results")
+    resultsScreen();
+  else if (a === "memos")
+    memosScreen();
+  else if (a === "board")
+    boardScreen();
+  else if (a === "logout")
+    logout();
+  else if (a === "fel")
+    fellowshipScreen(v, "");
+  else if (a === "joinfel")
+    joinFel();
+  else if (a === "attendfel")
+    attendFel();
+});
+function doAct() {
+  if (!P || inPanel)
+    return;
+  if (!near) {
+    if (nearNpc)
+      talkNpc(nearNpc);
+    return;
+  }
+  if (!P.visited.includes(near.n)) {
+    P.visited.push(near.n);
+    gain(20, 10);
+    say("First visit to " + near.n + "! +20 XP, +10 coins");
+    saveProfile(P);
+  }
+  enter(near.n);
+}
+actBtn.addEventListener("touchstart", e => {
+  e.preventDefault();
+  doAct();
+}, { passive: false });
+actBtn.addEventListener("click", doAct);
+addEventListener("keydown", e => {
+  if (e.key === "e")
+    doAct();
+});
+function blocked(x, z) {
+  return solids.some(s => Math.abs(x - s.x) < s.hw && Math.abs(z - s.z) < s.hd) || Math.abs(x) > 150 || z > 85 || z < -95;
+}
+
+// ===== MINIMAP =====
+const mini = $("mini"), mg = mini.getContext("2d");
+const mx = x => (x + 100) / 200 * 220, mz = z => (z + 100) / 180 * 220;
+function drawMini() {
+  mg.clearRect(0, 0, 220, 220);
+  mg.fillStyle = "#444";
+  mg.fillRect(mx(-5), 0, 12, 220);
+  mg.fillRect(0, mz(-26), 220, 9);
+  mg.fillRect(0, mz(10), 220, 9);
+  mg.fillStyle = "#ffeb3b";
+  places.forEach(p => mg.fillRect(mx(p[2]) - 5, mz(p[3]) - 4, 10, 8));
+  mg.fillStyle = "#fff";
+  mg.beginPath();
+  mg.arc(mx(player.position.x), mz(player.position.z), 6, 0, Math.PI * 2);
+  mg.fill();
+  mg.fillStyle = "#e10600";
+  mg.beginPath();
+  mg.arc(mx(player.position.x), mz(player.position.z), 4, 0, Math.PI * 2);
+  mg.fill();
+}
+let sh = 0;
+function drawStats() {
+  if ((sh += 1) % 10)
+    return;
+  const bar = (v, c) => "<div class=\"bar\"><i style=\"width:" + Math.round(v) + "%;background:" + c + "\"></i></div>";
+  $("stats").innerHTML = P.username + " &middot; Lv " + P.level + "<br>XP " + P.xp % 100 + "/100" + bar(P.xp % 100, "#ffeb3b") + "Coins: " + P.coins + "<br>Energy" + bar(P.energy, "#4caf50") + "Hunger" + bar(P.hunger, "#ff9800") + (P.stats.car ? "Vehicle: " + vehName() : "");
+}
+
+// ===== LOOP =====
+let gameMin = 8 * 60, clkN = 0;
+const NIGHT = new THREE.Color(858941), DAY = new THREE.Color(8900331), skyNow = new THREE.Color();
+function updateSky(dt) {
+  gameMin += dt * 2;
+  const hr = gameMin / 60 % 24, f = Math.max(0, Math.sin((hr - 6) / 12 * Math.PI));
+  skyNow.copy(NIGHT).lerp(DAY, f);
+  scene.background.copy(skyNow);
+  scene.fog.color.copy(skyNow);
+  hemi.intensity = 0.35 + 0.55 * f;
+  sun.intensity = 0.1 + 0.5 * f;
+  clouds.forEach(c => {
+    c.position.x += dt * 1.5;
+    if (c.position.x > 160)
+      c.position.x = -160;
+    c.material.color.setScalar(0.25 + 0.75 * f);
+  });
+  if ((clkN += 1) % 15 === 0) {
+    const pad = n => (n < 10 ? "0" : "") + n;
+    $("clk").textContent = "Day " + (Math.floor(gameMin / 1440) + 1) + " - " + pad(Math.floor(hr)) + ":" + pad(Math.floor(hr % 1 * 60));
+  }
+}
+const clock = new THREE.Clock();
+function loop() {
+  requestAnimationFrame(loop);
+  const dt = Math.min(clock.getDelta(), 0.05);
+  updateSky(dt);
+  const ix = jx + (keys.d || keys.arrowright ? 1 : 0) - (keys.a || keys.arrowleft ? 1 : 0);
+  const iy = jy + (keys.s || keys.arrowdown ? 1 : 0) - (keys.w || keys.arrowup ? 1 : 0);
+  const mag = P && !inPanel ? Math.min(1, Math.hypot(ix, iy)) : 0;
+  const wantRun = (running || keys.shift) && P && P.energy > 1 && P.hunger > 5;
+  if (mag > 0.08) {
+    const sp = (wantRun ? 13 : 6.5) * vehMult() * mag * dt;
+    if (wantRun)
+      P.energy = Math.max(0, P.energy - 4 * dt * (has("boots") ? 0.7 : 1));
+    const fx = -Math.sin(camAng), fz = -Math.cos(camAng), rx = Math.cos(camAng), rz = -Math.sin(camAng);
+    const l = Math.hypot(ix, iy);
+    const dx = (rx * ix / l - fx * iy / l) * sp, dz = (rz * ix / l - fz * iy / l) * sp;
+    const nx = player.position.x + dx, nz = player.position.z + dz;
+    if (!blocked(nx, player.position.z))
+      player.position.x = nx;
+    if (!blocked(player.position.x, nz))
+      player.position.z = nz;
+    player.rotation.y = Math.atan2(dx, dz);
+    body.position.y = 1.3 + Math.sin(performance.now() / 90) * 0.08;
+  }
+  if (P && mag <= 0.08)
+    P.energy = Math.min(100, P.energy + 3 * dt * (has("backpack") ? 1.5 : 1));
+  npcs.forEach(n => {
+    n.t += n.dir * n.sp * dt;
+    if (n.t > 1) {
+      n.t = 1;
+      n.dir = -1;
+    }
+    if (n.t < 0) {
+      n.t = 0;
+      n.dir = 1;
+    }
+    const [a, b, c, d] = n.p;
+    n.c.position.set(a + (c - a) * n.t, 0, b + (d - b) * n.t);
+    n.c.rotation.y = Math.atan2((c - a) * n.dir, (d - b) * n.dir);
+    n.c.userData.body.position.y = 1.3 + Math.sin(performance.now() / 110 + n.sp * 300) * 0.06;
+  });
+  const d = 11, h = 7;
+  const tx = player.position.x + Math.sin(camAng) * d, tz = player.position.z + Math.cos(camAng) * d;
+  cam.position.x += (tx - cam.position.x) * 0.1;
+  cam.position.z += (tz - cam.position.z) * 0.1;
+  cam.position.y += (h - cam.position.y) * 0.1;
+  cam.lookAt(player.position.x, 2, player.position.z);
+  near = null;
+  let best = 1000000000;
+  spots.forEach(s => {
+    const dd = Math.hypot(player.position.x - s.x, player.position.z - s.z);
+    if (dd < (s.r || 6) && dd < best) {
+      best = dd;
+      near = s;
+    }
+  });
+  nearNpc = null;
+  if (!near) {
+    let bd = 4;
+    npcs.forEach(n => {
+      const dd = Math.hypot(player.position.x - n.c.position.x, player.position.z - n.c.position.z);
+      if (dd < bd) {
+        bd = dd;
+        nearNpc = n;
+      }
+    });
+  }
+  if (near) {
+    locEl.textContent = near.n;
+    actBtn.textContent = "ENTER";
+    actBtn.style.display = near.r || inPanel ? "none" : "flex";
+  } else if (nearNpc) {
+    locEl.textContent = "PTI Campus";
+    actBtn.textContent = "TALK";
+    actBtn.style.display = inPanel ? "none" : "flex";
+  } else {
+    locEl.textContent = "PTI Campus";
+    actBtn.style.display = "none";
+  }
+  drawMini();
+  if (P)
+    drawStats();
+  ren.render(scene, cam);
+}
+cam.position.set(0, 7, 76);
+loop();
+addEventListener("resize", () => {
+  cam.aspect = innerWidth / innerHeight;
+  cam.updateProjectionMatrix();
+  ren.setSize(innerWidth, innerHeight);
+});
+
+// ===== ACCOUNT / SUPABASE =====
+const SUPABASE_URL = "https://xlylxyxjsvhvrnjrcvrf.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhseWx4eXhqc3ZodnJuanJjdnJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE0ODQ0NTUsImV4cCI6MjEwNzA2MDQ1NX0.sDx_VjbP30V7qo_7eUU74TgcPDUY0yxP574qFjt5liU";
+let sb = null, uid = null, ONLINE = false, remoteTimer = null, pendingName = "";
+try {
+  if (window.supabase)
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+} catch (e) {
+  sb = null;
+}
+const mkEmail = u => u.trim().toLowerCase().replace(/[^a-z0-9_]/g, "") + "@pngpd.game";
+const msg1 = t => {
+  $("msg").textContent = t;
+};
+function showCreate(name) {
+  $("c1").style.display = "none";
+  $("c2").style.display = "block";
+  $("pname").value = name || "";
+  buildColorChoices();
+}
+function fromRow(r) {
+  return {
+    username: r.username,
+    shirt_color: r.shirt_color || "#e10600",
+    level: r.level || 1,
+    xp: r.xp || 0,
+    coins: r.coins || 0,
+    energy: r.energy == null ? 100 : r.energy,
+    hunger: r.hunger == null ? 100 : r.hunger,
+    visited: r.visited || [],
+    done: r.done || [],
+    fellowship: r.fellowship || null,
+    stats: r.stats && r.stats.courses ? r.stats : {
+      courses: {},
+      fdate: ""
+    }
+  };
+}
+function toRow(p) {
+  return {
+    shirt_color: p.shirt_color,
+    level: p.level,
+    xp: p.xp,
+    coins: p.coins,
+    energy: Math.round(p.energy),
+    hunger: Math.round(p.hunger),
+    visited: p.visited,
+    done: p.done,
+    fellowship: p.fellowship,
+    stats: p.stats,
+    updated_at: new Date().toISOString()
+  };
+}
+function queueRemote() {
+  if (!ONLINE || !P || !sb || remoteTimer)
+    return;
+  remoteTimer = setTimeout(async () => {
+    remoteTimer = null;
+    try {
+      await sb.from("game_players").update(toRow(P)).eq("id", uid);
+    } catch (e) {
+    }
+  }, 3000);
+}
+function flushRemote() {
+  if (!ONLINE || !P || !sb)
+    return;
+  clearTimeout(remoteTimer);
+  remoteTimer = null;
+  sb.from("game_players").update(toRow(P)).eq("id", uid).then(() => {
+  }, () => {
+  });
+}
+async function loadRemote() {
+  const {data, error} = await sb.from("game_players").select("*").eq("id", uid).maybeSingle();
+  if (error) {
+    $("c1").style.display = "block";
+    msg1("Could not load your profile: " + error.message);
+    return false;
+  }
+  ONLINE = true;
+  if (data) {
+    startGame(fromRow(data));
+  } else
+    showCreate(pendingName);
+  return true;
+}
+function checkCreds() {
+  const u = $("un").value, p = $("pw").value;
+  if (u.trim().length < 3 || p.length < 6) {
+    msg1("Username 3+ letters, password 6+ characters.");
+    return null;
+  }
+  return {
+    u: u.trim(),
+    p
+  };
+}
+$("bl").onclick = async () => {
+  if (!sb)
+    return msg1("Online login is unavailable. Use Play offline.");
+  const c = checkCreds();
+  if (!c)
+    return;
+  msg1("Logging in...");
+  try {
+    const {data, error} = await sb.auth.signInWithPassword({
+      email: mkEmail(c.u),
+      password: c.p
+    });
+    if (error)
+      return msg1(error.message === "Invalid login credentials" ? "Wrong username or password." : error.message);
+    uid = data.user.id;
+    pendingName = c.u;
+    await loadRemote();
+  } catch (e) {
+    msg1("Could not reach the server: " + e.message);
+  }
+};
+$("br").onclick = async () => {
+  if (!sb)
+    return msg1("Online accounts are unavailable. Use Play offline.");
+  const c = checkCreds();
+  if (!c)
+    return;
+  msg1("Creating account...");
+  try {
+    const {data, error} = await sb.auth.signUp({
+      email: mkEmail(c.u),
+      password: c.p,
+      options: { data: { username: c.u } }
+    });
+    if (error)
+      return msg1(error.message);
+    if (!data.session)
+      return msg1("Turn off \"Confirm email\" in Supabase (Authentication > Sign In / Providers > Email), then try again.");
+    uid = data.user.id;
+    pendingName = c.u;
+    ONLINE = true;
+    showCreate(c.u);
+  } catch (e) {
+    msg1("Could not reach the server: " + e.message);
+  }
+};
+$("boff").onclick = () => {
+  const sp = loadProfile();
+  if (sp) {
+    profile = sp;
+    pickColor = sp.shirt_color || pickColor;
+    startGame(profile);
+  } else {
+    profile = getDefaultProfile();
+    showCreate("");
+  }
+};
+(async () => {
+  if (sb) {
+    try {
+      const {data} = await sb.auth.getSession();
+      if (data && data.session) {
+        uid = data.session.user.id;
+        pendingName = (data.session.user.user_metadata || {}).username || "";
+        if (await loadRemote())
+          return;
+      }
+    } catch (e) {
+    }
+  }
+  $("c1").style.display = "block";
+  if (!sb)
+    msg1("Online features are unavailable right now. You can still play offline.");
+})();
+setInterval(() => {
+  if (P) {
+    P.hunger = Math.max(0, P.hunger - 1);
+    if (P.hunger <= 10)
+      say("You are hungry! Eat at Bush Mama or Tutu Restaurant.");
+    saveProfile(P);
+  }
+}, 30000);
+addEventListener("visibilitychange", () => {
+  if (document.hidden && P) {
+    saveProfile(P);
+    flushRemote();
+  }
+});
 </script>
 </body>
 </html>
