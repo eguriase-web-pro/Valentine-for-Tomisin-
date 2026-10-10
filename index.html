@@ -33,6 +33,7 @@
       flex-direction: column;
       gap: 6px;
       pointer-events: none;
+      z-index: 20;
     }
 
     .pill {
@@ -60,6 +61,7 @@
       border: 3px solid #fff;
       background: #2e7d32;
       pointer-events: none;
+      z-index: 20;
     }
 
     #joy {
@@ -71,6 +73,7 @@
       border-radius: 50%;
       background: rgba(255,255,255,.35);
       border: 3px solid rgba(255,255,255,.8);
+      z-index: 20;
     }
 
     #knob {
@@ -93,6 +96,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      z-index: 20;
     }
 
     #run {
@@ -126,6 +130,7 @@
       display: none;
       max-width: 70%;
       text-align: center;
+      z-index: 25;
     }
 
     #stats {
@@ -137,6 +142,7 @@
       font-weight: 700;
       line-height: 1.5;
       display: none;
+      z-index: 20;
     }
 
     .bar {
@@ -281,40 +287,137 @@
   <div class="btn" id="run">RUN</div>
   <div class="btn" id="act">ENTER</div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
   <script>
-    const $ = (id) => document.getElementById(id);
+    const $ = id => document.getElementById(id);
 
-    // 1) Replace with your real Supabase values
-    const SUPABASE_URL = "https://YOUR_PROJECT_ID.supabase.co";
-    const SUPABASE_KEY = "YOUR_ANON_PUBLIC_KEY";
+    // LocalStorage keys
+    const USERS_KEY = "pngpd_users_v1";
+    const ACTIVE_USER_KEY = "pngpd_active_user_v1";
+    const PROFILE_KEY = "pngpd_profile_v1";
 
-    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    let uid = null;
+    let currentUser = null;
+    let profile = null;
     let pickColor = "#e10600";
+
+    function loadUsers() {
+      try {
+        return JSON.parse(localStorage.getItem(USERS_KEY)) || [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveUsers(users) {
+      localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    }
 
     function setMessage(elId, text) {
       const el = $(elId);
       if (el) el.textContent = text;
     }
 
-    const COLORS = [
-      "#e10600",
-      "#2196f3",
-      "#ffeb3b",
-      "#4caf50",
-      "#ff9800",
-      "#ab47bc",
-      "#00bcd4",
-      "#ffffff"
-    ];
+    function createId() {
+      return "id_" + Date.now() + "_" + Math.random().toString(36).slice(2, 9);
+    }
+
+    function creds() {
+      const u = $("un").value.trim();
+      const p = $("pw").value;
+
+      if (u.length < 3 || p.length < 6) {
+        setMessage("msg", "Username 3+ chars, password 6+ chars");
+        return null;
+      }
+
+      return { u, p };
+    }
+
+    function saveActiveUser(user) {
+      localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(user));
+    }
+
+    function loadActiveUser() {
+      try {
+        return JSON.parse(localStorage.getItem(ACTIVE_USER_KEY));
+      } catch {
+        return null;
+      }
+    }
+
+    function saveProfile(data) {
+      localStorage.setItem(PROFILE_KEY, JSON.stringify(data));
+    }
+
+    function loadProfile() {
+      try {
+        return JSON.parse(localStorage.getItem(PROFILE_KEY));
+      } catch {
+        return null;
+      }
+    }
+
+    function loginUser(username, password) {
+      const users = loadUsers();
+      return users.find(user => user.username === username && user.password === password) || null;
+    }
+
+    function createUser(username, password) {
+      const users = loadUsers();
+      if (users.some(user => user.username.toLowerCase() === username.toLowerCase())) {
+        return null;
+      }
+
+      const user = {
+        id: createId(),
+        username,
+        password
+      };
+
+      users.push(user);
+      saveUsers(users);
+      return user;
+    }
+
+    function updateProfileFromUser(user) {
+      const saved = loadProfile();
+
+      if (saved && saved.username === user.username) {
+        profile = saved;
+        return saved;
+      }
+
+      profile = {
+        id: user.id,
+        username: user.username,
+        shirt_color: pickColor,
+        level: 1,
+        xp: 0,
+        coins: 0,
+        energy: 100,
+        hunger: 100,
+        visited: []
+      };
+
+      saveProfile(profile);
+      return profile;
+    }
 
     function buildColorChoices() {
       const sws = $("sws");
       if (!sws) return;
+
+      const COLORS = [
+        "#e10600",
+        "#2196f3",
+        "#ffeb3b",
+        "#4caf50",
+        "#ff9800",
+        "#ab47bc",
+        "#00bcd4",
+        "#ffffff"
+      ];
 
       sws.innerHTML = COLORS.map((c, i) =>
         '<span class="sw' + (i === 0 ? " on" : "") + '" data-color="' + c + '" style="background:' + c + '"></span>'
@@ -328,104 +431,64 @@
 
         pickColor = color;
 
-        [...sws.children].forEach((x) => {
+        [...sws.children].forEach(x => {
           x.classList.toggle("on", x === target);
         });
 
-        if (body) {
+        if (typeof body !== "undefined" && body) {
           body.material.color.set(color);
         }
       });
     }
 
-    async function loginUser(username, password) {
-      const { data, error } = await sb
-        .from("users")
-        .select("*")
-        .eq("username", username)
-        .eq("password", password)
-        .maybeSingle();
-
-      if (error) return null;
-      return data;
-    }
-
-    async function createUser(username, password) {
-      const { data, error } = await sb
-        .from("users")
-        .insert([{ username, password }])
-        .select()
-        .single();
-
-      if (error) return null;
-      return data;
-    }
-
-    async function saveCharacterColor(userId, color) {
-      const { error } = await sb
-        .from("users")
-        .update({ color })
-        .eq("id", userId);
-
-      if (error) {
-        console.error(error);
-        return false;
-      }
-      return true;
-    }
-
-    function creds() {
-      const u = $("un").value;
-      const p = $("pw").value;
-
-      if (u.trim().length < 3 || p.length < 6) {
-        setMessage("msg", "Username 3+ chars, password 6+ chars");
-        return null;
-      }
-
-      return {
-        u: u.trim(),
-        p
-      };
-    }
-
-    $("bl").addEventListener("click", async () => {
+    $("bl").addEventListener("click", () => {
       const c = creds();
       if (!c) return;
 
       setMessage("msg", "Logging in...");
 
-      const user = await loginUser(c.u, c.p);
+      const found = loginUser(c.u, c.p);
 
-      if (!user) {
+      if (!found) {
         setMessage("msg", "Invalid username or password.");
         return;
       }
 
-      uid = user.id;
-      localStorage.setItem("userId", uid);
+      currentUser = found;
+      saveActiveUser(currentUser);
+      profile = updateProfileFromUser(currentUser);
 
       setMessage("msg", "");
       $("c1").style.display = "none";
       $("c2").style.display = "block";
       buildColorChoices();
+
+      if (profile.shirt_color) {
+        pickColor = profile.shirt_color;
+        const selected = document.querySelector('.sw[data-color="' + pickColor + '"]');
+        if (selected) {
+          document.querySelectorAll(".sw").forEach(x => x.classList.remove("on"));
+          selected.classList.add("on");
+        }
+      }
     });
 
-    $("br").addEventListener("click", async () => {
+    $("br").addEventListener("click", () => {
       const c = creds();
       if (!c) return;
 
       setMessage("msg", "Creating account...");
 
-      const user = await createUser(c.u, c.p);
+      const user = createUser(c.u, c.p);
 
       if (!user) {
-        setMessage("msg", "Username already exists or registration failed.");
+        setMessage("msg", "Username already exists.");
         return;
       }
 
-      uid = user.id;
-      localStorage.setItem("userId", uid);
+      currentUser = user;
+      saveActiveUser(currentUser);
+      profile = updateProfileFromUser(currentUser);
 
       setMessage("msg", "Account created. Choose your shirt color.");
       $("c1").style.display = "none";
@@ -433,35 +496,42 @@
       buildColorChoices();
     });
 
-    $("bgo").addEventListener("click", async () => {
-      const selected = document.querySelector(".sw.on");
-      const savedUserId = localStorage.getItem("userId");
+    $("bgo").addEventListener("click", () => {
+      if (!currentUser) {
+        setMessage("msg2", "Please log in first.");
+        return;
+      }
 
+      const selected = document.querySelector(".sw.on");
       if (!selected) {
         setMessage("msg2", "Please choose a shirt color.");
         return;
       }
 
-      const finalUid = savedUserId || uid;
-      if (!finalUid) {
-        setMessage("msg2", "Please log in first.");
-        return;
-      }
+      const chosen = selected.dataset.color || pickColor;
 
-      const color = selected.dataset.color || pickColor;
+      profile = {
+        ...(profile || {
+          id: currentUser.id,
+          username: currentUser.username
+        }),
+        username: currentUser.username,
+        shirt_color: chosen,
+        level: profile?.level || 1,
+        xp: profile?.xp || 0,
+        coins: profile?.coins || 0,
+        energy: profile?.energy || 100,
+        hunger: profile?.hunger || 100,
+        visited: profile?.visited || []
+      };
 
-      const ok = await saveCharacterColor(finalUid, color);
-
-      if (ok) {
-        $("ov").style.display = "none";
-      } else {
-        setMessage("msg2", "Could not save character color.");
-      }
+      saveProfile(profile);
+      startGame(profile);
     });
 
-    // =============================
-    // THREE.js game code
-    // =============================
+    // ==============================
+    // Game logic
+    // ==============================
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x87ceeb);
@@ -790,8 +860,8 @@
     });
 
     const keys = {};
-    addEventListener("keydown", (e) => { keys[e.key.toLowerCase()] = 1; });
-    addEventListener("keyup", (e) => { keys[e.key.toLowerCase()] = 0; });
+    addEventListener("keydown", e => { keys[e.key.toLowerCase()] = 1; });
+    addEventListener("keyup", e => { keys[e.key.toLowerCase()] = 0; });
 
     const runBtn = $("run");
     let running = false;
@@ -850,13 +920,13 @@
     }
 
     function doAct() {
-      if (!near || !P) return;
+      if (!near || !profile) return;
 
-      if (!P.visited.includes(near.n)) {
-        P.visited.push(near.n);
+      if (!profile.visited.includes(near.n)) {
+        profile.visited.push(near.n);
         gain(20, 10);
         say("First visit to " + near.n + "! +20 XP, +10 coins");
-        save();
+        saveProfile(profile);
       } else {
         say(near.n + ": activities coming in Phase 4!");
       }
@@ -869,7 +939,7 @@
 
     actBtn.addEventListener("click", doAct);
 
-    addEventListener("keydown", (e) => {
+    addEventListener("keydown", e => {
       if (e.key === "e") doAct();
     });
 
@@ -979,12 +1049,7 @@
 
         const [a, b, c, d] = n.p;
 
-        n.c.position.set(
-          a + (c - a) * n.t,
-          0,
-          b + (d - b) * n.t
-        );
-
+        n.c.position.set(a + (c - a) * n.t, 0, b + (d - b) * n.t);
         n.c.rotation.y = Math.atan2((c - a) * n.dir, (d - b) * n.dir);
         n.c.userData.body.position.y = 1.3 + Math.sin(performance.now() / 110 + n.sp * 300) * 0.06;
       });
@@ -1036,10 +1101,8 @@
       ren.setSize(innerWidth, innerHeight);
     });
 
-    say("Welcome to PTI! Walk up the main road. Drag the screen to turn the camera.");
-
-    function startGame(d) {
-      P = d;
+    function startGame(data) {
+      P = data;
 
       if (!P.visited) P.visited = [];
 
@@ -1080,50 +1143,48 @@
         "Hunger" + bar(P.hunger, "#ff9800");
     }
 
-    async function save() {
-      if (!P) return;
-
-      await sb
-        .from("game_players")
-        .update({
-          level: P.level,
-          xp: P.xp,
-          coins: P.coins,
-          energy: Math.round(P.energy),
-          hunger: Math.round(P.hunger),
-          visited: P.visited,
-          updated_at: new Date().toISOString()
-        })
-        .eq("id", uid);
+    function autoSaveProfile() {
+      if (!profile) return;
+      saveProfile(profile);
     }
 
     setInterval(() => {
-      if (P) {
-        P.hunger = Math.max(0, P.hunger - 1);
-        save();
+      if (profile) {
+        profile.hunger = Math.max(0, (profile.hunger || 100) - 1);
+        autoSaveProfile();
       }
     }, 30000);
 
     addEventListener("visibilitychange", () => {
-      if (document.hidden) save();
-    });
-
-    sb.auth.getSession().then(async ({ data }) => {
-      if (data.session) {
-        uid = data.session.user.id;
-        const { data: userData } = await sb
-          .from("game_players")
-          .select("*")
-          .eq("id", uid)
-          .maybeSingle();
-
-        if (userData) {
-          startGame(userData);
-        }
+      if (document.hidden && profile) {
+        autoSaveProfile();
       }
     });
 
-    buildColorChoices();
+    const savedUser = loadActiveUser();
+    const savedProfile = loadProfile();
+
+    if (savedUser && savedProfile && savedUser.username === savedProfile.username) {
+      currentUser = savedUser;
+      profile = savedProfile;
+      pickColor = profile.shirt_color || pickColor;
+
+      if (profile && profile.shirt_color) {
+        setTimeout(() => {
+          const selected = document.querySelector('.sw[data-color="' + profile.shirt_color + '"]');
+          if (selected) {
+            document.querySelectorAll(".sw").forEach(x => x.classList.remove("on"));
+            selected.classList.add("on");
+          }
+        }, 100);
+      }
+
+      startGame(profile);
+    } else {
+      buildColorChoices();
+    }
+
+    say("Welcome to PTI! Walk up the main road. Drag the screen to turn the camera.");
   </script>
 </body>
 </html>
