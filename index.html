@@ -196,15 +196,6 @@
       font-size: 14px;
     }
 
-    .card input {
-      width: 100%;
-      padding: 12px;
-      margin: 5px 0;
-      border: 2px solid #ddd;
-      border-radius: 10px;
-      font-size: 16px;
-    }
-
     .card button {
       width: 100%;
       padding: 13px;
@@ -217,13 +208,7 @@
       background: #e10600;
     }
 
-    .card button.alt {
-      background: #fff;
-      color: #e10600;
-      border: 2px solid #e10600;
-    }
-
-    #msg {
+    #msg2 {
       color: #c00;
       font-size: 13px;
       min-height: 18px;
@@ -258,25 +243,14 @@
   <div id="toast"></div>
 
   <div id="ov">
-    <div class="card" id="c1">
-      <h1>PNGPD LIFE 2.0</h1>
-      <p>Your virtual life at PTI Effurun</p>
-
-      <input id="un" placeholder="Username" autocapitalize="none" autocomplete="username" />
-      <input id="pw" type="password" placeholder="Password (min 6 characters)" autocomplete="current-password" />
-
-      <button id="bl">LOGIN</button>
-      <button class="alt" id="br">CREATE ACCOUNT</button>
-
-      <div id="msg"></div>
-    </div>
-
-    <div class="card" id="c2" style="display:none">
+    <div class="card" id="c2">
       <h1>Create Character</h1>
       <p>Pick your shirt colour</p>
+
       <div id="sws"></div>
+
       <button id="bgo">ENTER PTI</button>
-      <div id="msg2" style="color:#c00;font-size:13px"></div>
+      <div id="msg2"></div>
     </div>
   </div>
 
@@ -290,65 +264,13 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
   <script>
-    const $ = id => document.getElementById(id);
+    const $ = (id) => document.getElementById(id);
 
-    // LocalStorage keys
-    const USERS_KEY = "pngpd_users_v1";
-    const ACTIVE_USER_KEY = "pngpd_active_user_v1";
     const PROFILE_KEY = "pngpd_profile_v1";
+    const DEFAULT_NAME = "Tomisin";
 
-    let currentUser = null;
     let profile = null;
     let pickColor = "#e10600";
-
-    function loadUsers() {
-      try {
-        return JSON.parse(localStorage.getItem(USERS_KEY)) || [];
-      } catch {
-        return [];
-      }
-    }
-
-    function saveUsers(users) {
-      localStorage.setItem(USERS_KEY, JSON.stringify(users));
-    }
-
-    function setMessage(elId, text) {
-      const el = $(elId);
-      if (el) el.textContent = text;
-    }
-
-    function createId() {
-      return "id_" + Date.now() + "_" + Math.random().toString(36).slice(2, 9);
-    }
-
-    function creds() {
-      const u = $("un").value.trim();
-      const p = $("pw").value;
-
-      if (u.length < 3 || p.length < 6) {
-        setMessage("msg", "Username 3+ chars, password 6+ chars");
-        return null;
-      }
-
-      return { u, p };
-    }
-
-    function saveActiveUser(user) {
-      localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(user));
-    }
-
-    function loadActiveUser() {
-      try {
-        return JSON.parse(localStorage.getItem(ACTIVE_USER_KEY));
-      } catch {
-        return null;
-      }
-    }
-
-    function saveProfile(data) {
-      localStorage.setItem(PROFILE_KEY, JSON.stringify(data));
-    }
 
     function loadProfile() {
       try {
@@ -358,40 +280,14 @@
       }
     }
 
-    function loginUser(username, password) {
-      const users = loadUsers();
-      return users.find(user => user.username === username && user.password === password) || null;
+    function saveProfile(data) {
+      localStorage.setItem(PROFILE_KEY, JSON.stringify(data));
     }
 
-    function createUser(username, password) {
-      const users = loadUsers();
-      if (users.some(user => user.username.toLowerCase() === username.toLowerCase())) {
-        return null;
-      }
-
-      const user = {
-        id: createId(),
-        username,
-        password
-      };
-
-      users.push(user);
-      saveUsers(users);
-      return user;
-    }
-
-    function updateProfileFromUser(user) {
-      const saved = loadProfile();
-
-      if (saved && saved.username === user.username) {
-        profile = saved;
-        return saved;
-      }
-
-      profile = {
-        id: user.id,
-        username: user.username,
-        shirt_color: pickColor,
+    function getDefaultProfile() {
+      return {
+        username: DEFAULT_NAME,
+        shirt_color: "#e10600",
         level: 1,
         xp: 0,
         coins: 0,
@@ -399,9 +295,6 @@
         hunger: 100,
         visited: []
       };
-
-      saveProfile(profile);
-      return profile;
     }
 
     function buildColorChoices() {
@@ -441,81 +334,31 @@
       });
     }
 
-    $("bl").addEventListener("click", () => {
-      const c = creds();
-      if (!c) return;
+    function startGame(data) {
+      P = data;
 
-      setMessage("msg", "Logging in...");
+      if (!P.visited) P.visited = [];
 
-      const found = loginUser(c.u, c.p);
+      body.material.color.set(P.shirt_color || pickColor);
 
-      if (!found) {
-        setMessage("msg", "Invalid username or password.");
-        return;
-      }
+      $("ov").style.display = "none";
+      $("stats").style.display = "block";
 
-      currentUser = found;
-      saveActiveUser(currentUser);
-      profile = updateProfileFromUser(currentUser);
-
-      setMessage("msg", "");
-      $("c1").style.display = "none";
-      $("c2").style.display = "block";
-      buildColorChoices();
-
-      if (profile.shirt_color) {
-        pickColor = profile.shirt_color;
-        const selected = document.querySelector('.sw[data-color="' + pickColor + '"]');
-        if (selected) {
-          document.querySelectorAll(".sw").forEach(x => x.classList.remove("on"));
-          selected.classList.add("on");
-        }
-      }
-    });
-
-    $("br").addEventListener("click", () => {
-      const c = creds();
-      if (!c) return;
-
-      setMessage("msg", "Creating account...");
-
-      const user = createUser(c.u, c.p);
-
-      if (!user) {
-        setMessage("msg", "Username already exists.");
-        return;
-      }
-
-      currentUser = user;
-      saveActiveUser(currentUser);
-      profile = updateProfileFromUser(currentUser);
-
-      setMessage("msg", "Account created. Choose your shirt color.");
-      $("c1").style.display = "none";
-      $("c2").style.display = "block";
-      buildColorChoices();
-    });
+      say("Welcome " + P.username + "!");
+    }
 
     $("bgo").addEventListener("click", () => {
-      if (!currentUser) {
-        setMessage("msg2", "Please log in first.");
-        return;
-      }
-
       const selected = document.querySelector(".sw.on");
       if (!selected) {
-        setMessage("msg2", "Please choose a shirt color.");
+        $("msg2").textContent = "Please choose a shirt color.";
         return;
       }
 
       const chosen = selected.dataset.color || pickColor;
 
       profile = {
-        ...(profile || {
-          id: currentUser.id,
-          username: currentUser.username
-        }),
-        username: currentUser.username,
+        ...(profile || getDefaultProfile()),
+        username: DEFAULT_NAME,
         shirt_color: chosen,
         level: profile?.level || 1,
         xp: profile?.xp || 0,
@@ -530,7 +373,7 @@
     });
 
     // ==============================
-    // Game logic
+    // GAME LOGIC
     // ==============================
 
     const scene = new THREE.Scene();
@@ -920,13 +763,13 @@
     }
 
     function doAct() {
-      if (!near || !profile) return;
+      if (!near || !P) return;
 
-      if (!profile.visited.includes(near.n)) {
-        profile.visited.push(near.n);
+      if (!P.visited.includes(near.n)) {
+        P.visited.push(near.n);
         gain(20, 10);
         say("First visit to " + near.n + "! +20 XP, +10 coins");
-        saveProfile(profile);
+        saveProfile(P);
       } else {
         say(near.n + ": activities coming in Phase 4!");
       }
@@ -1101,19 +944,6 @@
       ren.setSize(innerWidth, innerHeight);
     });
 
-    function startGame(data) {
-      P = data;
-
-      if (!P.visited) P.visited = [];
-
-      body.material.color.set(P.shirt_color || pickColor);
-
-      $("ov").style.display = "none";
-      $("stats").style.display = "block";
-
-      say("Welcome " + P.username + "!");
-    }
-
     function gain(xp, coins) {
       P.xp += xp;
       P.coins += coins;
@@ -1143,46 +973,31 @@
         "Hunger" + bar(P.hunger, "#ff9800");
     }
 
-    function autoSaveProfile() {
-      if (!profile) return;
-      saveProfile(profile);
+    // start defaults if no saved profile
+    const savedProfile = loadProfile();
+
+    if (savedProfile) {
+      profile = savedProfile;
+      pickColor = savedProfile.shirt_color || pickColor;
+      startGame(profile);
+    } else {
+      profile = getDefaultProfile();
+      buildColorChoices();
+      say("Pick your shirt colour and enter PTI.");
     }
 
     setInterval(() => {
       if (profile) {
         profile.hunger = Math.max(0, (profile.hunger || 100) - 1);
-        autoSaveProfile();
+        saveProfile(profile);
       }
     }, 30000);
 
     addEventListener("visibilitychange", () => {
       if (document.hidden && profile) {
-        autoSaveProfile();
+        saveProfile(profile);
       }
     });
-
-    const savedUser = loadActiveUser();
-    const savedProfile = loadProfile();
-
-    if (savedUser && savedProfile && savedUser.username === savedProfile.username) {
-      currentUser = savedUser;
-      profile = savedProfile;
-      pickColor = profile.shirt_color || pickColor;
-
-      if (profile && profile.shirt_color) {
-        setTimeout(() => {
-          const selected = document.querySelector('.sw[data-color="' + profile.shirt_color + '"]');
-          if (selected) {
-            document.querySelectorAll(".sw").forEach(x => x.classList.remove("on"));
-            selected.classList.add("on");
-          }
-        }, 100);
-      }
-
-      startGame(profile);
-    } else {
-      buildColorChoices();
-    }
 
     say("Welcome to PTI! Walk up the main road. Drag the screen to turn the camera.");
   </script>
