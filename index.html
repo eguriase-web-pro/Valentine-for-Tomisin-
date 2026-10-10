@@ -2402,30 +2402,123 @@ say(
    SUPABASE + PLAYER PROFILE
 ========================================================= */
 
-const SUPABASE_URL =
-  'https://xlylxyxjsvhvrnjrcvrf.supabase.co';
+<script>
+  const SUPABASE_URL = 'https://YOUR-PROJECT-ID.supabase.co';
+  const SUPABASE_KEY = 'YOUR_ANON_PUBLIC_KEY';
 
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const SUPABASE_ANON_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhseWx4eXhqc3ZodnJuanJjdnJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE0ODQ0NTUsImV4cCI6MjEwNzA2MDQ1NX0.sDx_VjbP30V7qo_7eUU74TgcPDUY0yxP574qFjt5liU';
+  function setMessage(elId, text) {
+    const el = document.getElementById(elId);
+    if (el) el.textContent = text;
+  }
 
+  async function loginUser(username, password) {
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('username', username)
+      .eq('password', password)
+      .single();
 
-const sb =
-  supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
+    if (error) return null;
+    return data;
+  }
 
+  async function createUser(username, password) {
+    const { data, error } = await supabase
+      .from('users')
+      .insert([{ username, password }])
+      .select()
+      .single();
 
-let uid = null;
+    if (error) return null;
+    return data;
+  }
 
-let pickColor =
-  '#e10600';
+  async function saveCharacterColor(userId, color) {
+    const { error } = await supabase
+      .from('users')
+      .update({ color })
+      .eq('id', userId);
 
+    if (error) {
+      console.error(error);
+      return false;
+    }
+    return true;
+  }
+</script>
+<script>
+  document.getElementById('bl').addEventListener('click', async () => {
+    const username = document.getElementById('un').value.trim();
+    const password = document.getElementById('pw').value.trim();
 
-const $ =
-  id =>
-    document.getElementById(id);
+    if (!username || password.length < 6) {
+      setMessage('msg', 'Enter a valid username and password.');
+      return;
+    }
+
+    const user = await loginUser(username, password);
+
+    if (!user) {
+      setMessage('msg', 'Invalid username or password.');
+      return;
+    }
+
+    localStorage.setItem('userId', user.id);
+    document.getElementById('c1').style.display = 'none';
+    document.getElementById('c2').style.display = 'block';
+    setMessage('msg', '');
+  });
+
+  document.getElementById('br').addEventListener('click', async () => {
+    const username = document.getElementById('un').value.trim();
+    const password = document.getElementById('pw').value.trim();
+
+    if (!username || password.length < 6) {
+      setMessage('msg', 'Username required and password must be at least 6 chars.');
+      return;
+    }
+
+    const user = await createUser(username, password);
+
+    if (!user) {
+      setMessage('msg', 'Username already exists or registration failed.');
+      return;
+    }
+
+    localStorage.setItem('userId', user.id);
+    setMessage('msg', 'Account created. Choose your shirt color.');
+    document.getElementById('c1').style.display = 'none';
+    document.getElementById('c2').style.display = 'block';
+  });
+
+  document.getElementById('bgo').addEventListener('click', async () => {
+    const selected = document.querySelector('.sw.on');
+    const userId = localStorage.getItem('userId');
+
+    if (!selected) {
+      setMessage('msg2', 'Please choose a shirt color.');
+      return;
+    }
+
+    if (!userId) {
+      setMessage('msg2', 'Please log in first.');
+      return;
+    }
+
+    const color = selected.dataset.color || selected.style.backgroundColor || '#e10600';
+
+    const ok = await saveCharacterColor(userId, color);
+
+    if (ok) {
+      document.getElementById('ov').style.display = 'none';
+    } else {
+      setMessage('msg2', 'Could not save character color.');
+    }
+  });
+</script>
 
 
 /* =========================================================
