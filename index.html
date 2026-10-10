@@ -472,6 +472,17 @@ canvas {
   background:#e10600;
 }
 
+.swb {
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  border:3px solid #fff;
+  box-shadow:0 0 0 2px #ccc;
+  margin:4px;
+  display:inline-block;
+  padding:0;
+}
+
 </style>
 </head>
 <body>
@@ -1606,6 +1617,8 @@ function saveProfile(d) {
   }
   if (typeof queueRemote === "function")
     queueRemote();
+  if (d === P && typeof checkAch === "function")
+    checkAch();
 }
 function getDefaultProfile() {
   return {
@@ -1674,8 +1687,19 @@ function startGame(d) {
     P.stats.exams = {};
   if (!P.stats.examDay)
     P.stats.examDay = {};
+  if (!P.stats.look)
+    P.stats.look = {
+      skin: 9262372,
+      hair: 1118481,
+      pants: 1713022,
+      owned: [],
+      on: []
+    };
+  if (!P.stats.ach)
+    P.stats.ach = [];
   setVehicle(P.stats.car);
   setShirt(player, P.shirt_color || pickColor);
+  applyLook();
   $("ov").style.display = "none";
   $("stats").style.display = "block";
   say("Welcome " + P.username + "!");
@@ -2160,8 +2184,10 @@ function makeChar(shirt, skin, pants, hair) {
   const torso = part(1, 1.3, 0.55, shirt, 0, 1.55, 0);
   part(1.04, 0.22, 0.58, 3622735, 0, 0.95, 0);
   const head = part(0.8, 0.8, 0.8, skin, 0, 2.55, 0);
-  part(0.86, 0.28, 0.86, hair, 0, 2.98, 0);
-  part(0.86, 0.7, 0.2, hair, 0, 2.65, -0.33);
+  const hairM = [
+    part(0.86, 0.28, 0.86, hair, 0, 2.98, 0),
+    part(0.86, 0.7, 0.2, hair, 0, 2.65, -0.33)
+  ];
   part(0.14, 0.14, 0.05, 1118481, -0.2, 2.6, 0.41);
   part(0.14, 0.14, 0.05, 1118481, 0.2, 2.6, 0.41);
   part(0.26, 0.06, 0.05, 8077102, 0, 2.38, 0.41);
@@ -2169,18 +2195,18 @@ function makeChar(shirt, skin, pants, hair) {
     const pv = new THREE.Group();
     pv.position.set(side * 0.68, 2.15, 0);
     rig.add(pv);
-    const sl = part(0.34, 0.45, 0.34, shirt, 0, -0.22, 0, pv);
-    part(0.28, 0.6, 0.28, skin, 0, -0.72, 0, pv);
+    const sl = part(0.34, 0.45, 0.34, shirt, 0, -0.22, 0, pv), fa = part(0.28, 0.6, 0.28, skin, 0, -0.72, 0, pv);
     return {
       pv,
-      sl
+      sl,
+      fa
     };
   };
   const leg = side => {
     const pv = new THREE.Group();
     pv.position.set(side * 0.26, 0.95, 0);
     rig.add(pv);
-    part(0.42, 0.95, 0.42, pants, 0, -0.475, 0, pv);
+    pv.userData.pm = part(0.42, 0.95, 0.42, pants, 0, -0.475, 0, pv);
     part(0.44, 0.2, 0.58, 2171169, 0, -0.88, 0.07, pv);
     return pv;
   };
@@ -2197,6 +2223,16 @@ function makeChar(shirt, skin, pants, hair) {
       torso,
       aL.sl,
       aR.sl
+    ],
+    skinMeshes: [
+      head,
+      aL.fa,
+      aR.fa
+    ],
+    hairMeshes: hairM,
+    pantsMeshes: [
+      lL.userData.pm,
+      lR.userData.pm
     ],
     parts: [
       torso,
@@ -2235,6 +2271,100 @@ function animChar(c, moving, t, sp) {
 }
 const player = makeChar(14747136, 9262372, 1713022, 1118481);
 player.position.set(0, 0, 64);
+addAccessories(player);
+const SKINS = [
+  15843965,
+  14724201,
+  13010498,
+  9262372,
+  6111287,
+  4073251
+];
+const HAIRC = [
+  1118481,
+  4073251,
+  9262372,
+  12000284,
+  3754411,
+  16119285
+];
+const PANTC = [
+  1713022,
+  2503224,
+  5125166,
+  3622735,
+  16119285,
+  3046706
+];
+const SHIRTC = [
+  "#e10600",
+  "#2196f3",
+  "#ffeb3b",
+  "#4caf50",
+  "#ff9800",
+  "#ab47bc",
+  "#00bcd4",
+  "#ffffff"
+];
+const ACCS = [
+  {
+    id: "cap",
+    n: "Cap",
+    p: 60
+  },
+  {
+    id: "glasses",
+    n: "Glasses",
+    p: 80
+  },
+  {
+    id: "chain",
+    n: "Gold chain",
+    p: 150
+  }
+];
+const hexs = n => "#" + n.toString(16).padStart(6, "0");
+function addAccessories(c) {
+  const g = new THREE.Group();
+  c.userData.rig.add(g);
+  const mk = (w, h, d, col, x, y, z, grp) => {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), M(col));
+    m.position.set(x, y, z);
+    grp.add(m);
+  };
+  const cap = new THREE.Group();
+  mk(0.92, 0.24, 0.92, 14747136, 0, 3.08, 0, cap);
+  mk(0.92, 0.06, 0.45, 12000284, 0, 2.98, 0.6, cap);
+  const gl = new THREE.Group();
+  mk(0.3, 0.2, 0.05, 1118481, -0.2, 2.6, 0.43, gl);
+  mk(0.3, 0.2, 0.05, 1118481, 0.2, 2.6, 0.43, gl);
+  mk(0.12, 0.05, 0.05, 1118481, 0, 2.62, 0.43, gl);
+  const ch = new THREE.Group();
+  mk(0.5, 0.08, 0.05, 16766464, 0, 2.05, 0.3, ch);
+  mk(0.1, 0.18, 0.05, 16766464, 0, 1.92, 0.3, ch);
+  [
+    cap,
+    gl,
+    ch
+  ].forEach(x => {
+    x.visible = false;
+    g.add(x);
+  });
+  c.userData.acc = {
+    cap,
+    glasses: gl,
+    chain: ch
+  };
+}
+function applyLook() {
+  const L = P.stats.look, u = player.userData;
+  u.skinMeshes.forEach(m => m.material.color.setHex(L.skin));
+  u.hairMeshes.forEach(m => m.material.color.setHex(L.hair));
+  u.pantsMeshes.forEach(m => m.material.color.setHex(L.pants));
+  ACCS.forEach(a => {
+    u.acc[a.id].visible = L.on.includes(a.id);
+  });
+}
 let vehGroup = null;
 function setVehicle(id) {
   if (vehGroup) {
@@ -2547,6 +2677,8 @@ function enter(n) {
     return restaurant(n, "");
   if (HOSTELS.includes(n))
     return hostel(n, "");
+  if (n === "Football Field")
+    return footballMenu("");
   say(n + ": coming soon!");
 }
 function courseButtons(place) {
@@ -2693,6 +2825,10 @@ function answer(k) {
 }
 function finishQuiz() {
   const code = Q.code, cat = Q.cat, r = Q.right, n = Q.list.length, e = Q.earned, rev = Q.rev;
+  if (!rev && n >= 5 && r === n) {
+    P.stats.perfectQuiz = true;
+    saveProfile(P);
+  }
   openPanel("Quiz result", coinLine() + "<p><b>You got " + r + " of " + n + " correct.</b><br>Coins earned: " + e + "</p>" + (rev ? "<button class=\"pbtn solid\" data-a=\"revise\">Revise more mistakes (" + wrongCount() + " left)</button><button class=\"pbtn\" data-a=\"home\">Back</button>" : "<button class=\"pbtn solid\" data-a=\"quiz\" data-v=\"" + esc(code) + "\" data-c=\"" + esc(cat || "") + "\">Another quiz</button><button class=\"pbtn\" data-a=\"course\" data-v=\"" + esc(code) + "\">Back to course</button>"));
   Q = null;
 }
@@ -2714,7 +2850,7 @@ function buy(i) {
   restaurant(curPlace, "You bought " + it.n + ".");
 }
 function hostel(n, msg) {
-  openPanel(n, coinLine() + (msg ? "<div class=\"fb\">" + esc(msg) + "</div>" : "") + "<p>Welcome to " + esc(n) + ". Rest here to restore your energy.</p>" + "<button class=\"pbtn solid\" data-a=\"rest\">Rest and recover energy</button>");
+  openPanel(n, coinLine() + (msg ? "<div class=\"fb\">" + esc(msg) + "</div>" : "") + "<p>Welcome to " + esc(n) + ". Rest here to restore your energy.</p>" + "<button class=\"pbtn solid\" data-a=\"rest\">Rest and recover energy</button><button class=\"pbtn\" data-a=\"wardrobe\">Wardrobe (change your look)</button>");
 }
 
 // ===== DEPARTMENT, FELLOWSHIP, CALCULATOR =====
@@ -2730,6 +2866,10 @@ const MEMOS = [
   {
     t: "Hints and calculator",
     b: "Stuck on a question? Use the hint to remove two wrong options (you earn half the coins). The calculator is here in the department and also appears inside calculation questions."
+  },
+  {
+    t: "Looks, football and achievements",
+    b: "Change your look and buy accessories in the Wardrobe inside any hostel. Play penalty rounds at the Football Field for coins. Check the Achievements list in this department."
   },
   {
     t: "Exams, revision and jobs",
@@ -2760,7 +2900,7 @@ const FELLOWSHIPS = [
   "BSF"
 ];
 function deptMenu() {
-  openPanel("PNGPD Department", coinLine() + "<p>Check your results, read notices, use the calculator or see the leaderboard.</p>" + "<button class=\"pbtn solid\" data-a=\"missions\">Missions and daily reward</button><button class=\"pbtn\" data-a=\"results\">My results</button><button class=\"pbtn\" data-a=\"memos\">Notices and memos</button>" + "<button class=\"pbtn\" data-a=\"calc\" data-v=\"dept\">Calculator</button><button class=\"pbtn\" data-a=\"board\">Leaderboard</button>" + "<button class=\"pbtn\" data-a=\"logout\">" + (ONLINE ? "Log out" : "Back to start screen") + "</button>");
+  openPanel("PNGPD Department", coinLine() + "<p>Check your results, read notices, use the calculator or see the leaderboard.</p>" + "<button class=\"pbtn solid\" data-a=\"missions\">Missions and daily reward</button><button class=\"pbtn\" data-a=\"results\">My results</button><button class=\"pbtn\" data-a=\"memos\">Notices and memos</button><button class=\"pbtn\" data-a=\"ach\">Achievements</button>" + "<button class=\"pbtn\" data-a=\"calc\" data-v=\"dept\">Calculator</button><button class=\"pbtn\" data-a=\"board\">Leaderboard</button>" + "<button class=\"pbtn\" data-a=\"logout\">" + (ONLINE ? "Log out" : "Back to start screen") + "</button>");
 }
 function resultsScreen() {
   const rows = Object.keys(COURSES).filter(k => COURSES[k].quiz.length).map(k => {
@@ -3012,6 +3152,28 @@ const MISSIONS = [
     xp: 30,
     test: () => (P.stats.revFixed || 0) >= 5,
     prog: () => Math.min(P.stats.revFixed || 0, 5) + "/5"
+  },
+  {
+    id: "m17",
+    t: "Score a goal at the Football Field",
+    coins: 20,
+    xp: 20,
+    test: () => (P.stats.goals || 0) > 0
+  },
+  {
+    id: "m18",
+    t: "Buy an accessory in your hostel wardrobe",
+    coins: 30,
+    xp: 20,
+    test: () => P.stats.look.owned.length > 0
+  },
+  {
+    id: "m19",
+    t: "Unlock 5 achievements",
+    coins: 60,
+    xp: 50,
+    test: () => (P.stats.ach || []).length >= 5,
+    prog: () => Math.min((P.stats.ach || []).length, 5) + "/5"
   }
 ];
 function missionsScreen(msg) {
@@ -3336,7 +3498,7 @@ const TUT = [
   },
   {
     t: "Grow your life",
-    b: "Take mock exams in the Classrooms, fix mistakes with Revision in the Library, work shifts for coins, save at UBA Bank and buy vehicles at the Garage. Open Missions in the Department every day."
+    b: "Take mock exams in the Classrooms, fix mistakes with Revision in the Library, work shifts for coins, save at UBA Bank and buy vehicles at the Garage. Open Missions and Achievements in the Department every day. Change your look in a hostel wardrobe and play penalties at the Football Field."
   }
 ];
 function tutScreen(i) {
@@ -3420,7 +3582,7 @@ function gpaNote() {
       }
     }
   });
-  return "<div class=\"note\">Exam GPA: <b>" + (g == null ? "no exams yet" : g.toFixed(2) + " / 4.00") + "</b>" + (weak ? " &middot; Weakest course: " + esc(weak) + " (" + Math.round(wp) + "%)" : "") + " &middot; Mistakes to revise: " + wrongCount() + "</div>";
+  return "<div class=\"note\">Exam GPA: <b>" + (g == null ? "no exams yet" : g.toFixed(2) + " / 4.00") + "</b>" + (weak ? " &middot; Weakest course: " + esc(weak) + " (" + Math.round(wp) + "%)" : "") + " &middot; Mistakes to revise: " + wrongCount() + " &middot; Achievements: " + (P.stats.ach || []).length + "/" + ACH.length + "</div>";
 }
 function exTxt(k) {
   const e = P.stats.exams[k];
@@ -3665,6 +3827,238 @@ function jobFinish(coins, text) {
   sfx("coin");
   openPanel("Shift complete", coinLine() + "<div class=\"memo\"><b>" + esc(text) + "</b><br>You earned " + coins + " coins and 10 XP.</div>" + "<button class=\"pbtn solid\" data-a=\"home\">Back</button>");
 }
+
+// ===== ACHIEVEMENTS =====
+const ACH = [
+  {
+    id: "a1",
+    n: "First correct answer",
+    d: "Answer a question correctly.",
+    test: () => P.done.length >= 1
+  },
+  {
+    id: "a2",
+    n: "Getting started",
+    d: "Master 10 questions.",
+    test: () => P.done.length >= 10
+  },
+  {
+    id: "a3",
+    n: "Bookworm",
+    d: "Master 50 questions.",
+    test: () => P.done.length >= 50
+  },
+  {
+    id: "a4",
+    n: "Scholar",
+    d: "Master 150 questions.",
+    test: () => P.done.length >= 150
+  },
+  {
+    id: "a5",
+    n: "Perfect quiz",
+    d: "Get every question right in a quiz of 5 or more.",
+    test: () => !!P.stats.perfectQuiz
+  },
+  {
+    id: "a6",
+    n: "Exam ace",
+    d: "Score 75% or more in a mock exam.",
+    test: () => Object.values(P.stats.exams).some(e => e.best >= 75)
+  },
+  {
+    id: "a7",
+    n: "Perfect exam",
+    d: "Score 100% in a mock exam.",
+    test: () => Object.values(P.stats.exams).some(e => e.best >= 100)
+  },
+  {
+    id: "a8",
+    n: "Week streak",
+    d: "Claim the daily reward 7 days in a row.",
+    test: () => (P.stats.streak || 0) >= 7
+  },
+  {
+    id: "a9",
+    n: "Saver",
+    d: "Have 500 coins saved at UBA Bank.",
+    test: () => !!(P.stats.bank && P.stats.bank.bal >= 500)
+  },
+  {
+    id: "a10",
+    n: "On the road",
+    d: "Own a vehicle.",
+    test: () => P.stats.cars.length > 0
+  },
+  {
+    id: "a11",
+    n: "Hostel hopper",
+    d: "Visit all four hostels.",
+    test: () => HOSTELS.every(h => P.visited.includes(h))
+  },
+  {
+    id: "a12",
+    n: "Hard worker",
+    d: "Complete 10 work shifts.",
+    test: () => (P.stats.shifts || 0) >= 10
+  },
+  {
+    id: "a13",
+    n: "Front row",
+    d: "Attend 10 lectures.",
+    test: () => (P.stats.lectures || 0) >= 10
+  },
+  {
+    id: "a14",
+    n: "Level 5",
+    d: "Reach level 5.",
+    test: () => P.level >= 5
+  },
+  {
+    id: "a15",
+    n: "Level 10",
+    d: "Reach level 10.",
+    test: () => P.level >= 10
+  },
+  {
+    id: "a16",
+    n: "Sharpshooter",
+    d: "Score 5 goals in one penalty round.",
+    test: () => !!P.stats.fiveGoals
+  },
+  {
+    id: "a17",
+    n: "Fashion",
+    d: "Buy an accessory.",
+    test: () => P.stats.look.owned.length > 0
+  },
+  {
+    id: "a18",
+    n: "Fix it up",
+    d: "Fix 10 mistakes in Revision.",
+    test: () => (P.stats.revFixed || 0) >= 10
+  }
+];
+let inAch = false;
+function checkAch() {
+  if (!P || inAch || !P.stats.look)
+    return;
+  inAch = true;
+  if (!P.stats.ach)
+    P.stats.ach = [];
+  let changed = false;
+  ACH.forEach(a => {
+    if (!P.stats.ach.includes(a.id) && a.test()) {
+      P.stats.ach.push(a.id);
+      changed = true;
+      say("Achievement unlocked: " + a.n);
+      sfx("level");
+    }
+  });
+  inAch = false;
+  if (changed)
+    saveProfile(P);
+}
+function achScreen() {
+  const got = P.stats.ach || [];
+  openPanel("Achievements (" + got.length + "/" + ACH.length + ")", ACH.map(a => "<div class=\"row\"><span><b>" + esc(a.n) + "</b><br><small>" + esc(a.d) + "</small></span><span>" + (got.includes(a.id) ? "Unlocked" : "Locked") + "</span></div>").join("") + "<button class=\"pbtn solid\" data-a=\"home\">Back</button>");
+}
+
+// ===== WARDROBE =====
+function swatches(kind, arr, cur) {
+  return arr.map(c => {
+    const h = typeof c === "string" ? c : hexs(c);
+    return "<button class=\"swb\" data-a=\"look\" data-v=\"" + kind + ":" + h + "\" style=\"background:" + h + (cur === h ? ";box-shadow:0 0 0 3px #000" : "") + "\"></button>";
+  }).join("");
+}
+function wardrobeScreen(msg) {
+  const L = P.stats.look;
+  openPanel("Wardrobe", coinLine() + (msg ? "<div class=\"fb\">" + esc(msg) + "</div>" : "") + "<p>Shirt</p>" + swatches("shirt", SHIRTC, P.shirt_color) + "<p>Skin tone</p>" + swatches("skin", SKINS, hexs(L.skin)) + "<p>Hair colour</p>" + swatches("hair", HAIRC, hexs(L.hair)) + "<p>Trousers</p>" + swatches("pants", PANTC, hexs(L.pants)) + "<p>Accessories</p>" + ACCS.map(a => {
+    const own = L.owned.includes(a.id), on = L.on.includes(a.id);
+    return "<button class=\"pbtn" + (on ? " solid" : "") + "\" data-a=\"acc\" data-v=\"" + a.id + "\">" + esc(a.n) + (own ? on ? " (wearing - tap to remove)" : " (owned - tap to wear)" : " - " + a.p + " coins") + "</button>";
+  }).join("") + "<button class=\"pbtn solid\" data-a=\"home\">Back</button>");
+}
+function lookSet(v) {
+  const i = v.indexOf(":"), k = v.slice(0, i), h = v.slice(i + 1);
+  if (k === "shirt") {
+    P.shirt_color = h;
+    setShirt(player, h);
+  } else {
+    P.stats.look[k] = parseInt(h.slice(1), 16);
+    applyLook();
+  }
+  saveProfile(P);
+  wardrobeScreen("");
+}
+function accToggle(id) {
+  const a = ACCS.find(x => x.id === id), L = P.stats.look;
+  if (!a)
+    return;
+  if (!L.owned.includes(id)) {
+    if (P.coins < a.p)
+      return wardrobeScreen("Not enough coins for the " + a.n + ".");
+    P.coins -= a.p;
+    L.owned.push(id);
+    L.on.push(id);
+    sfx("buy");
+  } else if (L.on.includes(id))
+    L.on = L.on.filter(x => x !== id);
+  else
+    L.on.push(id);
+  applyLook();
+  saveProfile(P);
+  wardrobeScreen("");
+}
+
+// ===== FOOTBALL PENALTIES =====
+let F = null;
+function footballMenu(msg) {
+  openPanel("Football Field", coinLine() + (msg ? "<div class=\"fb\">" + esc(msg) + "</div>" : "") + "<p>Penalty shootout: 5 kicks. Pick a corner. Each goal earns 5 coins and 3 XP. A round costs 10 energy.</p>" + "<button class=\"pbtn solid\" data-a=\"fstart\">Start penalty round</button>");
+}
+function footballStart() {
+  if (P.energy < 10)
+    return footballMenu("You are too tired to play. Rest first.");
+  if (P.hunger < 10)
+    return footballMenu("You are too hungry to play. Eat first.");
+  P.energy -= 10;
+  F = {
+    k: 0,
+    g: 0
+  };
+  footballKick("");
+}
+function footballKick(msg) {
+  openPanel("Penalty " + (F.k + 1) + " of 5", coinLine() + (msg ? "<div class=\"fb\">" + esc(msg) + "</div>" : "") + "<p>Goals so far: " + F.g + ". Where do you shoot?</p>" + [
+    "Left",
+    "Centre",
+    "Right"
+  ].map((n, i) => "<button class=\"pbtn solid\" data-a=\"shoot\" data-v=\"" + i + "\">" + n + "</button>").join(""));
+}
+function footballShoot(i) {
+  if (!F)
+    return;
+  const keeper = Math.floor(Math.random() * 3);
+  let m;
+  if (keeper === i)
+    m = "Saved! The goalkeeper guessed right.";
+  else {
+    F.g++;
+    m = "GOAL!";
+    sfx("coin");
+  }
+  F.k++;
+  if (F.k >= 5) {
+    const g = F.g;
+    F = null;
+    P.stats.goals = (P.stats.goals || 0) + g;
+    if (g === 5)
+      P.stats.fiveGoals = true;
+    gain(g * 3, g * 5);
+    saveProfile(P);
+    openPanel("Full time", coinLine() + "<div class=\"memo\"><b>" + esc(m) + "</b><br>You scored " + g + " of 5.<br>Reward: " + g * 5 + " coins and " + g * 3 + " XP.</div><button class=\"pbtn solid\" data-a=\"fstart\">Play again</button><button class=\"pbtn\" data-a=\"close\">Leave the field</button>");
+  } else
+    footballKick(m);
+}
 pbody.addEventListener("click", e => {
   const b = e.target.closest("button");
   if (!b || !b.dataset.a)
@@ -3695,6 +4089,18 @@ pbody.addEventListener("click", e => {
     enter(curPlace);
   else if (a === "hint")
     useHint();
+  else if (a === "ach")
+    achScreen();
+  else if (a === "wardrobe")
+    wardrobeScreen("");
+  else if (a === "look")
+    lookSet(v);
+  else if (a === "acc")
+    accToggle(v);
+  else if (a === "fstart")
+    footballStart();
+  else if (a === "shoot")
+    footballShoot(+v);
   else if (a === "settings")
     settingsScreen();
   else if (a === "setsfx") {
@@ -3930,7 +4336,7 @@ function loop() {
   if (near) {
     locEl.textContent = near.n;
     actBtn.textContent = "ENTER";
-    actBtn.style.display = near.r || inPanel ? "none" : "flex";
+    actBtn.style.display = near.n === "PTI Entrance" || inPanel ? "none" : "flex";
   } else if (nearNpc) {
     locEl.textContent = "PTI Campus";
     actBtn.textContent = "TALK";
