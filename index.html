@@ -1,1005 +1,1107 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>PNGPD LIFE 2.0</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<title>PNGPD LIFE 2.0</title>
+<style>
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  touch-action: none;
+}
 
-  <style>
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-      touch-action: none;
-    }
+html,body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #87ceeb;
+  font-family: system-ui,sans-serif;
+}
 
-    html, body {
-      margin: 0;
-      height: 100%;
-      overflow: hidden;
-      background: #87ceeb;
-      font-family: system-ui, sans-serif;
-    }
+canvas {
+  display: block;
+}
 
-    canvas {
-      display: block;
-    }
+#hud {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  pointer-events: none;
+  z-index: 20;
+}
 
-    #hud {
-      position: fixed;
-      top: 8px;
-      left: 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      pointer-events: none;
-      z-index: 20;
-    }
+.pill {
+  background: #e10600;
+  color: #fff;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  width: fit-content;
+}
 
-    .pill {
-      background: #e10600;
-      color: #fff;
-      font-weight: 700;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 14px;
-      width: fit-content;
-    }
+#loc {
+  background: #fff;
+  color: #e10600;
+}
 
-    #loc {
-      background: #fff;
-      color: #e10600;
-    }
+#stats {
+  background: rgba(0,0,0,.55);
+  color: #fff;
+  border-radius: 12px;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.5;
+  display: none;
+}
 
-    #mini {
-      position: fixed;
-      top: 8px;
-      right: 8px;
-      width: 110px;
-      height: 110px;
-      border-radius: 12px;
-      border: 3px solid #fff;
-      background: #2e7d32;
-      pointer-events: none;
-      z-index: 20;
-    }
+.bar {
+  height: 7px;
+  border-radius: 4px;
+  background: rgba(255,255,255,.3);
+  overflow: hidden;
+  width: 110px;
+}
 
-    #joy {
-      position: fixed;
-      left: 24px;
-      bottom: 30px;
-      width: 130px;
-      height: 130px;
-      border-radius: 50%;
-      background: rgba(255,255,255,.35);
-      border: 3px solid rgba(255,255,255,.8);
-      z-index: 20;
-    }
+.bar i {
+  display: block;
+  height: 100%;
+}
 
-    #knob {
-      position: absolute;
-      left: 35px;
-      top: 35px;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: #e10600;
-      border: 3px solid #fff;
-    }
+#mini {
+  position: fixed;
+  top: 8px;
+  right: 8px;
+  width: 110px;
+  height: 110px;
+  border-radius: 12px;
+  border: 3px solid #fff;
+  background: #2e7d32;
+  pointer-events: none;
+  z-index: 20;
+}
 
-    .btn {
-      position: fixed;
-      border-radius: 50%;
-      border: 3px solid #fff;
-      color: #fff;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 20;
-    }
+#joy {
+  position: fixed;
+  left: 24px;
+  bottom: 30px;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.35);
+  border: 3px solid rgba(255,255,255,.8);
+  z-index: 20;
+}
 
-    #run {
-      right: 24px;
-      bottom: 30px;
-      width: 76px;
-      height: 76px;
-      background: #ff9800;
-      font-size: 14px;
-    }
+#knob {
+  position: absolute;
+  left: 35px;
+  top: 35px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #e10600;
+  border: 3px solid #fff;
+}
 
-    #act {
-      right: 112px;
-      bottom: 90px;
-      width: 84px;
-      height: 84px;
-      background: #e10600;
-      font-size: 15px;
-      display: none;
-    }
+.btn {
+  position: fixed;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  color: #fff;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
 
-    #toast {
-      position: fixed;
-      top: 70px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0,0,0,.75);
-      color: #fff;
-      padding: 10px 16px;
-      border-radius: 12px;
-      display: none;
-      max-width: 70%;
-      text-align: center;
-      z-index: 25;
-    }
+#run {
+  right: 24px;
+  bottom: 30px;
+  width: 76px;
+  height: 76px;
+  background: #ff9800;
+  font-size: 14px;
+}
 
-    #stats {
-      background: rgba(0,0,0,.55);
-      color: #fff;
-      border-radius: 12px;
-      padding: 6px 10px;
-      font-size: 13px;
-      font-weight: 700;
-      line-height: 1.5;
-      display: none;
-      z-index: 20;
-    }
+#act {
+  right: 112px;
+  bottom: 90px;
+  width: 84px;
+  height: 84px;
+  background: #e10600;
+  font-size: 15px;
+  display: none;
+}
 
-    .bar {
-      height: 7px;
-      border-radius: 4px;
-      background: rgba(255,255,255,.3);
-      overflow: hidden;
-      width: 110px;
-    }
+#toast {
+  position: fixed;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,.75);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 12px;
+  display: none;
+  max-width: 70%;
+  text-align: center;
+  z-index: 60;
+}
 
-    .bar i {
-      display: block;
-      height: 100%;
-    }
+#ov {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: linear-gradient(160deg,#e10600,#ff9800 60%,#ffeb3b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  touch-action: auto;
+}
 
-    #ov {
-      position: fixed;
-      inset: 0;
-      z-index: 50;
-      background: linear-gradient(160deg, #e10600, #ff9800 60%, #ffeb3b);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      touch-action: auto;
-    }
+#ov * {
+  touch-action: auto;
+  user-select: auto;
+}
 
-    #ov * {
-      touch-action: auto;
-      user-select: auto;
-    }
+.card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 22px;
+  width: 100%;
+  max-width: 340px;
+  text-align: center;
+}
 
-    .card {
-      background: #fff;
-      border-radius: 20px;
-      padding: 22px;
-      width: 100%;
-      max-width: 340px;
-      text-align: center;
-    }
+.card h1 {
+  margin: 0 0 4px;
+  color: #e10600;
+  font-size: 26px;
+}
 
-    .card h1 {
-      margin: 0 0 4px;
-      color: #e10600;
-      font-size: 26px;
-    }
+.card p {
+  margin: 0 0 14px;
+  color: #555;
+  font-size: 14px;
+}
 
-    .card p {
-      margin: 0 0 14px;
-      color: #555;
-      font-size: 14px;
-    }
+.card button {
+  width: 100%;
+  padding: 13px;
+  margin-top: 8px;
+  border: 0;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 800;
+  color: #fff;
+  background: #e10600;
+}
 
-    .card button {
-      width: 100%;
-      padding: 13px;
-      margin-top: 8px;
-      border: 0;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: 800;
-      color: #fff;
-      background: #e10600;
-    }
+#msg2 {
+  color: #c00;
+  font-size: 13px;
+  min-height: 18px;
+  margin-top: 6px;
+}
 
-    #msg2 {
-      color: #c00;
-      font-size: 13px;
-      min-height: 18px;
-      margin-top: 6px;
-    }
+.sw {
+  display: inline-block;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  margin: 5px;
+  border: 4px solid #fff;
+  box-shadow: 0 0 0 2px #ccc;
+  cursor: pointer;
+}
 
-    .sw {
-      display: inline-block;
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      margin: 5px;
-      border: 4px solid #fff;
-      box-shadow: 0 0 0 2px #ccc;
-      cursor: pointer;
-    }
+.sw.on {
+  box-shadow: 0 0 0 3px #000;
+}
 
-    .sw.on {
-      box-shadow: 0 0 0 3px #000;
-    }
-  </style>
+#panel {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(0,0,0,.6);
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+#panel * {
+  touch-action: auto;
+}
+
+#pbox {
+  background: #fff;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90%;
+  border-radius: 20px 20px 0 0;
+  display: flex;
+  flex-direction: column;
+}
+
+#phead {
+  padding: 14px 16px;
+  background: #e10600;
+  color: #fff;
+  font-weight: 800;
+  border-radius: 20px 20px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#pclose {
+  background: #fff;
+  color: #e10600;
+  border: 0;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-weight: 900;
+  font-size: 16px;
+}
+
+#pbody {
+  padding: 14px 16px 24px;
+  overflow-y: auto;
+  color: #222;
+  font-size: 15px;
+  line-height: 1.45;
+  user-select: text;
+}
+
+#pbody ul {
+  padding-left: 20px;
+  margin: 8px 0;
+}
+
+#pbody li {
+  margin: 6px 0;
+}
+
+.pbtn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin: 7px 0;
+  border: 2px solid #e10600;
+  border-radius: 10px;
+  background: #fff;
+  color: #e10600;
+  font-weight: 700;
+  font-size: 15px;
+  text-align: left;
+}
+
+.pbtn.solid {
+  background: #e10600;
+  color: #fff;
+  text-align: center;
+}
+
+.pbtn.good {
+  background: #4caf50;
+  border-color: #4caf50;
+  color: #fff;
+}
+
+.pbtn.bad {
+  background: #e53935;
+  border-color: #e53935;
+  color: #fff;
+}
+
+.note {
+  background: #fff3e0;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 13px;
+  margin: 8px 0;
+}
+
+.fb {
+  margin-top: 10px;
+  font-weight: 600;
+}
+
+.card input {
+  width: 100%;
+  padding: 12px;
+  margin: 5px 0;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  font-size: 16px;
+}
+
+.card button.alt {
+  background: #fff;
+  color: #e10600;
+  border: 2px solid #e10600;
+}
+
+#msg {
+  color: #c00;
+  font-size: 13px;
+  min-height: 18px;
+  margin-top: 6px;
+}
+
+.pbtn.dim {
+  opacity: .35;
+  pointer-events: none;
+  text-decoration: line-through;
+}
+
+.expl {
+  background: #e8f5e9;
+  border-radius: 10px;
+  padding: 8px 10px;
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.calcdisp {
+  background: #212121;
+  color: #fff;
+  border-radius: 12px;
+  padding: 10px;
+  text-align: right;
+  margin-bottom: 8px;
+  min-height: 68px;
+  word-break: break-all;
+}
+
+#cexp {
+  font-size: 20px;
+}
+
+#cres {
+  font-size: 26px;
+  font-weight: 800;
+  color: #ffeb3b;
+}
+
+.calcgrid {
+  display: grid;
+  grid-template-columns: repeat(5,1fr);
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.ck {
+  padding: 14px 0;
+  border: 2px solid #e10600;
+  border-radius: 10px;
+  background: #fff;
+  color: #e10600;
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+}
+
+.memo {
+  background: #fff8e1;
+  border-left: 4px solid #e10600;
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin: 8px 0;
+}
+
+</style>
 </head>
-
 <body>
-  <div id="hud">
-    <div class="pill">PNGPD LIFE 2.0</div>
-    <div class="pill" id="loc">PTI Entrance</div>
-    <div id="stats"></div>
+<div id="hud">
+  <div class="pill">PNGPD LIFE 2.0</div>
+  <div class="pill" id="loc">PTI Entrance</div>
+  <div id="stats"></div>
+</div>
+<canvas id="mini" width="220" height="220"></canvas>
+<div id="toast"></div>
+
+<div id="ov">
+  <div class="card" id="c1" style="display:none">
+    <h1>PNGPD LIFE 2.0</h1>
+    <p>Your virtual life at PTI Effurun</p>
+    <input id="un" placeholder="Username" autocapitalize="none" autocomplete="username">
+    <input id="pw" type="password" placeholder="Password (6+ characters)" autocomplete="current-password">
+    <button id="bl">LOGIN</button>
+    <button class="alt" id="br">CREATE ACCOUNT</button>
+    <button class="alt" id="boff">PLAY OFFLINE (this phone only)</button>
+    <div id="msg"></div>
   </div>
-
-  <canvas id="mini" width="220" height="220"></canvas>
-  <div id="toast"></div>
-
-  <div id="ov">
-    <div class="card" id="c2">
-      <h1>Create Character</h1>
-      <p>Pick your shirt colour</p>
-
-      <div id="sws"></div>
-
-      <button id="bgo">ENTER PTI</button>
-      <div id="msg2"></div>
-    </div>
+  <div class="card" id="c2" style="display:none">
+    <h1>Create Character</h1>
+    <input id="pname" placeholder="Your name" maxlength="16">
+    <p>Pick your shirt colour</p>
+    <div id="sws"></div>
+    <button id="bgo">ENTER PTI</button>
+    <div id="msg2"></div>
   </div>
-
-  <div id="joy">
-    <div id="knob"></div>
-  </div>
-
-  <div class="btn" id="run">RUN</div>
-  <div class="btn" id="act">ENTER</div>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
-  <script>
-    const $ = (id) => document.getElementById(id);
-
-    const PROFILE_KEY = "pngpd_profile_v1";
-    const DEFAULT_NAME = "Tomisin";
-
-    let profile = null;
-    let pickColor = "#e10600";
-
-    function loadProfile() {
-      try {
-        return JSON.parse(localStorage.getItem(PROFILE_KEY));
-      } catch {
-        return null;
-      }
-    }
-
-    function saveProfile(data) {
-      localStorage.setItem(PROFILE_KEY, JSON.stringify(data));
-    }
-
-    function getDefaultProfile() {
-      return {
-        username: DEFAULT_NAME,
-        shirt_color: "#e10600",
-        level: 1,
-        xp: 0,
-        coins: 0,
-        energy: 100,
-        hunger: 100,
-        visited: []
-      };
-    }
-
-    function buildColorChoices() {
-      const sws = $("sws");
-      if (!sws) return;
-
-      const COLORS = [
-        "#e10600",
-        "#2196f3",
-        "#ffeb3b",
-        "#4caf50",
-        "#ff9800",
-        "#ab47bc",
-        "#00bcd4",
-        "#ffffff"
-      ];
-
-      sws.innerHTML = COLORS.map((c, i) =>
-        '<span class="sw' + (i === 0 ? " on" : "") + '" data-color="' + c + '" style="background:' + c + '"></span>'
-      ).join("");
-
-      sws.addEventListener("click", (e) => {
-        const target = e.target;
-        const color = target.dataset.color;
-
-        if (!color) return;
-
-        pickColor = color;
-
-        [...sws.children].forEach(x => {
-          x.classList.toggle("on", x === target);
-        });
-
-        if (typeof body !== "undefined" && body) {
-          body.material.color.set(color);
-        }
-      });
-    }
-
-    function startGame(data) {
-      P = data;
-
-      if (!P.visited) P.visited = [];
-
-      body.material.color.set(P.shirt_color || pickColor);
-
-      $("ov").style.display = "none";
-      $("stats").style.display = "block";
-
-      say("Welcome " + P.username + "!");
-    }
-
-    $("bgo").addEventListener("click", () => {
-      const selected = document.querySelector(".sw.on");
-      if (!selected) {
-        $("msg2").textContent = "Please choose a shirt color.";
-        return;
-      }
-
-      const chosen = selected.dataset.color || pickColor;
-
-      profile = {
-        ...(profile || getDefaultProfile()),
-        username: DEFAULT_NAME,
-        shirt_color: chosen,
-        level: profile?.level || 1,
-        xp: profile?.xp || 0,
-        coins: profile?.coins || 0,
-        energy: profile?.energy || 100,
-        hunger: profile?.hunger || 100,
-        visited: profile?.visited || []
-      };
-
-      saveProfile(profile);
-      startGame(profile);
-    });
-
-    // ==============================
-    // GAME LOGIC
-    // ==============================
-
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x87ceeb);
-    scene.fog = new THREE.Fog(0x87ceeb, 50, 130);
-
-    const cam = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 220);
-    const ren = new THREE.WebGLRenderer({ antialias: false });
-    ren.setPixelRatio(Math.min(devicePixelRatio, 1.5));
-    ren.setSize(innerWidth, innerHeight);
-    document.body.appendChild(ren.domElement);
-
-    scene.add(new THREE.HemisphereLight(0xffffff, 0x88aa66, 0.9));
-
-    const sun = new THREE.DirectionalLight(0xffffff, 0.6);
-    sun.position.set(30, 50, 20);
-    scene.add(sun);
-
-    const M = c => new THREE.MeshLambertMaterial({ color: c });
-
-    function box(w, h, d, c, x, y, z) {
-      const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), M(c));
-      m.position.set(x, y, z);
-      scene.add(m);
-      return m;
-    }
-
-    function flat(w, d, c, x, y, z) {
-      const r = new THREE.Mesh(new THREE.PlaneGeometry(w, d), M(c));
-      r.rotation.x = -Math.PI / 2;
-      r.position.set(x, y, z);
-      scene.add(r);
-      return r;
-    }
-
-    flat(320, 320, 0x4caf50, 0, 0, 0);
-
-    flat(10, 170, 0x444444, 0, 0.02, -10);
-    [-22, 14].forEach(z => flat(170, 8, 0x444444, 0, 0.03, z));
-
-    for (let z = -90; z < 75; z += 8) {
-      flat(0.4, 3, 0xffffff, 0, 0.05, z);
-    }
-
-    flat(24, 10, 0xbdbdbd, 0, 0.04, 60);
-
-    function sign(text, x, y, z, color) {
-      const c = document.createElement("canvas");
-      c.width = 256;
-      c.height = 64;
-      const g = c.getContext("2d");
-
-      g.fillStyle = color || "#e10600";
-      g.fillRect(0, 0, 256, 64);
-
-      g.strokeStyle = "#fff";
-      g.lineWidth = 4;
-      g.strokeRect(2, 2, 252, 60);
-
-      g.fillStyle = "#fff";
-      g.font = "bold 26px sans-serif";
-      g.textAlign = "center";
-      g.textBaseline = "middle";
-      g.fillText(text, 128, 34);
-
-      const s = new THREE.Sprite(
-        new THREE.SpriteMaterial({
-          map: new THREE.CanvasTexture(c)
-        })
-      );
-
-      s.scale.set(9, 2.25, 1);
-      s.position.set(x, y, z);
-      scene.add(s);
-    }
-
-    const places = [
-      ["Admin Block", 0x607d8b, 0, -64, 22, 12, 10, 0xe10600],
-      ["PNGPD Department", 0xff9800, -26, -40, 14, 10, 8, 0xe10600],
-      ["PTI Library", 0x2196f3, 26, -40, 14, 10, 8, 0xffffff],
-      ["PGP 126 Laboratory", 0x9c27b0, -26, -8, 14, 10, 8, 0xffeb3b],
-      ["Classrooms", 0x4db6ac, 26, -8, 14, 10, 7, 0xe10600],
-      ["Hostel A", 0xffeb3b, -26, 28, 14, 10, 9, 0xe10600],
-      ["Hostel B", 0xf06292, 26, 28, 14, 10, 9, 0xffffff],
-      ["Bush Mama", 0xe91e63, -26, 50, 11, 8, 6, 0xffeb3b],
-      ["Tutu Restaurant", 0x00bcd4, 26, 50, 11, 8, 6, 0xe10600],
-      ["Fellowship Hall", 0x7e57c2, -62, -22, 13, 10, 8, 0xffffff],
-      ["UBA Bank", 0xd32f2f, -62, 14, 13, 10, 8, 0xffffff],
-      ["Garage", 0x8d6e63, 62, 14, 13, 10, 6, 0xffeb3b]
-    ];
-
-    const solids = [];
-    const spots = [];
-
-    places.forEach(([n, c, x, z, w, d, h, rc]) => {
-      const sx = x === 0 ? 0 : Math.sign(x);
-      const frontX = x - sx * (w / 2);
-      const frontZ = z + d / 2;
-
-      box(w, h, d, c, x, h / 2, z);
-      box(w + 1.2, 1, d + 1.2, rc, x, h + 0.5, z);
-
-      if (sx !== 0) {
-        box(0.5, 4.5, 3, 0x3e2723, frontX, 2.25, z);
-        box(0.4, 1.6, 2, 0xb3e5fc, frontX, h * 0.65, z - d / 4);
-        box(0.4, 1.6, 2, 0xb3e5fc, frontX, h * 0.65, z + d / 4);
-
-        spots.push({ n, x: frontX - sx * 3.5, z });
-      } else {
-        box(3, 4.5, 0.5, 0x3e2723, x, 2.25, frontZ);
-        box(2, 1.6, 0.4, 0xb3e5fc, x - 6, h * 0.6, frontZ);
-        box(2, 1.6, 0.4, 0xb3e5fc, x + 6, h * 0.6, frontZ);
-
-        spots.push({ n, x, z: frontZ + 3.5 });
-      }
-
-      sign(n, x, h + 3, z);
-
-      solids.push({
-        x, z,
-        hw: w / 2 + 0.6,
-        hd: d / 2 + 0.6
-      });
-    });
-
-    flat(34, 22, 0x66bb6a, 66, 0.03, -22);
-    flat(30, 0.3, 0xffffff, 66, 0.05, -22);
-    flat(0.3, 18, 0xffffff, 66, 0.05, -22);
-    flat(30, 0.3, 0xffffff, 66, 0.05, -31);
-    flat(30, 0.3, 0xffffff, 66, 0.05, -13);
-
-    box(0.3, 3, 6, 0xffffff, 50, 1.5, -22);
-    box(0.3, 3, 6, 0xffffff, 82, 1.5, -22);
-
-    sign("Football Field", 66, 7, -22);
-    spots.push({ n: "Football Field", x: 66, z: -22, r: 12 });
-
-    const gz = 72;
-    box(1.4, 7, 1.4, 0xe10600, -8, 3.5, gz);
-    box(1.4, 7, 1.4, 0xe10600, 8, 3.5, gz);
-    box(17, 1.6, 1.4, 0xe10600, 0, 7, gz);
-    box(14, 0.4, 0.4, 0xffffff, 0, 5, gz);
-
-    sign("PTI EFFURUN", 0, 10.5, gz);
-
-    solids.push(
-      { x: -8, z: gz, hw: 1, hd: 1 },
-      { x: 8, z: gz, hw: 1, hd: 1 }
-    );
-
-    spots.push({ n: "PTI Entrance", x: 0, z: 62, r: 10 });
-
-    for (const sx of [-1, 1]) {
-      box(40, 2.5, 0.8, 0xffccbc, sx * 29, 1.25, gz);
-      solids.push({ x: sx * 29, z: gz, hw: 20, hd: 0.8 });
-    }
-
-    for (let z = -80; z <= 66; z += 18) {
-      for (const sx of [-1, 1]) {
-        box(0.3, 5, 0.3, 0x424242, sx * 6, 2.5, z);
-        box(0.9, 0.5, 0.9, 0xfff59d, sx * 6, 5.2, z);
-      }
-    }
-
-    const rnd = (a, b) => a + Math.random() * (b - a);
-
-    for (let i = 0; i < 55; i++) {
-      const x = rnd(-120, 120);
-      const z = rnd(-100, 95);
-
-      if (Math.abs(x) < 8 || Math.abs(z + 22) < 7 || Math.abs(z - 14) < 7) continue;
-      if (places.some(p => Math.abs(x - p[2]) < p[4] / 2 + 5 && Math.abs(z - p[3]) < p[5] / 2 + 5)) continue;
-      if (Math.abs(x - 66) < 22 && Math.abs(z + 22) < 16) continue;
-
-      box(0.8, 3, 0.8, 0x6d4c41, x, 1.5, z);
-
-      const t = new THREE.Mesh(
-        new THREE.SphereGeometry(2.2, 8, 6),
-        M([0x2e7d32, 0x66bb6a, 0x43a047][i % 3])
-      );
-
-      t.position.set(x, 4.5, z);
-      scene.add(t);
-
-      solids.push({ x, z, hw: 1, hd: 1 });
-    }
-
-    for (let i = 0; i < 35; i++) {
-      const x = rnd(-120, 120);
-      const z = rnd(-100, 95);
-
-      if (Math.abs(x) < 8) continue;
-
-      box(0.5, 0.5, 0.5, [0xe10600, 0xffeb3b, 0xff4081, 0xffffff][i % 4], x, 0.25, z);
-    }
-
-    function makeChar(shirt, skin, pants) {
-      const g = new THREE.Group();
-
-      const bodyMesh = new THREE.Mesh(
-        new THREE.BoxGeometry(1, 1.4, 0.6),
-        M(shirt)
-      );
-      bodyMesh.position.y = 1.3;
-
-      const head = new THREE.Mesh(
-        new THREE.SphereGeometry(0.45, 10, 8),
-        M(skin)
-      );
-      head.position.y = 2.4;
-
-      const legs = new THREE.Mesh(
-        new THREE.BoxGeometry(0.9, 0.7, 0.5),
-        M(pants)
-      );
-      legs.position.y = 0.35;
-
-      g.add(bodyMesh, head, legs);
-      g.userData.body = bodyMesh;
-      scene.add(g);
-
-      return g;
-    }
-
-    const player = makeChar(0xe10600, 0x8d5524, 0x1a237e);
-    player.position.set(0, 0, 64);
-
-    const body = player.userData.body;
-
-    const npcs = [];
-    const skins = [0x8d5524, 0x6d4c41, 0xa1887f, 0x5d4037];
-    const shirts = [0x2196f3, 0xffeb3b, 0x4caf50, 0xff9800, 0xab47bc, 0xffffff, 0x00bcd4, 0xf06292];
-
-    const paths = [
-      [3, -60, 3, 55],
-      [-3, 55, -3, -60],
-      [-60, -22, 60, -22],
-      [-60, 14, 60, 14],
-      [-12, -22, -12, 14],
-      [12, 14, 12, -22],
-      [3, 30, 3, -5],
-      [-3, -5, -3, 30]
-    ];
-
-    paths.forEach((p, i) => {
-      for (let k = 0; k < 2; k++) {
-        const c = makeChar(shirts[(i * 2 + k) % 8], skins[(i + k) % 4], 0x37474f);
-        npcs.push({
-          c,
-          p,
-          t: Math.random(),
-          dir: 1,
-          sp: rnd(0.02, 0.045)
-        });
-      }
-    });
-
-    const joy = $("joy");
-    const knob = $("knob");
-    let jx = 0;
-    let jy = 0;
-    let jid = null;
-
-    function joyMove(t) {
-      const r = joy.getBoundingClientRect();
-      const cx = r.left + 65;
-      const cy = r.top + 65;
-
-      let dx = t.clientX - cx;
-      let dy = t.clientY - cy;
-
-      const len = Math.hypot(dx, dy);
-      const max = 50;
-
-      if (len > max) {
-        dx *= max / len;
-        dy *= max / len;
-      }
-
-      knob.style.left = 35 + dx + "px";
-      knob.style.top = 35 + dy + "px";
-
-      jx = dx / max;
-      jy = dy / max;
-    }
-
-    joy.addEventListener("touchstart", (e) => {
-      e.preventDefault();
-      jid = e.changedTouches[0].identifier;
-      joyMove(e.changedTouches[0]);
-    }, { passive: false });
-
-    joy.addEventListener("touchmove", (e) => {
-      e.preventDefault();
-      for (const t of e.changedTouches) {
-        if (t.identifier === jid) joyMove(t);
-      }
-    }, { passive: false });
-
-    const joyEnd = () => {
-      jid = null;
-      jx = 0;
-      jy = 0;
-      knob.style.left = "35px";
-      knob.style.top = "35px";
-    };
-
-    joy.addEventListener("touchend", joyEnd);
-    joy.addEventListener("touchcancel", joyEnd);
-
-    let md = false;
-
-    joy.addEventListener("mousedown", (e) => {
-      md = true;
-      joyMove(e);
-    });
-
-    addEventListener("mousemove", (e) => {
-      if (md) joyMove(e);
-    });
-
-    addEventListener("mouseup", () => {
-      if (md) {
-        md = false;
-        joyEnd();
-      }
-    });
-
-    const keys = {};
-    addEventListener("keydown", e => { keys[e.key.toLowerCase()] = 1; });
-    addEventListener("keyup", e => { keys[e.key.toLowerCase()] = 0; });
-
-    const runBtn = $("run");
-    let running = false;
-
-    runBtn.addEventListener("touchstart", (e) => {
-      e.preventDefault();
-      running = true;
-      runBtn.style.background = "#e65100";
-    }, { passive: false });
-
-    runBtn.addEventListener("touchend", () => {
-      running = false;
-      runBtn.style.background = "#ff9800";
-    });
-
-    let camAng = 0;
-    let camId = null;
-    let lastX = 0;
-
-    ren.domElement.addEventListener("touchstart", (e) => {
-      const t = e.changedTouches[0];
-      if (t.clientX > innerWidth * 0.4 && camId === null) {
-        camId = t.identifier;
-        lastX = t.clientX;
-      }
-    }, { passive: true });
-
-    ren.domElement.addEventListener("touchmove", (e) => {
-      for (const t of e.changedTouches) {
-        if (t.identifier === camId) {
-          camAng -= (t.clientX - lastX) * 0.008;
-          lastX = t.clientX;
-        }
-      }
-    }, { passive: true });
-
-    ren.domElement.addEventListener("touchend", (e) => {
-      for (const t of e.changedTouches) {
-        if (t.identifier === camId) camId = null;
-      }
-    });
-
-    const actBtn = $("act");
-    const toast = $("toast");
-    const locEl = $("loc");
-
-    let near = null;
-
-    function say(text) {
-      toast.textContent = text;
-      toast.style.display = "block";
-      clearTimeout(say.t);
-      say.t = setTimeout(() => {
-        toast.style.display = "none";
-      }, 2500);
-    }
-
-    function doAct() {
-      if (!near || !P) return;
-
-      if (!P.visited.includes(near.n)) {
-        P.visited.push(near.n);
-        gain(20, 10);
-        say("First visit to " + near.n + "! +20 XP, +10 coins");
-        saveProfile(P);
-      } else {
-        say(near.n + ": activities coming in Phase 4!");
-      }
-    }
-
-    actBtn.addEventListener("touchstart", (e) => {
-      e.preventDefault();
-      doAct();
-    }, { passive: false });
-
-    actBtn.addEventListener("click", doAct);
-
-    addEventListener("keydown", e => {
-      if (e.key === "e") doAct();
-    });
-
-    function blocked(x, z) {
-      return (
-        solids.some(s => Math.abs(x - s.x) < s.hw && Math.abs(z - s.z) < s.hd) ||
-        Math.abs(x) > 150 ||
-        z > 85 ||
-        z < -95
-      );
-    }
-
-    const mini = $("mini");
-    const mg = mini.getContext("2d");
-
-    const mx = x => (x + 100) / 200 * 220;
-    const mz = z => (z + 100) / 180 * 220;
-
-    function drawMini() {
-      mg.clearRect(0, 0, 220, 220);
-
-      mg.fillStyle = "#444";
-      mg.fillRect(mx(-5), 0, 12, 220);
-      mg.fillRect(0, mz(-26), 220, 9);
-      mg.fillRect(0, mz(10), 220, 9);
-
-      mg.fillStyle = "#ffeb3b";
-      places.forEach(p => {
-        mg.fillRect(mx(p[2]) - 5, mz(p[3]) - 4, 10, 8);
-      });
-
-      mg.fillStyle = "#fff";
-      mg.beginPath();
-      mg.arc(mx(player.position.x), mz(player.position.z), 6, 0, Math.PI * 2);
-      mg.fill();
-
-      mg.fillStyle = "#e10600";
-      mg.beginPath();
-      mg.arc(mx(player.position.x), mz(player.position.z), 4, 0, Math.PI * 2);
-      mg.fill();
-    }
-
-    let P = null;
-    const clock = new THREE.Clock();
-
-    function loop() {
-      requestAnimationFrame(loop);
-
-      const dt = Math.min(clock.getDelta(), 0.05);
-
-      const ix =
-        jx +
-        ((keys.d || keys.arrowright) ? 1 : 0) -
-        ((keys.a || keys.arrowleft) ? 1 : 0);
-
-      const iy =
-        jy +
-        ((keys.s || keys.arrowdown) ? 1 : 0) -
-        ((keys.w || keys.arrowup) ? 1 : 0);
-
-      const mag = P ? Math.min(1, Math.hypot(ix, iy)) : 0;
-
-      const wantRun = (running || keys.shift) && P && P.energy > 1;
-
-      if (mag > 0.08) {
-        const sp = (wantRun ? 13 : 6.5) * mag * dt;
-
-        if (wantRun) {
-          P.energy = Math.max(0, P.energy - 4 * dt);
-        }
-
-        const fx = -Math.sin(camAng);
-        const fz = -Math.cos(camAng);
-        const rx = Math.cos(camAng);
-        const rz = -Math.sin(camAng);
-
-        const l = Math.hypot(ix, iy);
-        const dx = (rx * ix / l - fx * iy / l) * sp;
-        const dz = (rz * ix / l - fz * iy / l) * sp;
-
-        const nx = player.position.x + dx;
-        const nz = player.position.z + dz;
-
-        if (!blocked(nx, player.position.z)) player.position.x = nx;
-        if (!blocked(player.position.x, nz)) player.position.z = nz;
-
-        player.rotation.y = Math.atan2(dx, dz);
-        body.position.y = 1.3 + Math.sin(performance.now() / 90) * 0.08;
-      }
-
-      if (P && mag <= 0.08) {
-        P.energy = Math.min(100, P.energy + 3 * dt);
-      }
-
-      npcs.forEach(n => {
-        n.t += n.dir * n.sp * dt;
-
-        if (n.t > 1) {
-          n.t = 1;
-          n.dir = -1;
-        }
-
-        if (n.t < 0) {
-          n.t = 0;
-          n.dir = 1;
-        }
-
-        const [a, b, c, d] = n.p;
-
-        n.c.position.set(a + (c - a) * n.t, 0, b + (d - b) * n.t);
-        n.c.rotation.y = Math.atan2((c - a) * n.dir, (d - b) * n.dir);
-        n.c.userData.body.position.y = 1.3 + Math.sin(performance.now() / 110 + n.sp * 300) * 0.06;
-      });
-
-      const d = 11;
-      const h = 7;
-
-      const tx = player.position.x + Math.sin(camAng) * d;
-      const tz = player.position.z + Math.cos(camAng) * d;
-
-      cam.position.x += (tx - cam.position.x) * 0.1;
-      cam.position.z += (tz - cam.position.z) * 0.1;
-      cam.position.y += (h - cam.position.y) * 0.1;
-
-      cam.lookAt(player.position.x, 2, player.position.z);
-
-      near = null;
-      let best = 1e9;
-
-      spots.forEach(s => {
-        const dd = Math.hypot(player.position.x - s.x, player.position.z - s.z);
-        if (dd < (s.r || 6) && dd < best) {
-          best = dd;
-          near = s;
-        }
-      });
-
-      if (near) {
-        locEl.textContent = near.n;
-        actBtn.style.display = near.r ? "none" : "flex";
-      } else {
-        locEl.textContent = "PTI Campus";
-        actBtn.style.display = "none";
-      }
-
-      drawMini();
-
-      if (P) drawStats();
-
-      ren.render(scene, cam);
-    }
-
-    cam.position.set(0, 7, 76);
-    loop();
-
-    addEventListener("resize", () => {
-      cam.aspect = innerWidth / innerHeight;
-      cam.updateProjectionMatrix();
-      ren.setSize(innerWidth, innerHeight);
-    });
-
-    function gain(xp, coins) {
-      P.xp += xp;
-      P.coins += coins;
-
-      const level = Math.floor(P.xp / 100) + 1;
-
-      if (level > P.level) {
-        P.level = level;
-        say("LEVEL UP! You are now level " + level);
-      }
-    }
-
-    let sh = 0;
-
-    function drawStats() {
-      if ((sh += 1) % 10) return;
-
-      const bar = (v, color) =>
-        '<div class="bar"><i style="width:' + Math.round(v) + '%;background:' + color + '"></i></div>';
-
-      $("stats").innerHTML =
-        P.username + " · Lv " + P.level +
-        "<br>XP " + (P.xp % 100) + "/100" +
-        bar(P.xp % 100, "#ffeb3b") +
-        "🪙 " + P.coins +
-        "<br>Energy" + bar(P.energy, "#4caf50") +
-        "Hunger" + bar(P.hunger, "#ff9800");
-    }
-
-    // start defaults if no saved profile
-    const savedProfile = loadProfile();
-
-    if (savedProfile) {
-      profile = savedProfile;
-      pickColor = savedProfile.shirt_color || pickColor;
-      startGame(profile);
-    } else {
-      profile = getDefaultProfile();
-      buildColorChoices();
-      say("Pick your shirt colour and enter PTI.");
-    }
-
-    setInterval(() => {
-      if (profile) {
-        profile.hunger = Math.max(0, (profile.hunger || 100) - 1);
-        saveProfile(profile);
-      }
-    }, 30000);
-
-    addEventListener("visibilitychange", () => {
-      if (document.hidden && profile) {
-        saveProfile(profile);
-      }
-    });
-
-    say("Welcome to PTI! Walk up the main road. Drag the screen to turn the camera.");
-  </script>
+</div>
+
+<div id="panel"><div id="pbox">
+  <div id="phead"><span id="ptitle"></span><button id="pclose">X</button></div>
+  <div id="pbody"></div>
+</div></div>
+
+<div id="joy"><div id="knob"></div></div>
+<div class="btn" id="run">RUN</div>
+<div class="btn" id="act">ENTER</div>
+
+<script>
+window.COURSES = {};
+
+// ===== PGP 121 - Fluid Kinematics =====
+window.COURSES["PGP 121"] = {
+title: "PGP 121 - Fluid Kinematics", place: "library", reward: 10,
+notes: [
+  "Fluid - a substance capable of continuous deformation when subjected to shear stress.",
+  "Fluid mechanics - study of fluids at rest and in motion.",
+  "Fluid kinematics - study of fluid motion without considering the forces causing the motion.",
+  "Fluid dynamics - study of fluid motion together with the forces responsible for it.",
+  "Fluid statics - study of fluids at rest.",
+  "Velocity - rate of change of position of a fluid particle with time.",
+  "Acceleration - rate of change of velocity with time.",
+  "Flow field - description of velocity and other flow properties throughout a region.",
+  "Streamline - imaginary line whose tangent at every point gives the instantaneous flow direction.",
+  "Pathline - actual path followed by an individual fluid particle.",
+  "Streakline - line formed by all fluid particles that have previously passed through a particular point.",
+  "Steady flow - flow in which flow properties at a fixed point do not change with time.",
+  "Unsteady flow - flow properties at a fixed point change with time.",
+  "Uniform flow - flow properties do not change from one position to another along the flow direction.",
+  "Non-uniform flow - flow properties vary from one location to another.",
+  "Laminar flow - smooth, orderly fluid motion in layers.",
+  "Turbulent flow - irregular fluid motion involving fluctuations and mixing.",
+  "Compressible flow - flow in which fluid density changes significantly.",
+  "Incompressible flow - flow where density is approximately constant.",
+  "Rotational flow - flow in which fluid elements rotate about their own axes.",
+  "Irrotational flow - flow in which fluid elements have no net rotation.",
+  "Volumetric flow rate - volume of fluid passing a section per unit time.",
+  "Mass flow rate - mass passing a section per unit time.",
+  "Continuity principle - conservation of mass during fluid flow.",
+  "For steady incompressible flow, the continuity relationship is commonly: A1V1 = A2V2",
+  "Volumetric flow rate: Q = AV",
+  "Mass flow rate: ṁ = ρQ = ρAV",
+  "Flow direction can be represented using velocity vectors and streamlines.",
+  "Fluid kinematics is important in pipelines, pumps, compressors and petroleum-processing systems.",
+  "Understanding flow behaviour helps engineers predict how fluids move through equipment."
+],
+quiz: [
+  {id:"PGP121-Q01", cat:"Concepts", q:"Define fluid kinematics.", o:["The study of fluid motion without considering the forces causing the motion", "Study of fluid motion together with the forces producing the motion", "Smooth, orderly flow in layers", "Rate of change of displacement with time"], a:0},
+  {id:"PGP121-Q02", cat:"Concepts", q:"Define fluid dynamics.", o:["Flow properties at a fixed point remain constant with time", "The study of fluid motion without considering the forces causing the motion", "Study of fluid motion together with the forces producing the motion", "Mass flowing through a section per unit time"], a:2},
+  {id:"PGP121-Q03", cat:"Concepts", q:"What is fluid statics?", o:["Kinematics describes motion; dynamics considers forces", "Flow varying significantly in three spatial directions", "Study of fluids at rest", "Direction of the velocity vector at a particular point and time"], a:2},
+  {id:"PGP121-Q04", cat:"Concepts", q:"Define velocity.", o:["Study of fluid motion together with the forces producing the motion", "Rate of change of displacement with time", "Flow properties at a fixed point remain constant with time", "Irregular flow with fluctuations and mixing"], a:1},
+  {id:"PGP121-Q05", cat:"Concepts", q:"Define acceleration.", o:["Flow properties at a fixed point remain constant with time", "Flow properties change with time at a fixed point", "Rate of change of velocity with time", "Smooth, orderly flow in layers"], a:2},
+  {id:"PGP121-Q06", cat:"Concepts", q:"What is a streamline?", o:["A line tangent to the instantaneous velocity direction at every point", "Cross-sectional flow area", "Flow properties vary spatially", "Velocity decreases"], a:0},
+  {id:"PGP121-Q07", cat:"Concepts", q:"Distinguish between streamline and pathline.", o:["Magnitude and direction of velocity", "Velocity decreases", "Smooth, orderly flow in layers", "A streamline represents instantaneous flow direction; a pathline is the actual path of a fluid particle"], a:3},
+  {id:"PGP121-Q08", cat:"Concepts", q:"What is a streakline?", o:["Spatial description of flow properties such as velocity", "The locus of particles that have passed through a particular point", "Magnitude and direction of velocity", "Volumetric flow measures volume/time; mass flow measures mass/time"], a:1},
+  {id:"PGP121-Q09", cat:"Concepts", q:"Define steady flow.", o:["Mass cannot be created or destroyed in a closed system", "Mass flowing through a section per unit time", "Flow properties at a fixed point remain constant with time", "Study of fluid motion together with the forces producing the motion"], a:2},
+  {id:"PGP121-Q10", cat:"Concepts", q:"Define unsteady flow.", o:["Flow properties change with time at a fixed point", "Irregular flow with fluctuations and mixing", "Rate of change of velocity with time", "Rate of change of displacement with time"], a:0},
+  {id:"PGP121-Q11", cat:"Concepts", q:"What is uniform flow?", o:["Velocity decreases", "Flow properties remain constant from one location to another", "Flow approximated as varying significantly in only one spatial direction", "Cross-sectional flow area"], a:1},
+  {id:"PGP121-Q12", cat:"Concepts", q:"What is non-uniform flow?", o:["The locus of particles that have passed through a particular point", "Incompressible flow", "Flow properties vary spatially", "Magnitude and direction of velocity"], a:2},
+  {id:"PGP121-Q13", cat:"Concepts", q:"Define laminar flow.", o:["Flow properties at a fixed point remain constant with time", "Smooth, orderly flow in layers", "Mass cannot be created or destroyed in a closed system", "Rate of change of displacement with time"], a:1},
+  {id:"PGP121-Q14", cat:"Concepts", q:"Define turbulent flow.", o:["Rate of change of displacement with time", "Mass cannot be created or destroyed in a closed system", "Mass flowing through a section per unit time", "Irregular flow with fluctuations and mixing"], a:3},
+  {id:"PGP121-Q15", cat:"Concepts", q:"Differentiate compressible and incompressible flow.", o:["Flow during startup of a pump", "Continuity requires the same mass/volume flow to pass through the smaller area", "Kinematics describes motion; dynamics considers forces", "Density changes significantly in compressible flow but is approximately constant in incompressible flow"], a:3},
+  {id:"PGP121-Q16", cat:"Concepts", q:"What is rotational flow?", o:["Flow in which fluid elements rotate", "A line tangent to the instantaneous velocity direction at every point", "Spatial description of flow properties such as velocity", "The locus of particles that have passed through a particular point"], a:0},
+  {id:"PGP121-Q17", cat:"Concepts", q:"What is irrotational flow?", o:["Flow varying significantly in three spatial directions", "A small representative element of fluid used to describe flow behaviour", "Flow whose significant variation occurs in two spatial directions", "Flow in which fluid elements have no net rotation"], a:3},
+  {id:"PGP121-Q18", cat:"Concepts", q:"What is volumetric flow rate?", o:["Volume flowing per unit time", "Direction of the velocity vector at a particular point and time", "Mass per unit volume", "Study of fluids at rest"], a:0},
+  {id:"PGP121-Q19", cat:"Concepts", q:"Give the equation for volumetric flow rate.", o:["ṁ = ρAV", "Q = AV", "m = ρ V", "A1V1 = A2V2"], a:1},
+  {id:"PGP121-Q20", cat:"Concepts", q:"What does A represent in Q = AV?", o:["A line tangent to the instantaneous velocity direction at every point", "Cross-sectional flow area", "Volume flowing per unit time", "Flow properties vary spatially"], a:1},
+  {id:"PGP121-Q21", cat:"Concepts", q:"What does V represent in Q = AV?", o:["Incompressible flow", "Volume flowing per unit time", "Average fluid velocity", "Volumetric flow measures volume/time; mass flow measures mass/time"], a:2},
+  {id:"PGP121-Q22", cat:"Concepts", q:"Define mass flow rate.", o:["Mass flowing through a section per unit time", "Rate of change of displacement with time", "Rate of change of velocity with time", "Flow properties at a fixed point remain constant with time"], a:0},
+  {id:"PGP121-Q23", cat:"Concepts", q:"Give the equation for mass flow rate.", o:["m = ρ V", "A1V1 = A2V2", "Q = AV", "ṁ = ρAV"], a:3},
+  {id:"PGP121-Q24", cat:"Concepts", q:"State the principle behind continuity.", o:["Laminar flow is orderly and layered; turbulent flow is irregular and highly mixed", "Spatial description of flow properties such as velocity", "Conservation of mass", "Pipeline transport and flow through processing equipment"], a:2},
+  {id:"PGP121-Q25", cat:"Concepts", q:"For incompressible steady flow, state the continuity equation.", o:["m = ρ V", "A1V1 = A2V2", "Q = AV", "ṁ = ρAV"], a:1},
+  {id:"PGP121-Q26", cat:"Concepts", q:"If pipe area decreases, what happens to velocity for incompressible steady flow?", o:["Flow approximated as varying significantly in only one spatial direction", "Study of fluids at rest", "Irregular flow with fluctuations and mixing", "Velocity increases"], a:3},
+  {id:"PGP121-Q27", cat:"Concepts", q:"If pipe area increases, what happens to velocity?", o:["Conservation of mass", "Velocity decreases", "They help control material balance and process operation", "A small representative element of fluid used to describe flow behaviour"], a:1},
+  {id:"PGP121-Q28", cat:"Calculations", q:"A pipe has area 2 m² and velocity 3 m/s. Find Q.", o:["7 m³/s", "6 m³/s", "9 m³/s", "8 m³/s"], a:1},
+  {id:"PGP121-Q29", cat:"Calculations", q:"A flow has Q = 10 m³/s through an area of 2 m². Find velocity.", o:["8 m/s", "10 m/s", "5 m/s", "4 m/s"], a:2},
+  {id:"PGP121-Q30", cat:"Concepts", q:"Why is fluid kinematics important to petroleum engineers?", o:["They help control material balance and process operation", "It helps describe and predict fluid motion in petroleum-processing equipment and pipelines", "Changes in velocity influence forces and energy requirements", "It increases energy losses and can produce vibration or erosion"], a:1},
+  {id:"PGP121-Q31", cat:"Concepts", q:"What is a flow field?", o:["Spatial description of flow properties such as velocity", "Flow whose significant variation occurs in two spatial directions", "Volumetric flow measures volume/time; mass flow measures mass/time", "Magnitude and direction of velocity"], a:0},
+  {id:"PGP121-Q32", cat:"Concepts", q:"What is one-dimensional flow?", o:["Spatial description of flow properties such as velocity", "The locus of particles that have passed through a particular point", "Flow approximated as varying significantly in only one spatial direction", "Volumetric flow measures volume/time; mass flow measures mass/time"], a:2},
+  {id:"PGP121-Q33", cat:"Concepts", q:"What is two-dimensional flow?", o:["Spatial description of flow properties such as velocity", "Mass per unit volume", "Particles that have passed through a particular point", "Flow whose significant variation occurs in two spatial directions"], a:3},
+  {id:"PGP121-Q34", cat:"Concepts", q:"What is three-dimensional flow?", o:["Particles that have passed through a particular point", "Flow in which fluid elements rotate", "A small representative element of fluid used to describe flow behaviour", "Flow varying significantly in three spatial directions"], a:3},
+  {id:"PGP121-Q35", cat:"Concepts", q:"Give two examples of equipment where fluid motion is important.", o:["Kinematics describes motion; dynamics considers forces", "Flow during startup of a pump", "Pumps and pipelines", "Flow properties change with time at a fixed point"], a:2},
+  {id:"PGP121-Q36", cat:"Concepts", q:"Explain why velocity may increase in a narrowing pipe.", o:["Continuity requires the same mass/volume flow to pass through the smaller area", "Incompressible flow", "Petroleum processing involves movement of liquids and gases through pipes and equipment, so understanding their motion is fundamental", "At a fixed point in the pipeline, velocity and other flow properties remain constant with time"], a:0},
+  {id:"PGP121-Q37", cat:"Concepts", q:"State two differences between laminar and turbulent flow.", o:["Pipeline transport and flow through processing equipment", "Laminar flow is orderly and layered; turbulent flow is irregular and highly mixed", "Conservation of mass", "It helps describe and predict fluid motion in petroleum-processing equipment and pipelines"], a:1},
+  {id:"PGP121-Q38", cat:"Concepts", q:"What type of flow has approximately constant density?", o:["Flow in which fluid elements rotate", "Magnitude and direction of velocity", "Incompressible flow", "Average fluid velocity"], a:2},
+  {id:"PGP121-Q39", cat:"Concepts", q:"What type of flow is commonly associated with strong mixing?", o:["m/s²", "m/s", "Turbulent flow", "m³/s"], a:2},
+  {id:"PGP121-Q40", cat:"Concepts", q:"What does a velocity vector provide?", o:["Magnitude and direction of velocity", "Kinematics describes motion; dynamics considers forces", "The locus of particles that have passed through a particular point", "Flow properties remain constant from one location to another"], a:0},
+  {id:"PGP121-Q41", cat:"Concepts", q:"What is the SI unit of velocity?", o:["Turbulent flow", "m³/s", "m/s", "m/s²"], a:2},
+  {id:"PGP121-Q42", cat:"Concepts", q:"What is the SI unit of acceleration?", o:["m³/s", "Turbulent flow", "m/s", "m/s²"], a:3},
+  {id:"PGP121-Q43", cat:"Concepts", q:"What is the SI unit of volumetric flow rate?", o:["m/s", "m³/s", "m/s²", "Turbulent flow"], a:1},
+  {id:"PGP121-Q44", cat:"Concepts", q:"What is the SI unit of mass flow rate?", o:["kg/s", "Turbulent flow", "m³/s", "m/s²"], a:0},
+  {id:"PGP121-Q45", cat:"Concepts", q:"What is density?", o:["Flow in which fluid elements rotate", "Volumetric flow measures volume/time; mass flow measures mass/time", "Mass per unit volume", "Velocity decreases"], a:2},
+  {id:"PGP121-Q46", cat:"Concepts", q:"If density increases while Q remains constant, what happens to mass flow rate?", o:["It increases", "kg/s", "m³/s", "m/s"], a:0},
+  {id:"PGP121-Q47", cat:"Calculations", q:"If Q = 4 m³/s and density = 800 kg/m³, find mass flow rate.", o:["1600 kg/s", "6400 kg/s", "3200 kg/s", "2400 kg/s"], a:2},
+  {id:"PGP121-Q48", cat:"Concepts", q:"Explain steady flow using a pipeline example.", o:["Continuity requires the same mass/volume flow to pass through the smaller area", "At a fixed point in the pipeline, velocity and other flow properties remain constant with time", "Petroleum processing involves movement of liquids and gases through pipes and equipment, so understanding their motion is fundamental", "Direction of the velocity vector at a particular point and time"], a:1},
+  {id:"PGP121-Q49", cat:"Concepts", q:"Give one example of unsteady flow.", o:["Flow during startup of a pump", "Mass flowing through a section per unit time", "A line tangent to the instantaneous velocity direction at every point", "Pumps and pipelines"], a:0},
+  {id:"PGP121-Q50", cat:"Concepts", q:"What is the difference between flow description and force analysis?", o:["To show how velocity varies across a flow section", "Cross-sectional flow area", "Flow in which fluid elements rotate", "Kinematics describes motion; dynamics considers forces"], a:3},
+  {id:"PGP121-Q51", cat:"Concepts", q:"Why are streamlines useful?", o:["They help control material balance and process operation", "Changes in velocity influence forces and energy requirements", "They show instantaneous flow direction", "It increases energy losses and can produce vibration or erosion"], a:2},
+  {id:"PGP121-Q52", cat:"Concepts", q:"Can streamlines cross in a normal flow field?", o:["No", "Yes"], a:0},
+  {id:"PGP121-Q53", cat:"Concepts", q:"What does a pathline describe?", o:["A line tangent to the instantaneous velocity direction at every point", "Flow in which fluid elements rotate", "To show how velocity varies across a flow section", "The trajectory of an individual fluid particle"], a:3},
+  {id:"PGP121-Q54", cat:"Concepts", q:"What does a streakline describe?", o:["Volume flowing per unit time", "Kinematics describes motion; dynamics considers forces", "Flow approximated as varying significantly in only one spatial direction", "Particles that have passed through a particular point"], a:3},
+  {id:"PGP121-Q55", cat:"Concepts", q:"What happens to velocity if pipe diameter decreases while flow remains constant?", o:["A small representative element of fluid used to describe flow behaviour", "Flow whose significant variation occurs in two spatial directions", "Spatial description of flow properties such as velocity", "Velocity increases"], a:3},
+  {id:"PGP121-Q56", cat:"Concepts", q:"What happens if pipe diameter increases?", o:["Flow in which fluid elements have no net rotation", "To show how velocity varies across a flow section", "Flow whose significant variation occurs in two spatial directions", "Velocity decreases"], a:3},
+  {id:"PGP121-Q57", cat:"Concepts", q:"Why is density important in fluid calculations?", o:["Changes in velocity influence forces and energy requirements", "It increases energy losses and can produce vibration or erosion", "It helps describe and predict fluid motion in petroleum-processing equipment and pipelines", "It connects volume flow to mass flow"], a:3},
+  {id:"PGP121-Q58", cat:"Concepts", q:"What is the purpose of a velocity profile?", o:["Study of fluids at rest", "Flow properties vary spatially", "Average fluid velocity", "To show how velocity varies across a flow section"], a:3},
+  {id:"PGP121-Q59", cat:"Concepts", q:"Why can turbulent flow be useful?", o:["It connects volume flow to mass flow", "It promotes mixing and heat/mass transfer", "Changes in velocity influence forces and energy requirements", "They help control material balance and process operation"], a:1},
+  {id:"PGP121-Q60", cat:"Concepts", q:"Why can turbulent flow also cause problems?", o:["It connects volume flow to mass flow", "They help control material balance and process operation", "It helps describe and predict fluid motion in petroleum-processing equipment and pipelines", "It increases energy losses and can produce vibration or erosion"], a:3},
+  {id:"PGP121-Q61", cat:"Concepts", q:"Define conservation of mass.", o:["Mass cannot be created or destroyed in a closed system", "Flow properties change with time at a fixed point", "Mass flowing through a section per unit time", "Study of fluid motion together with the forces producing the motion"], a:0},
+  {id:"PGP121-Q62", cat:"Concepts", q:"What is the relationship between density, volume and mass?", o:["ṁ = ρAV", "m = ρ V", "Q = AV", "A1V1 = A2V2"], a:1},
+  {id:"PGP121-Q63", cat:"Calculations", q:"If density = 900 kg/m³ and V = 5 m³, find mass.", o:["2700 kg", "5625 kg", "9000 kg", "4500 kg"], a:3},
+  {id:"PGP121-Q64", cat:"Concepts", q:"What is the difference between volumetric and mass flow rate?", o:["Kinematics describes motion; dynamics considers forces", "Direction of the velocity vector at a particular point and time", "Volumetric flow measures volume/time; mass flow measures mass/time", "A small representative element of fluid used to describe flow behaviour"], a:2},
+  {id:"PGP121-Q65", cat:"Concepts", q:"Why are flow measurements important in a refinery?", o:["They help control material balance and process operation", "It increases energy losses and can produce vibration or erosion", "It helps describe and predict fluid motion in petroleum-processing equipment and pipelines", "Changes in velocity influence forces and energy requirements"], a:0},
+  {id:"PGP121-Q66", cat:"Concepts", q:"State two petroleum applications of fluid kinematics.", o:["Pipeline transport and flow through processing equipment", "Mass flowing through a section per unit time", "Conservation of mass", "Laminar flow is orderly and layered; turbulent flow is irregular and highly mixed"], a:0},
+  {id:"PGP121-Q67", cat:"Concepts", q:"What is a fluid particle?", o:["Direction of the velocity vector at a particular point and time", "Flow in which fluid elements have no net rotation", "A small representative element of fluid used to describe flow behaviour", "Mass per unit volume"], a:2},
+  {id:"PGP121-Q68", cat:"Concepts", q:"Why is acceleration important in fluid flow?", o:["Changes in velocity influence forces and energy requirements", "It promotes mixing and heat/mass transfer", "It increases energy losses and can produce vibration or erosion", "It helps describe and predict fluid motion in petroleum-processing equipment and pipelines"], a:0},
+  {id:"PGP121-Q69", cat:"Concepts", q:"What is meant by instantaneous flow direction?", o:["Particles that have passed through a particular point", "Flow in which fluid elements have no net rotation", "Direction of the velocity vector at a particular point and time", "Flow in which fluid elements rotate"], a:2},
+  {id:"PGP121-Q70", cat:"Concepts", q:"Explain why PGP 121 is important to PNGPD.", o:["Petroleum processing involves movement of liquids and gases through pipes and equipment, so understanding their motion is fundamental", "Continuity requires the same mass/volume flow to pass through the smaller area", "At a fixed point in the pipeline, velocity and other flow properties remain constant with time", "They help control material balance and process operation"], a:0}
+]
+};
+
+// ===== PGP 122 - Separation Process I =====
+window.COURSES["PGP 122"] = {
+title: "PGP 122 - Separation Process I", place: "library", reward: 10,
+notes: [
+  "Separation - division of a mixture into distinct components/phases.",
+  "Separation process - operation used to distribute a mixture into separate phases.",
+  "Process - change from one equilibrium condition to another.",
+  "Why separation matters - chemical plants use separators before and after reactors.",
+  "Mixing - random distribution of initially separate phases.",
+  "Purpose of mixing - achieve uniformity and promote heat/mass transfer.",
+  "Liquid mixing - mixing involving fluids.",
+  "Solid mixing - mixing involving powders or solid particles.",
+  "Agitation vessel - tank in which fluid is mechanically agitated.",
+  "Baffle - wall-mounted strip used mainly to reduce vortexing.",
+  "Impeller - rotating component that imparts motion to fluid.",
+  "Axial-flow impeller - produces flow parallel to shaft.",
+  "Radial-flow impeller - produces radial/tangential flow.",
+  "Propeller - high-speed axial-flow impeller suitable for low-viscosity liquids.",
+  "Paddle - common impeller for mixing applications.",
+  "Turbine - versatile impeller type used in industrial mixing.",
+  "Vortex - rotating depression/free-surface motion caused by agitation.",
+  "Filtration - mechanical separation of solids from fluids.",
+  "Filter medium - porous material through which fluid passes.",
+  "Filter cake - accumulated solids on the filter medium.",
+  "Filtrate - clarified fluid passing through filter.",
+  "Filtration rate - volume of filtrate per unit time (dV/dt).",
+  "Cake resistance - resistance produced by deposited solids.",
+  "Medium resistance - resistance offered by filter medium.",
+  "Overall pressure drop: ΔP = ΔPc + ΔPm",
+  "Membrane - thin selective barrier between phases.",
+  "Leaching - removal of soluble material from a solid using a solvent.",
+  "Extraction - transfer of a component between phases.",
+  "Evaporation - concentration by vaporizing solvent.",
+  "Separation cost - separation can represent a major portion of chemical plant capital and operating cost."
+],
+quiz: [
+  {id:"PGP122-Q01", cat:"Concepts", q:"Define separation.", o:["Random distribution of two or more initially separate phases through one another", "Transfer of soluble material from a solid into a liquid solvent", "Division of a mixture into distinct components or phases", "Transfer of a desired component from one phase into another phase"], a:2},
+  {id:"PGP122-Q02", cat:"Concepts", q:"What is a separation process?", o:["Vaporization of solvent to concentrate a solution", "A process that divides or distributes a mixture into separate phases", "Liquid/fluid mixing and solid/powder mixing", "Layer of retained solids formed on the filter"], a:1},
+  {id:"PGP122-Q03", cat:"Concepts", q:"Why are separation processes important?", o:["To improve circulation and mixing in deeper vessels", "It provides the driving force for filtration", "They purify raw materials, separate products and enable recycling", "Plugging reduces filtration performance"], a:2},
+  {id:"PGP122-Q04", cat:"Concepts", q:"Define mixing.", o:["Transfer of a desired component from one phase into another phase", "Random distribution of two or more initially separate phases through one another", "Transfer of soluble material from a solid into a liquid solvent", "Removal of solids from a fluid through a filter medium"], a:1},
+  {id:"PGP122-Q05", cat:"Concepts", q:"State two purposes of mixing.", o:["To reduce gross vortexing", "Wastewater treatment and oil dewaxing", "Uniformity and promotion of heat/mass transfer", "To recover desired products and recycle unreacted materials"], a:2},
+  {id:"PGP122-Q06", cat:"Concepts", q:"What are the two broad types of mixing?", o:["Liquid/fluid mixing and solid/powder mixing", "It generally increases", "A membrane that allows some species to pass while retaining others", "A process that divides or distributes a mixture into separate phases"], a:0},
+  {id:"PGP122-Q07", cat:"Concepts", q:"What are the three main parts of agitation equipment?", o:["Vessel, baffles and impeller", "Resistance to flow caused by deposited filter solids", "Liquid/fluid mixing and solid/powder mixing", "A process that divides or distributes a mixture into separate phases"], a:0},
+  {id:"PGP122-Q08", cat:"Concepts", q:"What is the function of an impeller?", o:["Resistance caused by the filter medium itself", "Retain solids and produce a reasonably clear filtrate", "To impart motion to the fluid", "To separate and purify hydrocarbon/process streams"], a:2},
+  {id:"PGP122-Q09", cat:"Concepts", q:"What is the purpose of baffles?", o:["Pressure drop, area, viscosity, cake resistance and medium resistance", "To reduce gross vortexing", "Resistance to flow caused by deposited filter solids", "A vessel equipped to mechanically mix its contents"], a:1},
+  {id:"PGP122-Q10", cat:"Concepts", q:"Why is vortexing undesirable?", o:["It improves transfer of heat or mass", "It can reduce effective mixing and promote unwanted surface rotation", "It improves contact between phases", "Impurities can interfere with reactions and damage catalysts/equipment"], a:1},
+  {id:"PGP122-Q11", cat:"Concepts", q:"What is an axial-flow impeller?", o:["Liquid from which suspended solids have been removed", "Properties such as size, charge and molecular interactions", "One producing flow parallel to the shaft axis", "Liquid/fluid mixing and solid/powder mixing"], a:2},
+  {id:"PGP122-Q12", cat:"Concepts", q:"What is a radial-flow impeller?", o:["A process that divides or distributes a mixture into separate phases", "One producing radial/tangential flow", "Filtration capacity/rate generally increases under comparable conditions", "Solid retained by the filter"], a:1},
+  {id:"PGP122-Q13", cat:"Concepts", q:"Name three major impeller types.", o:["Propellers, paddles and turbines", "Petroleum plants continuously separate, purify and concentrate process streams", "High-speed axial-flow impeller", "Evaporation removes solvent by vaporization; filtration separates solids from fluids mechanically"], a:0},
+  {id:"PGP122-Q14", cat:"Concepts", q:"What is a propeller?", o:["High-speed axial-flow impeller", "A process that divides or distributes a mixture into separate phases", "Solid retained by the filter", "A vessel equipped to mechanically mix its contents"], a:0},
+  {id:"PGP122-Q15", cat:"Concepts", q:"For what type of liquid is a propeller particularly suitable?", o:["It is especially important during early filtration", "Low-viscosity liquids", "Pressure drop, area, viscosity, cake resistance and medium resistance", "To recover desired products and recycle unreacted materials"], a:1},
+  {id:"PGP122-Q16", cat:"Concepts", q:"What is pitch of a propeller?", o:["Resistance to flow caused by deposited filter solids", "It is especially important during early filtration", "Ratio of longitudinal distance moved per revolution to propeller diameter", "Propeller pitch equal to one"], a:2},
+  {id:"PGP122-Q17", cat:"Concepts", q:"What is square pitch?", o:["Properties such as size, charge and molecular interactions", "Propeller pitch equal to one", "A membrane that allows some species to pass while retaining others", "One producing flow parallel to the shaft axis"], a:1},
+  {id:"PGP122-Q18", cat:"Concepts", q:"Define filtration.", o:["Separation using a selective membrane barrier", "Removal of solids from a fluid through a filter medium", "Transfer of a desired component from one phase into another phase", "Division of a mixture into distinct components or phases"], a:1},
+  {id:"PGP122-Q19", cat:"Concepts", q:"What is the filter medium?", o:["Propeller pitch equal to one", "A membrane that allows some species to pass while retaining others", "One producing flow parallel to the shaft axis", "Permeable material used to retain particles"], a:3},
+  {id:"PGP122-Q20", cat:"Concepts", q:"What is filter cake?", o:["Liquid from which suspended solids have been removed", "Driving force for filtration increases", "An impeller with blades used for industrial agitation", "Layer of retained solids formed on the filter"], a:3},
+  {id:"PGP122-Q21", cat:"Concepts", q:"What is filtrate?", o:["Fluid passing through the filter", "Accumulation of unwanted material on/in a membrane that reduces performance", "Solid retained by the filter", "To separate and purify hydrocarbon/process streams"], a:0},
+  {id:"PGP122-Q22", cat:"Concepts", q:"What is residue?", o:["An impeller with blades used for industrial agitation", "Retain solids and produce a reasonably clear filtrate", "It is especially important during early filtration", "Solid retained by the filter"], a:3},
+  {id:"PGP122-Q23", cat:"Concepts", q:"What is filtration rate?", o:["A more concentrated solution or solids depending on the operation", "dV/dt", "Layer of retained solids formed on the filter", "Mixture containing solid particles dispersed in a liquid"], a:1},
+  {id:"PGP122-Q24", cat:"Concepts", q:"State two applications of filtration.", o:["To impart motion to the fluid", "Wastewater treatment and oil dewaxing", "Vaporization of solvent to concentrate a solution", "Uniformity and promotion of heat/mass transfer"], a:1},
+  {id:"PGP122-Q25", cat:"Concepts", q:"What should a good filter medium do?", o:["Filtration capacity/rate generally increases under comparable conditions", "Retain solids and produce a reasonably clear filtrate", "A membrane that allows some species to pass while retaining others", "Vessel, baffles and impeller"], a:1},
+  {id:"PGP122-Q26", cat:"Concepts", q:"Why must filter media resist plugging?", o:["It improves contact between phases", "Plugging reduces filtration performance", "To improve circulation and mixing in deeper vessels", "Cylindrical vessels provide useful mechanical and flow characteristics"], a:1},
+  {id:"PGP122-Q27", cat:"Concepts", q:"What is cake resistance?", o:["To separate and purify hydrocarbon/process streams", "Resistance to flow caused by deposited filter solids", "One producing flow parallel to the shaft axis", "Vessel, baffles and impeller"], a:1},
+  {id:"PGP122-Q28", cat:"Concepts", q:"What is medium resistance?", o:["Resistance caused by the filter medium itself", "A membrane that allows some species to pass while retaining others", "Layer of retained solids formed on the filter", "A vessel equipped to mechanically mix its contents"], a:0},
+  {id:"PGP122-Q29", cat:"Concepts", q:"State the relationship for overall pressure drop.", o:["Wastewater treatment and oil dewaxing", "ΔP = ΔPc + ΔPm", "Removal of solids from a fluid through a filter medium", "Uniformity and promotion of heat/mass transfer"], a:1},
+  {id:"PGP122-Q30", cat:"Concepts", q:"What factors affect filtration rate?", o:["Liquid/fluid mixing and solid/powder mixing", "Liquid from which suspended solids have been removed", "Pressure drop, area, viscosity, cake resistance and medium resistance", "Fluid passing through the filter"], a:2},
+  {id:"PGP122-Q31", cat:"Concepts", q:"What happens to cake resistance as filtration progresses?", o:["To reduce gross vortexing", "Fluid passing through the filter", "It generally increases", "An impeller with paddle-like blades for moving fluid"], a:2},
+  {id:"PGP122-Q32", cat:"Concepts", q:"What happens to filter-medium resistance during cake filtration?", o:["A membrane that allows some species to pass while retaining others", "It is especially important during early filtration", "Solid retained by the filter", "Propeller pitch equal to one"], a:1},
+  {id:"PGP122-Q33", cat:"Calculations", q:"A filter produces 20 m³ in 5 s. Find filtration rate.", o:["5 m³/s", "7 m³/s", "6 m³/s", "4 m³/s"], a:3},
+  {id:"PGP122-Q34", cat:"Concepts", q:"Define membrane separation.", o:["Separation using a selective membrane barrier", "Transfer of soluble material from a solid into a liquid solvent", "Removal of solids from a fluid through a filter medium", "Transfer of a desired component from one phase into another phase"], a:0},
+  {id:"PGP122-Q35", cat:"Concepts", q:"What determines membrane selectivity?", o:["Resistance to flow caused by deposited filter solids", "High-speed axial-flow impeller", "Vaporization of solvent to concentrate a solution", "Properties such as size, charge and molecular interactions"], a:3},
+  {id:"PGP122-Q36", cat:"Concepts", q:"What is a semipermeable membrane?", o:["Fluid passing through the filter", "A more concentrated solution or solids depending on the operation", "A membrane that allows some species to pass while retaining others", "Permeable material used to retain particles"], a:2},
+  {id:"PGP122-Q37", cat:"Concepts", q:"Why can membranes separate very small particles?", o:["Cylindrical vessels provide useful mechanical and flow characteristics", "They purify raw materials, separate products and enable recycling", "To prevent degradation and loss of performance", "Their selective barriers can operate at molecular and ionic scales"], a:3},
+  {id:"PGP122-Q38", cat:"Concepts", q:"What is size exclusion?", o:["Liquid/fluid mixing and solid/powder mixing", "Separation based on differences in molecular/particle size", "Mixture containing solid particles dispersed in a liquid", "It generally increases"], a:1},
+  {id:"PGP122-Q39", cat:"Concepts", q:"Define leaching.", o:["Separation using a selective membrane barrier", "Transfer of soluble material from a solid into a liquid solvent", "Random distribution of two or more initially separate phases through one another", "Removal of solids from a fluid through a filter medium"], a:1},
+  {id:"PGP122-Q40", cat:"Concepts", q:"Give one petroleum-related example where extraction/separation concepts can be relevant.", o:["To impart motion to the fluid", "To reduce gross vortexing", "Recovery or purification of selected components from process streams", "One producing radial/tangential flow"], a:2},
+  {id:"PGP122-Q41", cat:"Concepts", q:"Define extraction.", o:["Removal of solids from a fluid through a filter medium", "Division of a mixture into distinct components or phases", "Transfer of a desired component from one phase into another phase", "Separation using a selective membrane barrier"], a:2},
+  {id:"PGP122-Q42", cat:"Concepts", q:"What is evaporation?", o:["Vessel, baffles and impeller", "Ratio of longitudinal distance moved per revolution to propeller diameter", "Properties such as size, charge and molecular interactions", "Vaporization of solvent to concentrate a solution"], a:3},
+  {id:"PGP122-Q43", cat:"Concepts", q:"What remains after evaporation?", o:["Resistance to flow caused by deposited filter solids", "To reduce gross vortexing", "A more concentrated solution or solids depending on the operation", "Driving force for filtration increases"], a:2},
+  {id:"PGP122-Q44", cat:"Concepts", q:"Differentiate evaporation and filtration.", o:["Evaporation removes solvent by vaporization; filtration separates solids from fluids mechanically", "Properties such as size, charge and molecular interactions", "Leaching removes soluble material from a solid; extraction transfers a component between phases", "To impart motion to the fluid"], a:0},
+  {id:"PGP122-Q45", cat:"Concepts", q:"Differentiate leaching and extraction.", o:["Evaporation removes solvent by vaporization; filtration separates solids from fluids mechanically", "Leaching removes soluble material from a solid; extraction transfers a component between phases", "Separation based on differences in molecular/particle size", "In highly viscous systems where shear suppresses gross rotation"], a:1},
+  {id:"PGP122-Q46", cat:"Concepts", q:"Why is mixing important before some separation operations?", o:["To recover desired products and recycle unreacted materials", "It improves contact between phases", "Their selective barriers can operate at molecular and ionic scales", "To prevent degradation and loss of performance"], a:1},
+  {id:"PGP122-Q47", cat:"Concepts", q:"Why is contact between phases important?", o:["It provides the driving force for filtration", "It improves transfer of heat or mass", "Impurities can interfere with reactions and damage catalysts/equipment", "To recover desired products and recycle unreacted materials"], a:1},
+  {id:"PGP122-Q48", cat:"Concepts", q:"What is an agitation vessel?", o:["A vessel equipped to mechanically mix its contents", "Resistance to flow caused by deposited filter solids", "Permeable material used to retain particles", "Properties such as size, charge and molecular interactions"], a:0},
+  {id:"PGP122-Q49", cat:"Concepts", q:"Why are tanks often cylindrical?", o:["They purify raw materials, separate products and enable recycling", "Cylindrical vessels provide useful mechanical and flow characteristics", "It can reduce effective mixing and promote unwanted surface rotation", "Plugging reduces filtration performance"], a:1},
+  {id:"PGP122-Q50", cat:"Concepts", q:"Why may multiple impellers be used?", o:["Higher viscosity generally makes fluid flow through the filter more difficult", "Their selective barriers can operate at molecular and ionic scales", "To improve circulation and mixing in deeper vessels", "Impurities can interfere with reactions and damage catalysts/equipment"], a:2},
+  {id:"PGP122-Q51", cat:"Concepts", q:"When may baffles be unnecessary?", o:["To prevent degradation and loss of performance", "In highly viscous systems where shear suppresses gross rotation", "Plugging reduces filtration performance", "Random distribution of two or more initially separate phases through one another"], a:1},
+  {id:"PGP122-Q52", cat:"Concepts", q:"What is a turbine impeller?", o:["An impeller with blades used for industrial agitation", "A vessel equipped to mechanically mix its contents", "High-speed axial-flow impeller", "Layer of retained solids formed on the filter"], a:0},
+  {id:"PGP122-Q53", cat:"Concepts", q:"What is a paddle impeller?", o:["An impeller with paddle-like blades for moving fluid", "Pressure drop, area, viscosity, cake resistance and medium resistance", "Solid retained by the filter", "Driving force for filtration increases"], a:0},
+  {id:"PGP122-Q54", cat:"Concepts", q:"What is a clarified liquid?", o:["Liquid from which suspended solids have been removed", "Resistance caused by the filter medium itself", "An impeller with blades used for industrial agitation", "Permeable material used to retain particles"], a:0},
+  {id:"PGP122-Q55", cat:"Concepts", q:"What is a slurry?", o:["Properties such as size, charge and molecular interactions", "Accumulation of unwanted material on/in a membrane that reduces performance", "Mixture containing solid particles dispersed in a liquid", "Fluid passing through the filter"], a:2},
+  {id:"PGP122-Q56", cat:"Concepts", q:"Why is viscosity important in filtration?", o:["Petroleum plants continuously separate, purify and concentrate process streams", "Higher viscosity generally makes fluid flow through the filter more difficult", "To recover desired products and recycle unreacted materials", "It improves contact between phases"], a:1},
+  {id:"PGP122-Q57", cat:"Concepts", q:"What happens if filtration area increases?", o:["Increasing cake thickness generally increases resistance", "Filtration capacity/rate generally increases under comparable conditions", "Vaporization of solvent to concentrate a solution", "Accumulation of unwanted material on/in a membrane that reduces performance"], a:1},
+  {id:"PGP122-Q58", cat:"Concepts", q:"What happens if pressure difference increases?", o:["Driving force for filtration increases", "Ratio of longitudinal distance moved per revolution to propeller diameter", "A more concentrated solution or solids depending on the operation", "High-speed axial-flow impeller"], a:0},
+  {id:"PGP122-Q59", cat:"Concepts", q:"Why is pressure drop important?", o:["It improves transfer of heat or mass", "It provides the driving force for filtration", "To recover desired products and recycle unreacted materials", "Their selective barriers can operate at molecular and ionic scales"], a:1},
+  {id:"PGP122-Q60", cat:"Calculations", q:"Calculate Q if A = 0.5 m² and velocity = 2 m/s.", o:["1 m³/s", "4 m³/s", "3 m³/s", "2 m³/s"], a:0},
+  {id:"PGP122-Q61", cat:"Concepts", q:"What is the main purpose of separation in a refinery?", o:["One producing radial/tangential flow", "Driving force for filtration increases", "To separate and purify hydrocarbon/process streams", "Solid retained by the filter"], a:2},
+  {id:"PGP122-Q62", cat:"Concepts", q:"Why must raw materials sometimes be purified before reaction?", o:["Impurities can interfere with reactions and damage catalysts/equipment", "Plugging reduces filtration performance", "It improves transfer of heat or mass", "It provides the driving force for filtration"], a:0},
+  {id:"PGP122-Q63", cat:"Concepts", q:"Why are products separated after reaction?", o:["To prevent degradation and loss of performance", "It improves transfer of heat or mass", "To recover desired products and recycle unreacted materials", "Plugging reduces filtration performance"], a:2},
+  {id:"PGP122-Q64", cat:"Concepts", q:"What is the relationship between cake thickness and resistance?", o:["Mixture containing solid particles dispersed in a liquid", "Increasing cake thickness generally increases resistance", "To separate and purify hydrocarbon/process streams", "Vessel, baffles and impeller"], a:1},
+  {id:"PGP122-Q65", cat:"Concepts", q:"What is membrane fouling?", o:["Accumulation of unwanted material on/in a membrane that reduces performance", "To impart motion to the fluid", "Mixture containing solid particles dispersed in a liquid", "Solid retained by the filter"], a:0},
+  {id:"PGP122-Q66", cat:"Concepts", q:"Why should membrane material be chemically compatible with the feed?", o:["Impurities can interfere with reactions and damage catalysts/equipment", "To improve circulation and mixing in deeper vessels", "It can reduce effective mixing and promote unwanted surface rotation", "To prevent degradation and loss of performance"], a:3},
+  {id:"PGP122-Q67", cat:"Concepts", q:"Explain why evaporation can concentrate a solution.", o:["Feed purification and product recovery require separation before and after reaction", "Wastewater treatment and oil dewaxing", "Solid retained by the filter", "Solvent is removed as vapour while less volatile dissolved material remains"], a:3},
+  {id:"PGP122-Q68", cat:"Concepts", q:"Explain why separation equipment is common around reactors.", o:["Layer of retained solids formed on the filter", "Solvent is removed as vapour while less volatile dissolved material remains", "Feed purification and product recovery require separation before and after reaction", "Vaporization of solvent to concentrate a solution"], a:2},
+  {id:"PGP122-Q69", cat:"Concepts", q:"Give two mechanical separation operations.", o:["One producing flow parallel to the shaft axis", "Separation based on differences in molecular/particle size", "It generally increases", "Filtration and screening"], a:3},
+  {id:"PGP122-Q70", cat:"Concepts", q:"Why is PGP 122 important to petroleum processing?", o:["It can reduce effective mixing and promote unwanted surface rotation", "Their selective barriers can operate at molecular and ionic scales", "It improves contact between phases", "Petroleum plants continuously separate, purify and concentrate process streams"], a:3}
+]
+};
+
+// ===== PGP 123 - Wastewater, Steam and Energy =====
+window.COURSES["PGP 123"] = {
+title: "PGP 123 - Wastewater, Steam and Energy", place: "library", reward: 10,
+notes: [
+  "Wastewater - water contaminated by domestic, industrial or other activities.",
+  "Industrial wastewater - wastewater generated by industrial processes.",
+  "Untreated wastewater can damage aquatic ecosystems and human health.",
+  "Excess nutrients can cause algal blooms.",
+  "Algal blooms can reduce dissolved oxygen.",
+  "Preliminary treatment removes large debris.",
+  "Screening traps large materials.",
+  "Grit removal removes sand and heavy particles.",
+  "Flow equalization balances incoming flow.",
+  "Primary treatment removes settleable and floating solids.",
+  "Sedimentation allows solids to settle by gravity.",
+  "Sludge is the solid by-product of treatment.",
+  "Secondary treatment biologically removes dissolved/colloidal organics.",
+  "Activated sludge uses microorganisms in aerated tanks.",
+  "Trickling filters use microbial biofilms.",
+  "Aerated lagoons are biological treatment ponds.",
+  "Oxidation ditches are continuously mixed and aerated channels.",
+  "Tertiary treatment removes remaining contaminants.",
+  "Filtration removes fine particles.",
+  "Disinfection destroys pathogens.",
+  "Reverse osmosis uses a semipermeable membrane.",
+  "Adsorption removes contaminants by attachment to a surface.",
+  "Thickening reduces sludge water content.",
+  "Anaerobic digestion occurs without oxygen and can produce methane.",
+  "Aerobic digestion uses oxygen.",
+  "Dewatering further removes water from sludge.",
+  "Treated sludge can sometimes be reused as biosolids if safe.",
+  "Treated wastewater can be reused industrially or agriculturally.",
+  "Steam is vaporized water carrying thermal energy.",
+  "Energy is the capacity to do work."
+],
+quiz: [
+  {id:"PGP123-Q01", cat:"Concepts", q:"Define wastewater.", o:["Vaporized water containing thermal energy", "Shallow pond where microorganisms decompose organics with aeration", "Biological treatment of dissolved and colloidal organic matter", "Contaminated water resulting from human or industrial activities"], a:3},
+  {id:"PGP123-Q02", cat:"Concepts", q:"What is industrial wastewater?", o:["Heat absorbed/released during phase change", "Wastewater produced from industrial processes", "Biological removal of organic pollutants", "Further removal of water from stabilized sludge"], a:1},
+  {id:"PGP123-Q03", cat:"Concepts", q:"State two environmental effects of untreated wastewater.", o:["Biological removal of organic pollutants", "It rejects dissolved salts through a semipermeable membrane", "Heat causing temperature change without phase change", "Aquatic ecosystem disruption and thermal pollution"], a:3},
+  {id:"PGP123-Q04", cat:"Concepts", q:"What can excessive nutrients cause?", o:["Using treated water again for suitable applications", "It may be reused, landfilled or incinerated depending on standards", "Removal of settleable and floating materials", "Algal blooms"], a:3},
+  {id:"PGP123-Q05", cat:"Concepts", q:"Why are algal blooms harmful?", o:["They can reduce dissolved oxygen and harm aquatic organisms", "To reduce volume, stabilize organic matter and enable safe disposal/reuse", "It can cause abrasion and operational problems", "Petroleum processing requires environmental protection and large quantities of process energy"], a:0},
+  {id:"PGP123-Q06", cat:"Concepts", q:"What is preliminary treatment?", o:["Methane-rich biogas", "Heat causing temperature change without phase change", "Reduce sludge volume and water content", "Initial removal of large solids and debris"], a:3},
+  {id:"PGP123-Q07", cat:"Concepts", q:"What does screening remove?", o:["National Environmental Standards and Regulations Enforcement Agency", "Removal of settleable and floating materials", "Large debris such as plastics, rags and wood", "Using treated water again for suitable applications"], a:2},
+  {id:"PGP123-Q08", cat:"Concepts", q:"What is grit removal?", o:["Removal of heavy particles such as sand and gravel", "Higher-quality effluent and removal of remaining contaminants", "Stabilization of sludge using microorganisms in the presence of oxygen", "Advanced treatment and reuse of wastewater for drinking purposes"], a:0},
+  {id:"PGP123-Q09", cat:"Concepts", q:"What is flow equalization?", o:["Aerobic digestion requires oxygen; anaerobic digestion occurs without oxygen", "It may be reused, landfilled or incinerated depending on standards", "Balancing incoming wastewater flow", "Shallow pond where microorganisms decompose organics with aeration"], a:2},
+  {id:"PGP123-Q10", cat:"Concepts", q:"What is primary treatment?", o:["Using treated water again for suitable applications", "Removal of settleable and floating materials", "Steam containing moisture", "Separation by allowing particles to settle under gravity"], a:1},
+  {id:"PGP123-Q11", cat:"Concepts", q:"What is sedimentation?", o:["Circular channel providing continuous mixing and aeration", "Separation by allowing particles to settle under gravity", "Steam heated beyond its saturation temperature", "Total suspended solids"], a:1},
+  {id:"PGP123-Q12", cat:"Concepts", q:"What is sludge?", o:["Capacity to do work", "Advanced treatment and reuse of wastewater for drinking purposes", "Using treated water again for suitable applications", "Solid by-product of wastewater treatment"], a:3},
+  {id:"PGP123-Q13", cat:"Concepts", q:"Define secondary treatment.", o:["Contaminated water resulting from human or industrial activities", "Biological treatment of dissolved and colloidal organic matter", "Steam heated beyond its saturation temperature", "Vaporized water containing thermal energy"], a:1},
+  {id:"PGP123-Q14", cat:"Concepts", q:"What is activated sludge?", o:["Methane-rich biogas", "Shallow pond where microorganisms decompose organics with aeration", "Biological removal of organic pollutants", "Biological treatment using microorganisms in an aerated tank"], a:3},
+  {id:"PGP123-Q15", cat:"Concepts", q:"What is a trickling filter?", o:["Balancing incoming wastewater flow", "National Environmental Standards and Regulations Enforcement Agency", "Total suspended solids", "Biological treatment system where wastewater contacts microbial biofilm on media"], a:3},
+  {id:"PGP123-Q16", cat:"Concepts", q:"What is an aerated lagoon?", o:["Shallow pond where microorganisms decompose organics with aeration", "Balancing incoming wastewater flow", "Large debris such as plastics, rags and wood", "Biological treatment system where wastewater contacts microbial biofilm on media"], a:0},
+  {id:"PGP123-Q17", cat:"Concepts", q:"What is an oxidation ditch?", o:["Capacity to do work", "Circular channel providing continuous mixing and aeration", "SI unit of energy", "Advanced treatment and reuse of wastewater for drinking purposes"], a:1},
+  {id:"PGP123-Q18", cat:"Concepts", q:"What is tertiary treatment?", o:["Advanced treatment and reuse of wastewater for drinking purposes", "Attachment of contaminants onto a solid surface", "Separation by allowing particles to settle under gravity", "Advanced treatment for remaining contaminants"], a:3},
+  {id:"PGP123-Q19", cat:"Concepts", q:"Why is disinfection performed?", o:["It prevents harmful discharge and enables water reuse", "To destroy pathogens", "It can cause abrasion and operational problems", "It prevents hydraulic overloading"], a:1},
+  {id:"PGP123-Q20", cat:"Concepts", q:"Name three disinfection methods.", o:["Contaminated water resulting from human or industrial activities", "Chlorination, UV and ozonation", "Further removal of water from stabilized sludge", "Attachment of contaminants onto a solid surface"], a:1},
+  {id:"PGP123-Q21", cat:"Concepts", q:"What is reverse osmosis?", o:["Heat causing temperature change without phase change", "Membrane process used to remove salts and contaminants from water", "Attachment of contaminants onto a solid surface", "Initial removal of large solids and debris"], a:1},
+  {id:"PGP123-Q22", cat:"Concepts", q:"What is adsorption?", o:["Attachment of contaminants onto a solid surface", "Concentration of sludge by reducing water content", "Steam containing moisture", "Using treated water again for suitable applications"], a:0},
+  {id:"PGP123-Q23", cat:"Concepts", q:"What is sludge thickening?", o:["Concentration of sludge by reducing water content", "Discharge of heated water that raises receiving-water temperature", "Separation by allowing particles to settle under gravity", "Removal of settleable and floating materials"], a:0},
+  {id:"PGP123-Q24", cat:"Concepts", q:"What is anaerobic digestion?", o:["Steam containing moisture", "Capacity to do work", "Shallow pond where microorganisms decompose organics with aeration", "Biological decomposition without oxygen"], a:3},
+  {id:"PGP123-Q25", cat:"Concepts", q:"What gas can anaerobic digestion produce?", o:["Large debris such as plastics, rags and wood", "SI unit of energy", "Methane-rich biogas", "Further removal of water from stabilized sludge"], a:2},
+  {id:"PGP123-Q26", cat:"Concepts", q:"What is aerobic digestion?", o:["Total suspended solids", "Capacity to do work", "Stabilization of sludge using microorganisms in the presence of oxygen", "Advanced treatment and reuse of wastewater for drinking purposes"], a:2},
+  {id:"PGP123-Q27", cat:"Concepts", q:"What is dewatering?", o:["Advanced treatment and reuse of wastewater for drinking purposes", "Further removal of water from stabilized sludge", "Aerobic digestion requires oxygen; anaerobic digestion occurs without oxygen", "Initial removal of large solids and debris"], a:1},
+  {id:"PGP123-Q28", cat:"Concepts", q:"Give two methods of sludge dewatering.", o:["Aerobic digestion requires oxygen; anaerobic digestion occurs without oxygen", "Petroleum and natural gas", "Cooling water and process water", "Belt press and centrifuge"], a:3},
+  {id:"PGP123-Q29", cat:"Concepts", q:"What is treated wastewater reuse?", o:["Advanced treatment for remaining contaminants", "Aerobic digestion requires oxygen; anaerobic digestion occurs without oxygen", "Measure of vapour content in steam", "Using treated water again for suitable applications"], a:3},
+  {id:"PGP123-Q30", cat:"Concepts", q:"Give two industrial uses of treated wastewater.", o:["Advanced treatment and reuse of wastewater for drinking purposes", "Belt press and centrifuge", "Cooling water and process water", "Petroleum and natural gas"], a:2},
+  {id:"PGP123-Q31", cat:"Concepts", q:"What is potable reuse?", o:["Concentration of sludge by reducing water content", "Capacity to do work", "Advanced treatment and reuse of wastewater for drinking purposes", "Using treated water again for suitable applications"], a:2},
+  {id:"PGP123-Q32", cat:"Concepts", q:"What is NESREA?", o:["National Environmental Standards and Regulations Enforcement Agency", "Methane-rich biogas", "Circular channel providing continuous mixing and aeration", "Concentration of sludge by reducing water content"], a:0},
+  {id:"PGP123-Q33", cat:"Concepts", q:"What pollutants may be regulated in wastewater?", o:["BOD, TSS, nutrients, heavy metals and pathogens", "SI unit of energy", "Removal of settleable and floating materials", "Large debris such as plastics, rags and wood"], a:0},
+  {id:"PGP123-Q34", cat:"Concepts", q:"Define steam.", o:["Vaporized water containing thermal energy", "Contaminated water resulting from human or industrial activities", "Further removal of water from stabilized sludge", "Biological treatment of dissolved and colloidal organic matter"], a:0},
+  {id:"PGP123-Q35", cat:"Concepts", q:"What is sensible heat?", o:["Membrane process used to remove salts and contaminants from water", "Heat causing temperature change without phase change", "Biological treatment using microorganisms in an aerated tank", "Solid by-product of wastewater treatment"], a:1},
+  {id:"PGP123-Q36", cat:"Concepts", q:"What is latent heat?", o:["Total suspended solids", "Balancing incoming wastewater flow", "Heat absorbed/released during phase change", "Biological removal of organic pollutants"], a:2},
+  {id:"PGP123-Q37", cat:"Concepts", q:"Give the sensible heat equation.", o:["Petroleum and natural gas", "Solar and wind", "Q = mCp(Tf - Ti)", "Q = mHv"], a:2},
+  {id:"PGP123-Q38", cat:"Concepts", q:"Give the latent heat equation.", o:["Q = mCp(Tf - Ti)", "Solar and wind", "Petroleum and natural gas", "Q = mHv"], a:3},
+  {id:"PGP123-Q39", cat:"Concepts", q:"What is saturated steam?", o:["Steam produced from water heated to its boiling point", "It may be reused, landfilled or incinerated depending on standards", "Solid by-product of wastewater treatment", "Further removal of water from stabilized sludge"], a:0},
+  {id:"PGP123-Q40", cat:"Concepts", q:"What is steam quality?", o:["Sensible heat changes temperature; latent heat changes phase", "Attachment of contaminants onto a solid surface", "Removal of heavy particles such as sand and gravel", "Measure of vapour content in steam"], a:3},
+  {id:"PGP123-Q41", cat:"Concepts", q:"What is wet steam?", o:["Further removal of water from stabilized sludge", "Using treated water again for suitable applications", "Steam containing moisture", "Biological decomposition without oxygen"], a:2},
+  {id:"PGP123-Q42", cat:"Concepts", q:"What is superheated steam?", o:["BOD, TSS, nutrients, heavy metals and pathogens", "Shallow pond where microorganisms decompose organics with aeration", "Steam heated beyond its saturation temperature", "Removal of settleable and floating materials"], a:2},
+  {id:"PGP123-Q43", cat:"Concepts", q:"What is energy?", o:["Steam containing moisture", "Steam heated beyond its saturation temperature", "Steam produced from water heated to its boiling point", "Capacity to do work"], a:3},
+  {id:"PGP123-Q44", cat:"Concepts", q:"Give two renewable energy sources.", o:["Q = mCp(Tf - Ti)", "Cooling water and process water", "Q = mHv", "Solar and wind"], a:3},
+  {id:"PGP123-Q45", cat:"Concepts", q:"Give two non-renewable energy sources.", o:["Contaminated water resulting from human or industrial activities", "Belt press and centrifuge", "Petroleum and natural gas", "Cooling water and process water"], a:2},
+  {id:"PGP123-Q46", cat:"Concepts", q:"What is a joule?", o:["Total suspended solids", "Attachment of contaminants onto a solid surface", "SI unit of energy", "Reduce sludge volume and water content"], a:2},
+  {id:"PGP123-Q47", cat:"Concepts", q:"Why is wastewater treatment important to petroleum industries?", o:["It indicates oxygen demand associated with biodegradable organic matter", "It prevents harmful discharge and enables water reuse", "It rejects dissolved salts through a semipermeable membrane", "It prevents hydraulic overloading"], a:1},
+  {id:"PGP123-Q48", cat:"Concepts", q:"Why is sludge treated?", o:["To remove finer particles", "It rejects dissolved salts through a semipermeable membrane", "It can cause abrasion and operational problems", "To reduce volume, stabilize organic matter and enable safe disposal/reuse"], a:3},
+  {id:"PGP123-Q49", cat:"Concepts", q:"What is the purpose of primary treatment?", o:["Removal of settleable and floating materials", "Steam heated beyond its saturation temperature", "Circular channel providing continuous mixing and aeration", "Further removal of water from stabilized sludge"], a:0},
+  {id:"PGP123-Q50", cat:"Concepts", q:"What is the purpose of secondary treatment?", o:["Total suspended solids", "Aerobic digestion requires oxygen; anaerobic digestion occurs without oxygen", "Biological removal of organic pollutants", "Attachment of contaminants onto a solid surface"], a:2},
+  {id:"PGP123-Q51", cat:"Concepts", q:"What is the purpose of tertiary treatment?", o:["Steam containing moisture", "SI unit of energy", "Biological treatment system where wastewater contacts microbial biofilm on media", "Higher-quality effluent and removal of remaining contaminants"], a:3},
+  {id:"PGP123-Q52", cat:"Concepts", q:"Which treatment stage uses activated sludge?", o:["Circular channel providing continuous mixing and aeration", "Attachment of contaminants onto a solid surface", "Secondary treatment", "Preliminary treatment"], a:2},
+  {id:"PGP123-Q53", cat:"Concepts", q:"Which stage normally comes first?", o:["Petroleum and natural gas", "Preliminary treatment", "Balancing incoming wastewater flow", "Secondary treatment"], a:1},
+  {id:"PGP123-Q54", cat:"Concepts", q:"Which stage normally follows primary treatment?", o:["Large debris such as plastics, rags and wood", "Heat absorbed/released during phase change", "Adequately treated water can provide a controlled water source when standards are met", "Secondary treatment"], a:3},
+  {id:"PGP123-Q55", cat:"Concepts", q:"Why is flow equalization useful?", o:["It prevents hydraulic overloading", "They can reduce dissolved oxygen and harm aquatic organisms", "To destroy pathogens", "Adequately treated water can provide a controlled water source when standards are met"], a:0},
+  {id:"PGP123-Q56", cat:"Concepts", q:"Why is grit dangerous to equipment?", o:["It prevents harmful discharge and enables water reuse", "To remove finer particles", "It can cause abrasion and operational problems", "Adequately treated water can provide a controlled water source when standards are met"], a:2},
+  {id:"PGP123-Q57", cat:"Concepts", q:"Why is filtration used in tertiary treatment?", o:["It rejects dissolved salts through a semipermeable membrane", "It can cause abrasion and operational problems", "To remove finer particles", "They can reduce dissolved oxygen and harm aquatic organisms"], a:2},
+  {id:"PGP123-Q58", cat:"Concepts", q:"Why is RO useful for desalination?", o:["It rejects dissolved salts through a semipermeable membrane", "To reduce volume, stabilize organic matter and enable safe disposal/reuse", "Adequately treated water can provide a controlled water source when standards are met", "To remove finer particles"], a:0},
+  {id:"PGP123-Q59", cat:"Concepts", q:"Why can treated wastewater be used for irrigation?", o:["It can cause abrasion and operational problems", "It indicates oxygen demand associated with biodegradable organic matter", "It rejects dissolved salts through a semipermeable membrane", "Adequately treated water can provide a controlled water source when standards are met"], a:3},
+  {id:"PGP123-Q60", cat:"Concepts", q:"What is the difference between aerobic and anaerobic digestion?", o:["Heat causing temperature change without phase change", "SI unit of energy", "Aerobic digestion requires oxygen; anaerobic digestion occurs without oxygen", "Removal of settleable and floating materials"], a:2},
+  {id:"PGP123-Q61", cat:"Concepts", q:"What is the purpose of dewatering?", o:["Reduce sludge volume and water content", "Heat causing temperature change without phase change", "Solid by-product of wastewater treatment", "Sensible heat changes temperature; latent heat changes phase"], a:0},
+  {id:"PGP123-Q62", cat:"Concepts", q:"What happens to sludge after treatment?", o:["Shallow pond where microorganisms decompose organics with aeration", "Biological decomposition without oxygen", "Balancing incoming wastewater flow", "It may be reused, landfilled or incinerated depending on standards"], a:3},
+  {id:"PGP123-Q63", cat:"Concepts", q:"What is thermal pollution?", o:["Separation by allowing particles to settle under gravity", "Steam containing moisture", "Methane-rich biogas", "Discharge of heated water that raises receiving-water temperature"], a:3},
+  {id:"PGP123-Q64", cat:"Concepts", q:"Why can wastewater harm humans?", o:["To destroy pathogens", "It may contain pathogens and toxic substances", "It prevents hydraulic overloading", "It rejects dissolved salts through a semipermeable membrane"], a:1},
+  {id:"PGP123-Q65", cat:"Concepts", q:"Why is BOD important?", o:["Adequately treated water can provide a controlled water source when standards are met", "It indicates oxygen demand associated with biodegradable organic matter", "It prevents harmful discharge and enables water reuse", "It prevents hydraulic overloading"], a:1},
+  {id:"PGP123-Q66", cat:"Concepts", q:"What is TSS?", o:["Total suspended solids", "Removal of settleable and floating materials", "Reduce sludge volume and water content", "SI unit of energy"], a:0},
+  {id:"PGP123-Q67", cat:"Concepts", q:"Why is steam important industrially?", o:["It supplies thermal energy for heating and process operations", "Adequately treated water can provide a controlled water source when standards are met", "It can cause abrasion and operational problems", "It rejects dissolved salts through a semipermeable membrane"], a:0},
+  {id:"PGP123-Q68", cat:"Calculations", q:"Calculate sensible heat if m = 10 kg, Cp = 4 kJ/kgK and ΔT = 20 K.", o:["1000 kJ", "1600 kJ", "800 kJ", "480 kJ"], a:2},
+  {id:"PGP123-Q69", cat:"Concepts", q:"What is the difference between sensible and latent heat?", o:["Concentration of sludge by reducing water content", "SI unit of energy", "Sensible heat changes temperature; latent heat changes phase", "Total suspended solids"], a:2},
+  {id:"PGP123-Q70", cat:"Concepts", q:"Why are wastewater treatment and energy concepts important to PNGPD?", o:["Petroleum processing requires environmental protection and large quantities of process energy", "To reduce volume, stabilize organic matter and enable safe disposal/reuse", "To destroy pathogens", "It supplies thermal energy for heating and process operations"], a:0}
+]
+};
+
+// ===== PGP 124 - Calculus and Mathematical Methods =====
+window.COURSES["PGP 124"] = {
+title: "PGP 124 - Calculus and Mathematical Methods", place: "library", reward: 10,
+notes: [
+  "Function - relationship assigning an output to an input.",
+  "Limit - value approached by a function as the independent variable approaches a point.",
+  "Continuity - absence of a break/discontinuity in a function.",
+  "Derivative - instantaneous rate of change.",
+  "First derivative - rate of change of a quantity.",
+  "Second derivative - rate of change of the first derivative.",
+  "Product rule - derivative of uv is u(dv/dx) + v(du/dx).",
+  "Quotient rule - derivative of u/v is (v du/dx - u dv/dx)/v².",
+  "Chain rule - derivative of composite function.",
+  "Implicit differentiation - differentiation when variables are not isolated.",
+  "Maximum - point where function reaches local highest value.",
+  "Minimum - point where function reaches local lowest value.",
+  "Stationary point - point where first derivative is zero.",
+  "Integration - reverse process of differentiation.",
+  "Indefinite integral - family of antiderivatives plus constant.",
+  "Definite integral - integral between specified limits.",
+  "Constant of integration - C.",
+  "Substitution simplifies integrals by replacing an expression with a new variable.",
+  "Area under a curve can be obtained using definite integration.",
+  "Engineering systems often use calculus to model rates and accumulated quantities.",
+  "d/dx(x^n) = n x^(n-1).",
+  "d/dx(c) = 0.",
+  "d/dx(e^x) = e^x.",
+  "d/dx(sin x) = cos x.",
+  "d/dx(cos x) = -sin x.",
+  "Integral of x^n dx = x^(n+1)/(n+1) + C, n not equal to -1.",
+  "Integral of 1/x dx = ln|x| + C.",
+  "Differentiation generally measures change.",
+  "Integration generally measures accumulation.",
+  "Calculus is useful for process modelling, optimization and engineering calculations."
+],
+quiz: [
+  {id:"PGP124-Q01", cat:"Concepts", q:"Define a function.", o:["Rule for differentiating composite functions", "A relationship assigning an output to each permitted input", "Because differentiation of any constant gives zero", "Value a function approaches as the variable approaches a point"], a:1},
+  {id:"PGP124-Q02", cat:"Concepts", q:"Define a limit.", o:["It models change, accumulation and optimization", "A relationship assigning an output to each permitted input", "Quantities such as area and accumulated change", "Value a function approaches as the variable approaches a point"], a:3},
+  {id:"PGP124-Q03", cat:"Concepts", q:"What is continuity?", o:["A function is continuous where it has no break and its limiting value agrees with its value", "Integral evaluated between specified limits", "Function formed by applying one function to another", "Reverse operation of differentiation"], a:0},
+  {id:"PGP124-Q04", cat:"Concepts", q:"What is differentiation?", o:["Rate of change of y with respect to x", "Rule for differentiating composite functions", "Finding the derivative of a function", "Point where the direction of change changes, commonly at a stationary point"], a:2},
+  {id:"PGP124-Q05", cat:"Calculations", q:"Differentiate x².", o:["1/x", "5x⁴", "3x²", "2x"], a:3},
+  {id:"PGP124-Q06", cat:"Calculations", q:"Differentiate x³.", o:["1/x", "3x²", "6x⁵", "14x + 3"], a:1},
+  {id:"PGP124-Q07", cat:"Calculations", q:"Differentiate 5x.", o:["10", "8", "7", "5"], a:3},
+  {id:"PGP124-Q08", cat:"Calculations", q:"Differentiate a constant.", o:["0", "10", "1", "2"], a:0},
+  {id:"PGP124-Q09", cat:"Calculations", q:"Differentiate x⁵.", o:["e^x", "1/x", "3x²", "5x⁴"], a:3},
+  {id:"PGP124-Q10", cat:"Calculations", q:"State the power rule.", o:["Specified limits", "Local low point", "Rate of change", "d(x^n)/dx = n x^(n-1)"], a:3},
+  {id:"PGP124-Q11", cat:"Calculations", q:"Differentiate sin x.", o:["6x⁵", "3x²", "cos x", "12x²"], a:2},
+  {id:"PGP124-Q12", cat:"Calculations", q:"Differentiate cos x.", o:["14x + 3", "5x⁴", "-sin x", "6x + 5"], a:2},
+  {id:"PGP124-Q13", cat:"Calculations", q:"Differentiate e^x.", o:["14x + 3", "e^x", "3x²", "6x + 5"], a:1},
+  {id:"PGP124-Q14", cat:"Concepts", q:"What is the product rule?", o:["(u/v)' = (vu' - uv')/v²", "(uv)' = uv' + vu'", "Integral of x^n dx = x^(n+1)/(n+1) + C for n not equal to -1", "Set dy/dx = 0 and solve"], a:1},
+  {id:"PGP124-Q15", cat:"Concepts", q:"What is the quotient rule?", o:["(u/v)' = (vu' - uv')/v²", "Integral of x^n dx = x^(n+1)/(n+1) + C for n not equal to -1", "Set dy/dx = 0 and solve", "(uv)' = uv' + vu'"], a:0},
+  {id:"PGP124-Q16", cat:"Concepts", q:"What is the chain rule?", o:["Differentiating an equation where variables remain mixed", "Derivative of a derivative", "Point where first derivative is zero", "Rule for differentiating composite functions"], a:3},
+  {id:"PGP124-Q17", cat:"Concepts", q:"What is a stationary point?", o:["Quantities such as area and accumulated change", "Rate of change of the first derivative", "Point where the direction of change changes, commonly at a stationary point", "Point where first derivative is zero"], a:3},
+  {id:"PGP124-Q18", cat:"Calculations", q:"How can stationary points be located?", o:["(uv)' = uv' + vu'", "Set dy/dx = 0 and solve", "No", "Specified limits"], a:1},
+  {id:"PGP124-Q19", cat:"Concepts", q:"What is a maximum?", o:["Local low point", "Rule for differentiating composite functions", "Local high point", "Rate of change of y with respect to x"], a:2},
+  {id:"PGP124-Q20", cat:"Concepts", q:"What is a minimum?", o:["Rate of change of the first derivative", "Local low point", "Replacing a complicated expression with a new variable", "Rate of change of y with respect to x"], a:1},
+  {id:"PGP124-Q21", cat:"Concepts", q:"What is integration?", o:["Local low point", "Reverse operation of differentiation", "Function formed by applying one function to another", "Point where the direction of change changes, commonly at a stationary point"], a:1},
+  {id:"PGP124-Q22", cat:"Calculations", q:"Integrate x.", o:["x³/3 + C", "x² + C", "ln|x| + C", "x²/2 + C"], a:3},
+  {id:"PGP124-Q23", cat:"Calculations", q:"Integrate x².", o:["2x² + C", "C", "x³/3 + C", "2x⁵ + C"], a:2},
+  {id:"PGP124-Q24", cat:"Calculations", q:"Integrate 1.", o:["x² + C", "5x + C", "x + C", "x³/3 + C"], a:2},
+  {id:"PGP124-Q25", cat:"Calculations", q:"Integrate 2x.", o:["x² + C", "5x + C", "C", "x + C"], a:0},
+  {id:"PGP124-Q26", cat:"Concepts", q:"What is C in an indefinite integral?", o:["Constant of integration", "Reverse operation of differentiation", "Studying curvature and classifying stationary points", "Replacing a complicated expression with a new variable"], a:0},
+  {id:"PGP124-Q27", cat:"Concepts", q:"What is a definite integral?", o:["Differentiating an equation where variables remain mixed", "Reverse operation of differentiation", "Rate of change of the first derivative", "Integral evaluated between specified limits"], a:3},
+  {id:"PGP124-Q28", cat:"Concepts", q:"What does definite integration help calculate?", o:["Quantities such as area and accumulated change", "Rate of change of the first derivative", "Rate of change of y with respect to x", "Constant of integration"], a:0},
+  {id:"PGP124-Q29", cat:"Concepts", q:"What is substitution in integration?", o:["Derivative of a derivative", "Replacing a complicated expression with a new variable", "A function is continuous where it has no break and its limiting value agrees with its value", "Maximum is locally highest; minimum is locally lowest"], a:1},
+  {id:"PGP124-Q30", cat:"Concepts", q:"Why is calculus important in engineering?", o:["It can represent accumulated physical quantities", "It models change, accumulation and optimization", "Because differentiation of any constant gives zero", "They help define behaviour near points and support derivatives/integrals"], a:1},
+  {id:"PGP124-Q31", cat:"Calculations", q:"Find dy/dx for y = 4x³.", o:["12x²", "14x + 3", "40x³", "cos x"], a:0},
+  {id:"PGP124-Q32", cat:"Calculations", q:"Find dy/dx for y = 7x² + 3x.", o:["3x²", "14x + 3", "e^x", "40x³"], a:1},
+  {id:"PGP124-Q33", cat:"Calculations", q:"Find the integral of 4x dx.", o:["5x + C", "x² + C", "ln|x| + C", "2x² + C"], a:3},
+  {id:"PGP124-Q34", cat:"Calculations", q:"Find the integral of 6x² dx.", o:["x² + C", "2x⁵ + C", "x³/3 + C", "2x³ + C"], a:3},
+  {id:"PGP124-Q35", cat:"Concepts", q:"What is implicit differentiation?", o:["Differentiating an equation where variables remain mixed", "Integral evaluated between specified limits", "Point where first derivative is zero", "Replacing a complicated expression with a new variable"], a:0},
+  {id:"PGP124-Q36", cat:"Concepts", q:"What is a higher derivative?", o:["Derivative of a derivative", "Local low point", "Function formed by applying one function to another", "Local high point"], a:0},
+  {id:"PGP124-Q37", cat:"Concepts", q:"What is the second derivative used for?", o:["Integral evaluated between specified limits", "Studying curvature and classifying stationary points", "Point where first derivative is zero", "Specified limits"], a:1},
+  {id:"PGP124-Q38", cat:"Concepts", q:"What does a positive second derivative at a stationary point generally indicate?", o:["ln|x| + C", "x² + C", "Local minimum", "x⁷/7 + C"], a:2},
+  {id:"PGP124-Q39", cat:"Calculations", q:"What does a negative second derivative generally indicate?", o:["d(x^n)/dx = n x^(n-1)", "Specified limits", "Local minimum", "Local maximum"], a:3},
+  {id:"PGP124-Q40", cat:"Concepts", q:"What does dy/dx represent?", o:["Point where the direction of change changes, commonly at a stationary point", "Derivative of a derivative", "Rate of change of y with respect to x", "Rule for differentiating composite functions"], a:2},
+  {id:"PGP124-Q41", cat:"Concepts", q:"What does integration represent physically?", o:["They help define behaviour near points and support derivatives/integrals", "Constant of integration", "Local low point", "Accumulation of a quantity"], a:3},
+  {id:"PGP124-Q42", cat:"Concepts", q:"Why is area under a curve important?", o:["Many physical and process relationships involve rates and accumulated quantities", "It models change, accumulation and optimization", "Because differentiation of any constant gives zero", "It can represent accumulated physical quantities"], a:3},
+  {id:"PGP124-Q43", cat:"Calculations", q:"What is the derivative of 10x⁴?", o:["3x²", "12x²", "6x + 5", "40x³"], a:3},
+  {id:"PGP124-Q44", cat:"Calculations", q:"What is the integral of 10x⁴?", o:["x² + C", "2x² + C", "x + C", "2x⁵ + C"], a:3},
+  {id:"PGP124-Q45", cat:"Calculations", q:"Differentiate 3x² + 5x + 2.", o:["2x", "14x + 3", "3x²", "6x + 5"], a:3},
+  {id:"PGP124-Q46", cat:"Calculations", q:"Integrate 3x² + 5x.", o:["x²/2 + C", "x³ + (5/2)x² + C", "C", "x + C"], a:1},
+  {id:"PGP124-Q47", cat:"Calculations", q:"Differentiate x⁶.", o:["6x⁵", "14x + 3", "-sin x", "5x⁴"], a:0},
+  {id:"PGP124-Q48", cat:"Calculations", q:"Integrate x⁶.", o:["x²/2 + C", "C", "ln|x| + C", "x⁷/7 + C"], a:3},
+  {id:"PGP124-Q49", cat:"Calculations", q:"What is a constant function's derivative?", o:["(uv)' = uv' + vu'", "Rate of change", "Zero", "Local high point"], a:2},
+  {id:"PGP124-Q50", cat:"Concepts", q:"What is the purpose of limits?", o:["Function formed by applying one function to another", "They help define behaviour near points and support derivatives/integrals", "Studying curvature and classifying stationary points", "Differentiating an equation where variables remain mixed"], a:1},
+  {id:"PGP124-Q51", cat:"Concepts", q:"What is a composite function?", o:["Derivative of a derivative", "Replacing a complicated expression with a new variable", "Point where first derivative is zero", "Function formed by applying one function to another"], a:3},
+  {id:"PGP124-Q52", cat:"Concepts", q:"Which rule is commonly used for composite functions?", o:["Local maximum", "x⁷/7 + C", "Chain rule", "e^x"], a:2},
+  {id:"PGP124-Q53", cat:"Concepts", q:"What is optimization?", o:["Rule for differentiating composite functions", "Replacing a complicated expression with a new variable", "Accumulation of a quantity", "Finding maximum/minimum values subject to conditions"], a:3},
+  {id:"PGP124-Q54", cat:"Concepts", q:"Give one engineering use of optimization.", o:["Process optimization and modelling changes in flow/temperature/composition", "Minimizing energy consumption or maximizing process output", "A relationship assigning an output to each permitted input", "Differentiating an equation where variables remain mixed"], a:1},
+  {id:"PGP124-Q55", cat:"Concepts", q:"What is the difference between maximum and minimum?", o:["Specified limits", "Maximum is locally highest; minimum is locally lowest", "Rate of change of y with respect to x", "Differentiating an equation where variables remain mixed"], a:1},
+  {id:"PGP124-Q56", cat:"Calculations", q:"What is the derivative of the constant 15?", o:["5", "10", "2", "0"], a:3},
+  {id:"PGP124-Q57", cat:"Calculations", q:"What is the integral of 5 dx?", o:["5x + C", "x + C", "2x⁵ + C", "x⁷/7 + C"], a:0},
+  {id:"PGP124-Q58", cat:"Calculations", q:"What is the integral of 0 dx?", o:["x + C", "C", "2x³ + C", "x³ + (5/2)x² + C"], a:1},
+  {id:"PGP124-Q59", cat:"Concepts", q:"Why is C added to indefinite integrals?", o:["Because differentiation of any constant gives zero", "It models change, accumulation and optimization", "Many physical and process relationships involve rates and accumulated quantities", "It can represent accumulated physical quantities"], a:0},
+  {id:"PGP124-Q60", cat:"Concepts", q:"What does a definite integral have that an indefinite integral does not?", o:["Studying curvature and classifying stationary points", "Local high point", "Differentiating an equation where variables remain mixed", "Specified limits"], a:3},
+  {id:"PGP124-Q61", cat:"Concepts", q:"What does the first derivative measure?", o:["Rate of change", "x⁷/7 + C", "cos x", "ln|x| + C"], a:0},
+  {id:"PGP124-Q62", cat:"Concepts", q:"What does the second derivative measure?", o:["Integral evaluated between specified limits", "Rate of change of the first derivative", "They help define behaviour near points and support derivatives/integrals", "A function is continuous where it has no break and its limiting value agrees with its value"], a:1},
+  {id:"PGP124-Q63", cat:"Concepts", q:"What is a turning point?", o:["Specified limits", "Finding the derivative of a function", "Rate of change of the first derivative", "Point where the direction of change changes, commonly at a stationary point"], a:3},
+  {id:"PGP124-Q64", cat:"Concepts", q:"Can every stationary point be called a maximum?", o:["No", "Yes"], a:0},
+  {id:"PGP124-Q65", cat:"Concepts", q:"Can every stationary point be called a minimum?", o:["Yes", "No"], a:1},
+  {id:"PGP124-Q66", cat:"Concepts", q:"What is the power rule for integration?", o:["d(x^n)/dx = n x^(n-1)", "(uv)' = uv' + vu'", "(u/v)' = (vu' - uv')/v²", "Integral of x^n dx = x^(n+1)/(n+1) + C for n not equal to -1"], a:3},
+  {id:"PGP124-Q67", cat:"Calculations", q:"What is the integral of 1/x?", o:["x²/2 + C", "2x³ + C", "5x + C", "ln|x| + C"], a:3},
+  {id:"PGP124-Q68", cat:"Calculations", q:"What is the derivative of ln x?", o:["-sin x", "14x + 3", "5x⁴", "1/x"], a:3},
+  {id:"PGP124-Q69", cat:"Concepts", q:"Why should engineering students learn calculus?", o:["Because differentiation of any constant gives zero", "It can represent accumulated physical quantities", "Rate of change of the first derivative", "Many physical and process relationships involve rates and accumulated quantities"], a:3},
+  {id:"PGP124-Q70", cat:"Concepts", q:"Give two petroleum-processing applications of calculus.", o:["Minimizing energy consumption or maximizing process output", "Rate of change of the first derivative", "Process optimization and modelling changes in flow/temperature/composition", "Local high point"], a:2}
+]
+};
+
+// ===== PGP 125 - Petroleum and Petrochemical Chemistry =====
+window.COURSES["PGP 125"] = {
+title: "PGP 125 - Petroleum and Petrochemical Chemistry", place: "library", reward: 10,
+notes: [
+  "Petroleum is derived largely from ancient organic matter transformed over geological time.",
+  "Lipids are important petroleum precursors because of their carbon/hydrogen-rich nature.",
+  "Proteins contribute nitrogen-containing compounds.",
+  "Carbohydrates are oxygen-rich and are less direct petroleum precursors.",
+  "Lignin is resistant plant material contributing strongly to terrestrial organic matter.",
+  "Kerogen is solid organic matter from which petroleum can form during maturation.",
+  "Diagenesis is the early transformation stage.",
+  "Catagenesis involves thermal maturation and major hydrocarbon generation.",
+  "Metagenesis represents later high-maturity transformation.",
+  "Paraffins are saturated hydrocarbons.",
+  "Isoparaffins are branched paraffins.",
+  "Increasing carbon number generally increases boiling point for n-paraffins.",
+  "Branching generally lowers boiling point.",
+  "Paraffins are non-polar.",
+  "Complete combustion produces CO₂ and H₂O.",
+  "Density is mass per unit volume.",
+  "Specific gravity is density relative to water.",
+  "API gravity is inversely related to specific gravity.",
+  "API formula: API = 141.5/SG - 131.5",
+  "Higher API means lighter petroleum.",
+  "Lower API means heavier petroleum.",
+  "Molecular weight is important in process design.",
+  "Fractional composition describes distribution of petroleum components/fractions.",
+  "Desalting removes salts and water from crude.",
+  "MgCl₂ and CaCl₂ can hydrolyse at refinery temperatures to produce HCl.",
+  "HCl contributes to overhead corrosion.",
+  "Hydrotreating uses hydrogen and catalysts to remove heteroatoms.",
+  "Catalyst activity measures conversion rate.",
+  "Catalyst selectivity measures preference for desired products.",
+  "Catalytic reforming produces high-octane reformate and hydrogen."
+],
+quiz: [
+  {id:"PGP125-Q01", cat:"Concepts", q:"What is the accepted broad origin of petroleum?", o:["Thermal agglomeration of catalyst particles reducing active surface area", "Organic matter transformed through geological processes", "They promote reactions such as isomerization and cyclization", "It can hydrolyse to Mg(OH)₂ and HCl"], a:1},
+  {id:"PGP125-Q02", cat:"Concepts", q:"Name four major organic raw-material classes.", o:["High-octane aromatics-rich reformate and hydrogen", "Lipids, proteins, carbohydrates and lignin", "Coking, poisoning and sintering", "Density, specific gravity, molecular weight, viscosity index and fractional composition"], a:1},
+  {id:"PGP125-Q03", cat:"Concepts", q:"Why are lipids important?", o:["To react with/remove heteroatom compounds and saturate certain hydrocarbons", "It can form corrosive hydrochloric acid in the overhead system", "They generally yield more valuable light products", "They are relatively rich in carbon and hydrogen and are important petroleum precursors"], a:3},
+  {id:"PGP125-Q04", cat:"Concepts", q:"What do proteins contribute to petroleum chemistry?", o:["Characterizing petroleum density/lightness", "Thermal agglomeration of catalyst particles reducing active surface area", "Nitrogen-containing compounds", "Undesired adsorption of contaminants that blocks active sites"], a:2},
+  {id:"PGP125-Q05", cat:"Concepts", q:"Why are carbohydrates less direct petroleum precursors?", o:["Certain contaminants/metals interfere with catalyst active sites", "To determine quality and predict processing/product behaviour", "They contain relatively high oxygen content and are often degraded early", "Branching reduces effective molecular contact area"], a:2},
+  {id:"PGP125-Q06", cat:"Concepts", q:"What is lignin?", o:["Hydrogenation/dehydrogenation functions", "Complex aromatic plant polymer", "Mass associated with one mole of a substance", "They promote reactions such as isomerization and cyclization"], a:1},
+  {id:"PGP125-Q07", cat:"Concepts", q:"What is kerogen?", o:["Solid organic matter that can generate petroleum during maturation", "It reduces salt-related fouling and corrosion", "Equipment that uses an electric field to promote coalescence of water droplets in crude", "Classification based on petroleum lightness/heaviness"], a:0},
+  {id:"PGP125-Q08", cat:"Concepts", q:"Name the three broad stages of organic matter transformation.", o:["Coking, poisoning and sintering", "Diagenesis, catagenesis and metagenesis", "High-octane aromatics-rich reformate and hydrogen", "Saturated and aromatic hydrocarbons"], a:1},
+  {id:"PGP125-Q09", cat:"Concepts", q:"What is diagenesis?", o:["Classification based on petroleum lightness/heaviness", "It can hydrolyse to Mg(OH)₂ and HCl", "Early transformation after deposition", "Compound consisting primarily of carbon and hydrogen"], a:2},
+  {id:"PGP125-Q10", cat:"Concepts", q:"What is catagenesis?", o:["Catalytic treatment with hydrogen to remove sulfur, nitrogen, oxygen and metals and improve product quality", "High-octane product from catalytic reforming", "Material that accelerates desired refinery reactions without being consumed overall", "Thermal maturation stage associated with significant hydrocarbon generation"], a:3},
+  {id:"PGP125-Q11", cat:"Concepts", q:"What is metagenesis?", o:["Advanced high-maturity transformation", "Compound consisting primarily of carbon and hydrogen", "Distribution of petroleum into fractions based largely on boiling characteristics", "Catalytic treatment with hydrogen to remove sulfur, nitrogen, oxygen and metals and improve product quality"], a:0},
+  {id:"PGP125-Q12", cat:"Concepts", q:"What are paraffins?", o:["Saturated hydrocarbons", "Distribution of petroleum into fractions based largely on boiling characteristics", "Branched-chain paraffins", "Corrosion associated with naphthenic acids in certain crude oils at elevated refinery temperatures"], a:0},
+  {id:"PGP125-Q13", cat:"Concepts", q:"What are isoparaffins?", o:["Early transformation after deposition", "Advanced high-maturity transformation", "Branched-chain paraffins", "Compound consisting primarily of carbon and hydrogen"], a:2},
+  {id:"PGP125-Q14", cat:"Concepts", q:"What happens to n-paraffin boiling point as carbon number increases?", o:["Advanced high-maturity transformation", "It generally increases", "Complex aromatic plant polymer", "Combustion with insufficient oxygen producing CO and/or soot"], a:1},
+  {id:"PGP125-Q15", cat:"Concepts", q:"Why do branched isomers have lower boiling points?", o:["Branching reduces effective molecular contact area", "They contain relatively high oxygen content and are often degraded early", "It can be used in hydrotreating and other refinery processes", "It increases desired products and suppresses unwanted products"], a:0},
+  {id:"PGP125-Q16", cat:"Concepts", q:"Are paraffins polar?", o:["Yes", "No"], a:1},
+  {id:"PGP125-Q17", cat:"Concepts", q:"Write the equation for methane combustion.", o:["CH₄ + 2O₂ -> CO₂ + 2H₂O", "API gravity decreases", "Equipment that uses an electric field to promote coalescence of water droplets in crude", "It can form corrosive hydrochloric acid in the overhead system"], a:0},
+  {id:"PGP125-Q18", cat:"Concepts", q:"What is density?", o:["Compound consisting primarily of carbon and hydrogen", "Nitrogen-containing compounds", "Mass per unit volume", "Hydrogenation/dehydrogenation functions"], a:2},
+  {id:"PGP125-Q19", cat:"Concepts", q:"What is specific gravity?", o:["It generally increases", "Material that accelerates desired refinery reactions without being consumed overall", "Ratio of substance density to reference-water density", "Rate at which a catalyst converts reactants"], a:2},
+  {id:"PGP125-Q20", cat:"Concepts", q:"Is specific gravity dimensionless?", o:["No", "Yes"], a:1},
+  {id:"PGP125-Q21", cat:"Concepts", q:"Give the API gravity formula.", o:["Branched-chain paraffins", "Classification based on petroleum lightness/heaviness", "API = 141.5/SG - 131.5", "Density = mass/volume"], a:2},
+  {id:"PGP125-Q22", cat:"Concepts", q:"What happens to API gravity when SG increases?", o:["Thermal maturation stage associated with significant hydrocarbon generation", "Early transformation after deposition", "API gravity decreases", "Distribution of petroleum into fractions based largely on boiling characteristics"], a:2},
+  {id:"PGP125-Q23", cat:"Concepts", q:"Which crude is generally lighter: high-API or low-API?", o:["High-API", "Low-API"], a:0},
+  {id:"PGP125-Q24", cat:"Concepts", q:"What is molecular weight?", o:["Mass per unit volume", "Mass associated with one mole of a substance", "Corrosion associated with naphthenic acids in certain crude oils at elevated refinery temperatures", "Conversion of low-octane naphtha into higher-octane reformate"], a:1},
+  {id:"PGP125-Q25", cat:"Concepts", q:"Why is molecular weight important?", o:["They are relatively rich in carbon and hydrogen and are important petroleum precursors", "It can form corrosive hydrochloric acid in the overhead system", "It is used in thermodynamic and process calculations", "It can be used in hydrotreating and other refinery processes"], a:2},
+  {id:"PGP125-Q26", cat:"Concepts", q:"What is fractional composition?", o:["API gravity decreases", "It generally increases", "Distribution of petroleum into fractions based largely on boiling characteristics", "Rate at which a catalyst converts reactants"], a:2},
+  {id:"PGP125-Q27", cat:"Concepts", q:"Why is crude desalting necessary?", o:["To remove salts and water that cause corrosion, fouling and catalyst problems", "It changes molecular shape and intermolecular contact", "It affects pumping and flow behaviour", "They generally yield more valuable light products"], a:0},
+  {id:"PGP125-Q28", cat:"Concepts", q:"What happens to MgCl₂ at high temperature with water?", o:["Material that accelerates desired refinery reactions without being consumed overall", "Saturated hydrocarbons", "It can hydrolyse to Mg(OH)₂ and HCl", "They promote reactions such as isomerization and cyclization"], a:2},
+  {id:"PGP125-Q29", cat:"Concepts", q:"Why is HCl dangerous in crude distillation?", o:["Certain contaminants/metals interfere with catalyst active sites", "API is inversely related to specific gravity", "It can form corrosive hydrochloric acid in the overhead system", "It affects pumping and flow behaviour"], a:2},
+  {id:"PGP125-Q30", cat:"Concepts", q:"What is an electrostatic desalter?", o:["Equipment that uses an electric field to promote coalescence of water droplets in crude", "API gravity decreases", "Branched-chain paraffins", "Characterizing petroleum density/lightness"], a:0},
+  {id:"PGP125-Q31", cat:"Concepts", q:"What is hydrotreating?", o:["Catalytic treatment with hydrogen to remove sulfur, nitrogen, oxygen and metals and improve product quality", "Ratio of substance density to reference-water density", "It generally increases", "Ability to favour desired products"], a:0},
+  {id:"PGP125-Q32", cat:"Concepts", q:"What is catalyst activity?", o:["Compound consisting primarily of carbon and hydrogen", "Rate at which a catalyst converts reactants", "High-octane product from catalytic reforming", "Hydrogenation/dehydrogenation functions"], a:1},
+  {id:"PGP125-Q33", cat:"Concepts", q:"What is catalyst selectivity?", o:["Ability to favour desired products", "High-octane product from catalytic reforming", "Thermal maturation stage associated with significant hydrocarbon generation", "Catalytic treatment with hydrogen to remove sulfur, nitrogen, oxygen and metals and improve product quality"], a:0},
+  {id:"PGP125-Q34", cat:"Concepts", q:"What is catalyst service life?", o:["Corrosion associated with naphthenic acids in certain crude oils at elevated refinery temperatures", "Nitrogen-containing compounds", "Mass per unit volume", "Time the catalyst maintains acceptable activity/selectivity"], a:3},
+  {id:"PGP125-Q35", cat:"Concepts", q:"Name three catalyst deactivation mechanisms.", o:["High-octane aromatics-rich reformate and hydrogen", "Coking, poisoning and sintering", "Density, specific gravity, molecular weight, viscosity index and fractional composition", "Saturated and aromatic hydrocarbons"], a:1},
+  {id:"PGP125-Q36", cat:"Concepts", q:"What is coking?", o:["Classification based on petroleum lightness/heaviness", "Characterizing petroleum density/lightness", "Deposition of carbonaceous material on catalyst", "Mass per unit volume"], a:2},
+  {id:"PGP125-Q37", cat:"Concepts", q:"What is catalyst poisoning?", o:["Undesired adsorption of contaminants that blocks active sites", "Thermal agglomeration of catalyst particles reducing active surface area", "Characterizing petroleum density/lightness", "Reaction with oxygen releasing energy"], a:0},
+  {id:"PGP125-Q38", cat:"Concepts", q:"What is sintering?", o:["It generally increases", "Equipment that uses an electric field to promote coalescence of water droplets in crude", "Thermal agglomeration of catalyst particles reducing active surface area", "Thermal maturation stage associated with significant hydrocarbon generation"], a:2},
+  {id:"PGP125-Q39", cat:"Concepts", q:"What is catalytic reforming?", o:["Reaction with oxygen releasing energy", "Conversion of low-octane naphtha into higher-octane reformate", "It reduces salt-related fouling and corrosion", "Nitrogen-containing compounds"], a:1},
+  {id:"PGP125-Q40", cat:"Concepts", q:"Name valuable products from catalytic reforming.", o:["Density, specific gravity, molecular weight, viscosity index and fractional composition", "Saturated and aromatic hydrocarbons", "Coking, poisoning and sintering", "High-octane aromatics-rich reformate and hydrogen"], a:3},
+  {id:"PGP125-Q41", cat:"Concepts", q:"What is the role of acid sites in bifunctional reforming catalysts?", o:["They promote reactions such as isomerization and cyclization", "Deposition of carbonaceous material on catalyst", "It generally increases", "Compound consisting primarily of carbon and hydrogen"], a:0},
+  {id:"PGP125-Q42", cat:"Concepts", q:"What is the role of metal sites in reforming catalysts?", o:["Undesired adsorption of contaminants that blocks active sites", "Characterizing petroleum density/lightness", "Hydrogenation/dehydrogenation functions", "API gravity decreases"], a:2},
+  {id:"PGP125-Q43", cat:"Concepts", q:"What is naphthenic acid corrosion?", o:["Rate at which a catalyst converts reactants", "Corrosion associated with naphthenic acids in certain crude oils at elevated refinery temperatures", "Combustion with insufficient oxygen producing CO and/or soot", "Deposition of carbonaceous material on catalyst"], a:1},
+  {id:"PGP125-Q44", cat:"Concepts", q:"Why are high-alloy steels sometimes used?", o:["To improve corrosion resistance", "It is used in thermodynamic and process calculations", "Processing petroleum requires understanding its composition, reactions, impurities and product properties", "They contain relatively high oxygen content and are often degraded early"], a:0},
+  {id:"PGP125-Q45", cat:"Concepts", q:"What is API gravity used for?", o:["Thermal maturation stage associated with significant hydrocarbon generation", "Characterizing petroleum density/lightness", "Corrosion associated with naphthenic acids in certain crude oils at elevated refinery temperatures", "They promote reactions such as isomerization and cyclization"], a:1},
+  {id:"PGP125-Q46", cat:"Calculations", q:"Calculate the API gravity for SG = 0.80.", o:["68.06°API approximately", "45.375°API approximately", "27.22°API approximately", "22.69°API approximately"], a:1},
+  {id:"PGP125-Q47", cat:"Calculations", q:"Calculate the API gravity for SG = 0.90.", o:["32.15°API approximately", "25.72°API approximately", "12.86°API approximately", "15.43°API approximately"], a:1},
+  {id:"PGP125-Q48", cat:"Concepts", q:"Which has greater API: SG 0.75 or SG 0.95?", o:["SG 0.95", "SG 0.75"], a:1},
+  {id:"PGP125-Q49", cat:"Concepts", q:"Why does high API generally indicate lighter crude?", o:["It is used in thermodynamic and process calculations", "It can form corrosive hydrochloric acid in the overhead system", "Branching reduces effective molecular contact area", "API is inversely related to specific gravity"], a:3},
+  {id:"PGP125-Q50", cat:"Concepts", q:"Why are lighter crudes often economically attractive?", o:["They generally yield more valuable light products", "Certain contaminants/metals interfere with catalyst active sites", "Processing petroleum requires understanding its composition, reactions, impurities and product properties", "It changes molecular shape and intermolecular contact"], a:0},
+  {id:"PGP125-Q51", cat:"Concepts", q:"What is desalting's effect on refinery equipment?", o:["Combustion with insufficient oxygen producing CO and/or soot", "It reduces salt-related fouling and corrosion", "It generally increases", "Catalytic treatment with hydrogen to remove sulfur, nitrogen, oxygen and metals and improve product quality"], a:1},
+  {id:"PGP125-Q52", cat:"Concepts", q:"Why do salts poison catalysts?", o:["Certain contaminants/metals interfere with catalyst active sites", "It is used in thermodynamic and process calculations", "To improve corrosion resistance", "Processing petroleum requires understanding its composition, reactions, impurities and product properties"], a:0},
+  {id:"PGP125-Q53", cat:"Concepts", q:"What is a hydrocarbon?", o:["Compound consisting primarily of carbon and hydrogen", "API gravity decreases", "Ability to favour desired products", "It generally increases"], a:0},
+  {id:"PGP125-Q54", cat:"Concepts", q:"Name two broad hydrocarbon classes found in petroleum.", o:["High-octane aromatics-rich reformate and hydrogen", "Density, specific gravity, molecular weight, viscosity index and fractional composition", "Saturated and aromatic hydrocarbons", "Coking, poisoning and sintering"], a:2},
+  {id:"PGP125-Q55", cat:"Concepts", q:"What is combustion?", o:["Characterizing petroleum density/lightness", "Reaction with oxygen releasing energy", "Undesired adsorption of contaminants that blocks active sites", "Mass per unit volume"], a:1},
+  {id:"PGP125-Q56", cat:"Concepts", q:"What is incomplete combustion?", o:["Time the catalyst maintains acceptable activity/selectivity", "Compound consisting primarily of carbon and hydrogen", "Combustion with insufficient oxygen producing CO and/or soot", "Rate at which a catalyst converts reactants"], a:2},
+  {id:"PGP125-Q57", cat:"Concepts", q:"Why does branching affect physical properties?", o:["It increases desired products and suppresses unwanted products", "They are relatively rich in carbon and hydrogen and are important petroleum precursors", "It changes molecular shape and intermolecular contact", "Certain contaminants/metals interfere with catalyst active sites"], a:2},
+  {id:"PGP125-Q58", cat:"Concepts", q:"Why is viscosity important in petroleum processing?", o:["It affects pumping and flow behaviour", "They contain relatively high oxygen content and are often degraded early", "To improve corrosion resistance", "Processing petroleum requires understanding its composition, reactions, impurities and product properties"], a:0},
+  {id:"PGP125-Q59", cat:"Concepts", q:"What is the relationship between density, mass and volume?", o:["Equipment that uses an electric field to promote coalescence of water droplets in crude", "It generally increases", "It reduces salt-related fouling and corrosion", "Density = mass/volume"], a:3},
+  {id:"PGP125-Q60", cat:"Calculations", q:"If mass = 100 kg and volume = 0.2 m³, find density.", o:["625 kg/m³", "500 kg/m³", "375 kg/m³", "300 kg/m³"], a:1},
+  {id:"PGP125-Q61", cat:"Concepts", q:"What is a refinery catalyst?", o:["API gravity decreases", "Solid organic matter that can generate petroleum during maturation", "Material that accelerates desired refinery reactions without being consumed overall", "Classification based on petroleum lightness/heaviness"], a:2},
+  {id:"PGP125-Q62", cat:"Concepts", q:"Why is selectivity economically important?", o:["Certain contaminants/metals interfere with catalyst active sites", "API is inversely related to specific gravity", "Branching reduces effective molecular contact area", "It increases desired products and suppresses unwanted products"], a:3},
+  {id:"PGP125-Q63", cat:"Concepts", q:"Why is hydrogen used in hydrotreating?", o:["To react with/remove heteroatom compounds and saturate certain hydrocarbons", "Processing petroleum requires understanding its composition, reactions, impurities and product properties", "Certain contaminants/metals interfere with catalyst active sites", "API is inversely related to specific gravity"], a:0},
+  {id:"PGP125-Q64", cat:"Concepts", q:"What is reformate?", o:["High-octane product from catalytic reforming", "Organic matter transformed through geological processes", "Mass per unit volume", "Ratio of substance density to reference-water density"], a:0},
+  {id:"PGP125-Q65", cat:"Concepts", q:"Why is hydrogen a valuable reforming by-product?", o:["It can form corrosive hydrochloric acid in the overhead system", "It can be used in hydrotreating and other refinery processes", "They are relatively rich in carbon and hydrogen and are important petroleum precursors", "It affects pumping and flow behaviour"], a:1},
+  {id:"PGP125-Q66", cat:"Concepts", q:"What is crude classification by API?", o:["Catalytic treatment with hydrogen to remove sulfur, nitrogen, oxygen and metals and improve product quality", "Classification based on petroleum lightness/heaviness", "Saturated hydrocarbons", "It generally increases"], a:1},
+  {id:"PGP125-Q67", cat:"Concepts", q:"What happens to boiling point when n-paraffin chain length increases?", o:["Thermal maturation stage associated with significant hydrocarbon generation", "Distribution of petroleum into fractions based largely on boiling characteristics", "Nitrogen-containing compounds", "It generally increases"], a:3},
+  {id:"PGP125-Q68", cat:"Concepts", q:"Why are petroleum characterization tests performed?", o:["It can be used in hydrotreating and other refinery processes", "To determine quality and predict processing/product behaviour", "It changes molecular shape and intermolecular contact", "It is used in thermodynamic and process calculations"], a:1},
+  {id:"PGP125-Q69", cat:"Concepts", q:"Name five fundamental petroleum characterization parameters.", o:["Coking, poisoning and sintering", "High-octane aromatics-rich reformate and hydrogen", "Density, specific gravity, molecular weight, viscosity index and fractional composition", "Saturated and aromatic hydrocarbons"], a:2},
+  {id:"PGP125-Q70", cat:"Concepts", q:"Why is petroleum chemistry important to PNGPD?", o:["Branching reduces effective molecular contact area", "It increases desired products and suppresses unwanted products", "It affects pumping and flow behaviour", "Processing petroleum requires understanding its composition, reactions, impurities and product properties"], a:3}
+]
+};
+
+// ===== PGP 126 - Petroleum Practicals =====
+window.COURSES["PGP 126"] = {
+title: "PGP 126 - Petroleum Practicals", place: "lab", reward: 15,
+notes: [
+  "Practical aim states exactly what the experiment is intended to determine.",
+  "Apparatus are the instruments/equipment required.",
+  "Procedure must be written in correct sequence.",
+  "Observation records what is actually seen/measured.",
+  "Result is obtained from observations/calculations.",
+  "Precautions reduce experimental error and hazards.",
+  "Sources of error explain why experimental results may differ from expected values.",
+  "Relative density compares density with a reference density.",
+  "Specific gravity is dimensionless.",
+  "API gravity expresses petroleum density/lightness on the API scale.",
+  "Higher API generally means lighter petroleum.",
+  "Lower API generally means heavier petroleum.",
+  "Density is mass divided by volume: density = m/V.",
+  "Temperature affects petroleum density and related measurements.",
+  "Pour point is related to the lowest temperature at which an oil remains sufficiently fluid under specified test conditions.",
+  "Pour point is important for handling and transportation of petroleum products.",
+  "A sample should be representative of the material being tested.",
+  "Apparatus must be clean before measurement.",
+  "Read measuring instruments at eye level where applicable.",
+  "Avoid contamination.",
+  "Record readings immediately.",
+  "Use appropriate units.",
+  "Repeat measurements when required.",
+  "Abnormal observations should not simply be ignored.",
+  "Experimental results should be compared with expected/reference values.",
+  "Calibration improves reliability.",
+  "Meniscus errors can affect liquid measurements.",
+  "Temperature control can be critical in petroleum-property tests.",
+  "Safety precautions are part of a proper practical report.",
+  "A good conclusion must directly relate to the experimental aim.",
+  "Formulas: SG = density of substance / density of reference substance; API = (141.5 / SG at 60°F/60°F) - 131.5; density = m/V; Q = mCp ΔT."
+],
+quiz: [
+  {id:"PGP126-Q01", cat:"Practical", q:"What is the aim of a practical experiment?", o:["A measured or noticed experimental occurrence", "Density has units; relative density is a dimensionless ratio", "The specific purpose the experiment intends to achieve", "Consistent bias in measurement"], a:2},
+  {id:"PGP126-Q02", cat:"Practical", q:"What is an apparatus?", o:["Density has units; relative density is a dimensionless ratio", "Relatively light petroleum", "Equipment/instrument used to perform an experiment", "Consistent bias in measurement"], a:2},
+  {id:"PGP126-Q03", cat:"Practical", q:"What is an observation?", o:["Action taken to prevent error or danger", "To show how measured data produced the final result", "A measured or noticed experimental occurrence", "Reading error caused by viewing a scale from the wrong angle"], a:2},
+  {id:"PGP126-Q04", cat:"Practical", q:"What is a result?", o:["Light petroleum", "Value or conclusion obtained from observations and calculations", "A statement linking the result to the aim", "Laboratory determination of a measurable property of petroleum/product"], a:1},
+  {id:"PGP126-Q05", cat:"Practical", q:"What is a precaution?", o:["Equipment/instrument used to perform an experiment", "Understand the aim, principle, apparatus, procedure and safety precautions", "Action taken to prevent error or danger", "Approximately 1"], a:2},
+  {id:"PGP126-Q06", cat:"Practical", q:"What is an experimental error?", o:["Difference between an experimental measurement and the accepted/true value", "Dimensionless density ratio relative to water at a specified reference condition", "The specific purpose the experiment intends to achieve", "Observation is what was measured/seen; conclusion interprets the result"], a:0},
+  {id:"PGP126-Q07", cat:"Practical", q:"Define density.", o:["Any factor that causes measured value to deviate from expected value", "Mass per unit volume", "To determine low-temperature flow behaviour", "It characterizes petroleum lightness/heaviness"], a:1},
+  {id:"PGP126-Q08", cat:"Practical", q:"Give the density formula.", o:["To verify dimensional consistency", "Density = mass/volume", "API = 141.5/SG - 131.5", "Lowest temperature at which the oil remains sufficiently fluid under the specified test conditions"], a:1},
+  {id:"PGP126-Q09", cat:"Practical", q:"Define relative density.", o:["Ratio of density of a substance to density of a reference substance", "Reading error caused by viewing a scale from the wrong angle", "Oral question used to test practical understanding", "A non-representative sample produces misleading results"], a:0},
+  {id:"PGP126-Q10", cat:"Practical", q:"Is relative density dimensionless?", o:["No", "Yes"], a:1},
+  {id:"PGP126-Q11", cat:"Practical", q:"What is specific gravity?", o:["Relatively heavy petroleum", "Light petroleum", "Dimensionless density ratio relative to water at a specified reference condition", "Density has units; relative density is a dimensionless ratio"], a:2},
+  {id:"PGP126-Q12", cat:"Practical", q:"Give the API formula.", o:["Consistent bias in measurement", "Lowest temperature at which the oil remains sufficiently fluid under the specified test conditions", "Density = mass/volume", "API = 141.5/SG - 131.5"], a:3},
+  {id:"PGP126-Q13", cat:"Practical", q:"What does high API indicate?", o:["Oral question used to test practical understanding", "Relatively light petroleum", "Check the calculation, compare with expected values and write a proper conclusion", "Dimensionless density ratio relative to water at a specified reference condition"], a:1},
+  {id:"PGP126-Q14", cat:"Practical", q:"What does low API indicate?", o:["Value or conclusion obtained from observations and calculations", "Action taken to prevent error or danger", "Approximately 1", "Relatively heavy petroleum"], a:3},
+  {id:"PGP126-Q15", cat:"Practical", q:"Why is API gravity important?", o:["To verify dimensional consistency", "Density changes with temperature", "It can yield more valuable light products", "It characterizes petroleum lightness/heaviness"], a:3},
+  {id:"PGP126-Q16", cat:"Calculations", q:"Calculate the API gravity for SG = 0.80.", o:["Approximately 22.7°API", "Approximately 45.4°API", "Approximately 34.05°API", "Approximately 68.1°API"], a:1},
+  {id:"PGP126-Q17", cat:"Calculations", q:"Calculate the API gravity for SG = 0.90.", o:["Approximately 51.4°API", "Approximately 25.7°API", "Approximately 19.27°API", "Approximately 12.85°API"], a:1},
+  {id:"PGP126-Q18", cat:"Practical", q:"Which sample is lighter: 35°API or 15°API?", o:["35°API", "15°API"], a:0},
+  {id:"PGP126-Q19", cat:"Practical", q:"What is pour point?", o:["Equipment/instrument used to perform an experiment", "Unpredictable variation in measurements", "The specific purpose the experiment intends to achieve", "Lowest temperature at which the oil remains sufficiently fluid under the specified test conditions"], a:3},
+  {id:"PGP126-Q20", cat:"Practical", q:"Why is pour point important?", o:["It helps predict processing and handling behaviour", "It indicates low-temperature flow behaviour", "To verify dimensional consistency", "To avoid forgetting or altering observations"], a:1},
+  {id:"PGP126-Q21", cat:"Practical", q:"What can a high pour point indicate?", o:["To show how measured data produced the final result", "Poorer flow at low temperatures", "Density has units; relative density is a dimensionless ratio", "Check apparatus, procedure, sample, temperature, calculation and repeat where appropriate"], a:1},
+  {id:"PGP126-Q22", cat:"Practical", q:"Why should a petroleum sample be representative?", o:["A non-representative sample produces misleading results", "Contamination can change measurements", "It characterizes petroleum lightness/heaviness", "It allows them to explain why the procedure works"], a:0},
+  {id:"PGP126-Q23", cat:"Practical", q:"Why must apparatus be clean?", o:["Temperature directly controls wax crystallization and flow behaviour", "They demonstrate safe laboratory practice", "A non-representative sample produces misleading results", "Contamination can change measurements"], a:3},
+  {id:"PGP126-Q24", cat:"Practical", q:"Why should temperature be controlled?", o:["To ensure it is clean, intact and suitable", "API is inversely related to SG", "It indicates low-temperature flow behaviour", "Petroleum properties can depend strongly on temperature"], a:3},
+  {id:"PGP126-Q25", cat:"Practical", q:"Why are repeated readings useful?", o:["They improve confidence and help identify anomalous readings", "It can yield more valuable light products", "To ensure it is clean, intact and suitable", "Temperature directly controls wax crystallization and flow behaviour"], a:0},
+  {id:"PGP126-Q26", cat:"Practical", q:"Why should units always be recorded?", o:["Units give physical meaning to measurements", "To make the experiment reproducible", "It indicates low-temperature flow behaviour", "It helps predict processing and handling behaviour"], a:0},
+  {id:"PGP126-Q27", cat:"Practical", q:"What is calibration?", o:["Reading error caused by viewing a scale from the wrong angle", "Comparison/adjustment of an instrument against a known standard", "To show how measured data produced the final result", "Laboratory determination of a measurable property of petroleum/product"], a:1},
+  {id:"PGP126-Q28", cat:"Practical", q:"Why is calibration important?", o:["A non-representative sample produces misleading results", "They may indicate procedural, instrument or sample problems", "It characterizes petroleum lightness/heaviness", "It improves measurement accuracy"], a:3},
+  {id:"PGP126-Q29", cat:"Practical", q:"What is parallax error?", o:["Any factor that causes measured value to deviate from expected value", "Reading error caused by viewing a scale from the wrong angle", "Value or conclusion obtained from observations and calculations", "Check apparatus, procedure, sample, temperature, calculation and repeat where appropriate"], a:1},
+  {id:"PGP126-Q30", cat:"Practical", q:"How can parallax error be reduced?", o:["Poorer flow at low temperatures", "Read the scale at eye level", "API is inversely related to SG", "Density, specific gravity and pour point"], a:1},
+  {id:"PGP126-Q31", cat:"Practical", q:"What is systematic error?", o:["Poorer flow at low temperatures", "Value or conclusion obtained from observations and calculations", "Consistent bias in measurement", "Relatively heavy petroleum"], a:2},
+  {id:"PGP126-Q32", cat:"Practical", q:"What is random error?", o:["Unpredictable variation in measurements", "Heavy petroleum", "The specific purpose the experiment intends to achieve", "Dimensionless density ratio relative to water at a specified reference condition"], a:0},
+  {id:"PGP126-Q33", cat:"Practical", q:"Why should abnormal results be investigated?", o:["It allows them to explain why the procedure works", "A non-representative sample produces misleading results", "It can yield more valuable light products", "They may indicate procedural, instrument or sample problems"], a:3},
+  {id:"PGP126-Q34", cat:"Practical", q:"What should a practical conclusion contain?", o:["A statement linking the result to the aim", "Unpredictable variation in measurements", "Any factor that causes measured value to deviate from expected value", "Approximately 0"], a:0},
+  {id:"PGP126-Q35", cat:"Practical", q:"Why is a procedure written sequentially?", o:["To ensure it is clean, intact and suitable", "To test whether the student understands the experiment rather than memorized steps", "To make the experiment reproducible", "To avoid forgetting or altering observations"], a:2},
+  {id:"PGP126-Q36", cat:"Practical", q:"What is the difference between observation and conclusion?", o:["Observation is what was measured/seen; conclusion interprets the result", "Consistent bias in measurement", "Action taken to prevent error or danger", "Check the calculation, compare with expected values and write a proper conclusion"], a:0},
+  {id:"PGP126-Q37", cat:"Practical", q:"What is the purpose of a calculation section?", o:["Consistent bias in measurement", "Light petroleum", "To show how measured data produced the final result", "Relatively heavy petroleum"], a:2},
+  {id:"PGP126-Q38", cat:"Practical", q:"Why should calculations show units?", o:["To verify dimensional consistency", "API is inversely related to SG", "Density changes with temperature", "Units give physical meaning to measurements"], a:0},
+  {id:"PGP126-Q39", cat:"Calculations", q:"What is the specific gravity of water approximately, under standard petroleum reference conditions?", o:["Approximately 1", "Approximately 1.2", "Approximately 0.8", "Approximately 1.5"], a:0},
+  {id:"PGP126-Q40", cat:"Practical", q:"If SG increases, what happens to API?", o:["API decreases", "Density, specific gravity and pour point", "To determine low-temperature flow behaviour", "Density has units; relative density is a dimensionless ratio"], a:0},
+  {id:"PGP126-Q41", cat:"Practical", q:"Why does API decrease as SG increases?", o:["It can yield more valuable light products", "It helps predict processing and handling behaviour", "API is inversely related to SG", "It indicates low-temperature flow behaviour"], a:2},
+  {id:"PGP126-Q42", cat:"Practical", q:"What is a petroleum-property practical?", o:["A measured or noticed experimental occurrence", "To show how measured data produced the final result", "Laboratory determination of a measurable property of petroleum/product", "Consistent bias in measurement"], a:2},
+  {id:"PGP126-Q43", cat:"Practical", q:"Name three petroleum properties that can be experimentally determined.", o:["Approximately 45.4°API", "Incorrect reading, contaminated apparatus and poor temperature control", "Relatively heavy petroleum", "Density, specific gravity and pour point"], a:3},
+  {id:"PGP126-Q44", cat:"Practical", q:"Why is petroleum characterization important?", o:["To avoid forgetting or altering observations", "It improves measurement accuracy", "It helps predict processing and handling behaviour", "To ensure it is clean, intact and suitable"], a:2},
+  {id:"PGP126-Q45", cat:"Practical", q:"Why should readings be recorded immediately?", o:["Crystallization of wax can restrict low-temperature flow", "To verify dimensional consistency", "To avoid forgetting or altering observations", "To test whether the student understands the experiment rather than memorized steps"], a:2},
+  {id:"PGP126-Q46", cat:"Practical", q:"What happens if a measuring cylinder is contaminated?", o:["Oral question used to test practical understanding", "The sample measurement can be altered or inaccurate", "To ensure it is clean, intact and suitable", "It indicates low-temperature flow behaviour"], a:1}
+]
+};
+</script>
 </body>
 </html>
