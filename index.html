@@ -433,6 +433,45 @@ canvas {
   color:#333;
 }
 
+#setbtn {
+  position:fixed;
+  top:calc(126px + env(safe-area-inset-top, 0px));
+  right:8px;
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  border:2px solid #fff;
+  background:rgba(0,0,0,.45);
+  color:#fff;
+  font-size:20px;
+  z-index:21;
+  padding:0;
+}
+
+.tbar {
+  position:relative;
+  height:28px;
+  background:#ddd;
+  border-radius:14px;
+  margin:12px 0;
+  overflow:hidden;
+}
+
+#tz {
+  position:absolute;
+  top:0;
+  bottom:0;
+  background:#4caf50;
+}
+
+#tm {
+  position:absolute;
+  top:0;
+  bottom:0;
+  width:6px;
+  background:#e10600;
+}
+
 </style>
 </head>
 <body>
@@ -474,6 +513,7 @@ canvas {
 <div id="joy"><div id="knob"></div></div>
 <div class="btn" id="run">RUN</div>
 <div class="btn" id="act">ENTER</div>
+<button id="setbtn">&#9881;</button>
 
 <script>
 window.COURSES = {};
@@ -1422,6 +1462,27 @@ window.MENUS = {
 const $ = id => document.getElementById(id);
 const COURSES = window.COURSES || {}, MENUS = window.MENUS || {};
 const PROFILE_KEY = "pngpd_profile_v1", DEFAULT_NAME = "Player";
+const SET = (() => {
+  try {
+    return Object.assign({
+      sfx: true,
+      music: false,
+      pix: 1
+    }, JSON.parse(localStorage.getItem("pngpd_settings")));
+  } catch (e) {
+    return {
+      sfx: true,
+      music: false,
+      pix: 1
+    };
+  }
+})();
+const saveSet = () => {
+  try {
+    localStorage.setItem("pngpd_settings", JSON.stringify(SET));
+  } catch (e) {
+  }
+};
 const HOSTELS = [
   "Kokori Hostel",
   "PTDF Hostel",
@@ -1585,7 +1646,7 @@ function buildColorChoices() {
       return;
     pickColor = color;
     [...sws.children].forEach(x => x.classList.toggle("on", x === e.target));
-    body.material.color.set(color);
+    setShirt(player, color);
   });
 }
 function startGame(d) {
@@ -1607,11 +1668,20 @@ function startGame(d) {
     P.stats.car = null;
   if (!P.stats.att)
     P.stats.att = {};
+  if (!P.stats.wrong)
+    P.stats.wrong = {};
+  if (!P.stats.exams)
+    P.stats.exams = {};
+  if (!P.stats.examDay)
+    P.stats.examDay = {};
   setVehicle(P.stats.car);
-  body.material.color.set(P.shirt_color || pickColor);
+  setShirt(player, P.shirt_color || pickColor);
   $("ov").style.display = "none";
   $("stats").style.display = "block";
   say("Welcome " + P.username + "!");
+  applyAudio();
+  if (!P.stats.tut)
+    setTimeout(() => tutScreen(0), 600);
 }
 $("bgo").addEventListener("click", async () => {
   const sel = document.querySelector(".sw.on");
@@ -1647,9 +1717,18 @@ scene.background = new THREE.Color(8900331);
 scene.fog = new THREE.Fog(8900331, 50, 130);
 const cam = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 220);
 const ren = new THREE.WebGLRenderer({ antialias: false });
-ren.setPixelRatio(Math.min(devicePixelRatio, 1.5));
-ren.setSize(innerWidth, innerHeight);
+function applyPix() {
+  const r = [
+    Math.min(devicePixelRatio, 1.5),
+    0.5,
+    0.34
+  ][SET.pix];
+  ren.setPixelRatio(r);
+  ren.setSize(innerWidth, innerHeight);
+  ren.domElement.style.imageRendering = SET.pix ? "pixelated" : "auto";
+}
 document.body.appendChild(ren.domElement);
+applyPix();
 const hemi = new THREE.HemisphereLight(16777215, 8956518, 0.9);
 scene.add(hemi);
 const sun = new THREE.DirectionalLight(16777215, 0.6);
@@ -1668,25 +1747,104 @@ for (let i = 0; i < 10; i++) {
   clouds.push(c);
 }
 const M = c => new THREE.MeshLambertMaterial({ color: c });
-function box(w, h, d, c, x, y, z) {
-  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), M(c));
+const texCache = {};
+function rng32(a) {
+  return function () {
+    a |= 0;
+    a = a + 1831565813 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function pixTex(hex, kind, rx, ry) {
+  const key = hex + kind + rx + "x" + ry;
+  if (texCache[key])
+    return texCache[key];
+  const S = 16, cv = document.createElement("canvas");
+  cv.width = cv.height = S;
+  const g = cv.getContext("2d"), b = new THREE.Color(hex), R = rng32(hex + kind.length * 977);
+  const sh = k => "rgb(" + [
+    b.r,
+    b.g,
+    b.b
+  ].map(v => Math.max(0, Math.min(255, Math.round(v * 255 * k)))).join(",") + ")";
+  g.fillStyle = sh(1);
+  g.fillRect(0, 0, S, S);
+  const dots = (n, lo, hi) => {
+    for (let i = 0; i < n; i++) {
+      g.fillStyle = sh(lo + R() * (hi - lo));
+      g.fillRect(Math.floor(R() * S), Math.floor(R() * S), 1, 1);
+    }
+  };
+  if (kind === "grass")
+    dots(80, 0.78, 1.25);
+  else if (kind === "road")
+    dots(60, 0.8, 1.2);
+  else if (kind === "leaf")
+    dots(70, 0.7, 1.3);
+  else if (kind === "brick") {
+    dots(30, 0.92, 1.08);
+    g.fillStyle = sh(0.7);
+    for (let y = 0; y < S; y += 4) {
+      g.fillRect(0, y, S, 1);
+      const off = (y >> 2 & 1) * 4;
+      for (let x = off; x < S; x += 8)
+        g.fillRect(x, y, 1, 4);
+    }
+  } else if (kind === "roof") {
+    dots(30, 0.85, 1.1);
+    g.fillStyle = sh(0.72);
+    for (let y = 0; y < S; y += 3)
+      g.fillRect(0, y, S, 1);
+  } else if (kind === "plank") {
+    g.fillStyle = sh(0.72);
+    for (let x = 0; x < S; x += 4)
+      g.fillRect(x, 0, 1, S);
+    dots(20, 0.9, 1.1);
+  } else if (kind === "window") {
+    g.fillStyle = sh(0.55);
+    g.fillRect(0, 0, S, 1);
+    g.fillRect(0, S - 1, S, 1);
+    g.fillRect(0, 0, 1, S);
+    g.fillRect(S - 1, 0, 1, S);
+    g.fillRect(7, 0, 2, S);
+    g.fillRect(0, 7, S, 2);
+    g.fillStyle = sh(1.25);
+    g.fillRect(2, 2, 3, 2);
+  } else
+    dots(25, 0.9, 1.1);
+  const t = new THREE.CanvasTexture(cv);
+  t.magFilter = THREE.NearestFilter;
+  t.minFilter = THREE.NearestFilter;
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(rx, ry);
+  texCache[key] = t;
+  return t;
+}
+function mat(c, kind, rx, ry) {
+  return kind ? new THREE.MeshLambertMaterial({ map: pixTex(c, kind, rx, ry) }) : M(c);
+}
+function box(w, h, d, c, x, y, z, kind) {
+  const small = kind === "window" || kind === "plank";
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat(c, kind, small ? 1 : Math.max(1, Math.round(w / 3)), small ? 1 : Math.max(1, Math.round(h / 3))));
   m.position.set(x, y, z);
   scene.add(m);
   return m;
 }
-function flat(w, d, c, x, y, z) {
-  const r = new THREE.Mesh(new THREE.PlaneGeometry(w, d), M(c));
+function flat(w, d, c, x, y, z, kind) {
+  const r = new THREE.Mesh(new THREE.PlaneGeometry(w, d), mat(c, kind, Math.max(1, Math.round(w / 4)), Math.max(1, Math.round(d / 4))));
   r.rotation.x = -Math.PI / 2;
   r.position.set(x, y, z);
   scene.add(r);
   return r;
 }
-flat(320, 320, 5025616, 0, 0, 0);
-flat(10, 170, 4473924, 0, 0.02, -10);
+flat(320, 320, 5025616, 0, 0, 0, "grass");
+flat(10, 170, 4473924, 0, 0.02, -10, "road");
 [
   -22,
   14
-].forEach(z => flat(170, 8, 4473924, 0, 0.03, z));
+].forEach(z => flat(170, 8, 4473924, 0, 0.03, z, "road"));
 for (let z = -90; z < 75; z += 8)
   flat(0.4, 3, 16777215, 0, 0.05, z);
 flat(24, 10, 12434877, 0, 0.04, 60);
@@ -1855,21 +2013,27 @@ const places = [
 const solids = [], spots = [];
 places.forEach(([n, c, x, z, w, d, h, rc]) => {
   const sx = x === 0 ? 0 : Math.sign(x), frontX = x - sx * (w / 2), frontZ = z + d / 2;
-  box(w, h, d, c, x, h / 2, z);
-  box(w + 1.2, 1, d + 1.2, rc, x, h + 0.5, z);
+  box(w, h, d, c, x, h / 2, z, "brick");
+  box(w + 1.2, 1, d + 1.2, rc, x, h + 0.5, z, "roof");
   if (sx !== 0) {
-    box(0.5, 4.5, 3, 4073251, frontX, 2.25, z);
-    box(0.4, 1.6, 2, 11789820, frontX, h * 0.65, z - d / 4);
-    box(0.4, 1.6, 2, 11789820, frontX, h * 0.65, z + d / 4);
+    box(0.5, 4.5, 3, 7162945, frontX, 2.25, z, "plank");
+    box(0.4, 1.6, 2, 8508666, frontX, h * 0.65, z - d / 4, "window");
+    box(0.4, 1.6, 2, 8508666, frontX, h * 0.65, z + d / 4, "window");
+    if (h >= 8) {
+      box(0.4, 1.6, 2, 8508666, frontX, h * 0.3, z - d / 4, "window");
+      box(0.4, 1.6, 2, 8508666, frontX, h * 0.3, z + d / 4, "window");
+    }
     spots.push({
       n,
       x: frontX - sx * 3.5,
       z
     });
   } else {
-    box(3, 4.5, 0.5, 4073251, x, 2.25, frontZ);
-    box(2, 1.6, 0.4, 11789820, x - 6, h * 0.6, frontZ);
-    box(2, 1.6, 0.4, 11789820, x + 6, h * 0.6, frontZ);
+    box(3, 4.5, 0.5, 7162945, x, 2.25, frontZ, "plank");
+    box(2, 1.6, 0.4, 8508666, x - 6, h * 0.6, frontZ, "window");
+    box(2, 1.6, 0.4, 8508666, x + 6, h * 0.6, frontZ, "window");
+    box(2, 1.6, 0.4, 8508666, x - 6, h * 0.3, frontZ, "window");
+    box(2, 1.6, 0.4, 8508666, x + 6, h * 0.3, frontZ, "window");
     spots.push({
       n,
       x,
@@ -1884,7 +2048,7 @@ places.forEach(([n, c, x, z, w, d, h, rc]) => {
     hd: d / 2 + 0.6
   });
 });
-flat(34, 22, 6732650, 66, 0.03, -22);
+flat(34, 22, 6732650, 66, 0.03, -22, "grass");
 flat(30, 0.3, 16777215, 66, 0.05, -22);
 flat(0.3, 18, 16777215, 66, 0.05, -22);
 flat(30, 0.3, 16777215, 66, 0.05, -31);
@@ -1899,8 +2063,8 @@ spots.push({
   r: 12
 });
 const gz = 72;
-box(1.4, 7, 1.4, 14747136, -8, 3.5, gz);
-box(1.4, 7, 1.4, 14747136, 8, 3.5, gz);
+box(1.4, 7, 1.4, 14747136, -8, 3.5, gz, "brick");
+box(1.4, 7, 1.4, 14747136, 8, 3.5, gz, "brick");
 box(17, 1.6, 1.4, 14747136, 0, 7, gz);
 box(14, 0.4, 0.4, 16777215, 0, 5, gz);
 sign("PTI EFFURUN", 0, 10.5, gz);
@@ -1925,7 +2089,7 @@ for (const sx of [
     -1,
     1
   ]) {
-  box(40, 2.5, 0.8, 16764092, sx * 29, 1.25, gz);
+  box(40, 2.5, 0.8, 16764092, sx * 29, 1.25, gz, "brick");
   solids.push({
     x: sx * 29,
     z: gz,
@@ -1950,19 +2114,20 @@ for (let i = 0; i < 55; i++) {
     continue;
   if (Math.abs(x - 66) < 22 && Math.abs(z + 22) < 16)
     continue;
-  box(0.8, 3, 0.8, 7162945, x, 1.5, z);
-  const t = new THREE.Mesh(new THREE.SphereGeometry(2.2, 8, 6), M([
+  const lc = [
     3046706,
     6732650,
     4431943
-  ][i % 3]));
-  t.position.set(x, 4.5, z);
-  scene.add(t);
+  ][i % 3];
+  box(0.9, 3, 0.9, 7162945, x, 1.5, z, "plank");
+  box(3.4, 1.3, 3.4, lc, x, 3.4, z, "leaf");
+  box(2.5, 1.3, 2.5, lc, x, 4.6, z, "leaf");
+  box(1.4, 1.2, 1.4, lc, x, 5.7, z, "leaf");
   solids.push({
     x,
     z,
-    hw: 1,
-    hd: 1
+    hw: 1.2,
+    hd: 1.2
   });
 }
 for (let i = 0; i < 35; i++) {
@@ -1976,20 +2141,99 @@ for (let i = 0; i < 35; i++) {
     16777215
   ][i % 4], x, 0.25, z);
 }
-function makeChar(shirt, skin, pants) {
-  const g = new THREE.Group();
-  const b = new THREE.Mesh(new THREE.BoxGeometry(1, 1.4, 0.6), M(shirt));
-  b.position.y = 1.3;
-  const h = new THREE.Mesh(new THREE.SphereGeometry(0.45, 10, 8), M(skin));
-  h.position.y = 2.4;
-  const l = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.7, 0.5), M(pants));
-  l.position.y = 0.35;
-  g.add(b, h, l);
-  g.userData.body = b;
+const HAIRS = [
+  1118481,
+  2824978,
+  4073251,
+  0,
+  6111287
+];
+function makeChar(shirt, skin, pants, hair) {
+  const g = new THREE.Group(), rig = new THREE.Group();
+  g.add(rig);
+  const part = (w, h, d, c, x, y, z, parent) => {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), M(c));
+    m.position.set(x, y, z);
+    (parent || rig).add(m);
+    return m;
+  };
+  const torso = part(1, 1.3, 0.55, shirt, 0, 1.55, 0);
+  part(1.04, 0.22, 0.58, 3622735, 0, 0.95, 0);
+  const head = part(0.8, 0.8, 0.8, skin, 0, 2.55, 0);
+  part(0.86, 0.28, 0.86, hair, 0, 2.98, 0);
+  part(0.86, 0.7, 0.2, hair, 0, 2.65, -0.33);
+  part(0.14, 0.14, 0.05, 1118481, -0.2, 2.6, 0.41);
+  part(0.14, 0.14, 0.05, 1118481, 0.2, 2.6, 0.41);
+  part(0.26, 0.06, 0.05, 8077102, 0, 2.38, 0.41);
+  const arm = side => {
+    const pv = new THREE.Group();
+    pv.position.set(side * 0.68, 2.15, 0);
+    rig.add(pv);
+    const sl = part(0.34, 0.45, 0.34, shirt, 0, -0.22, 0, pv);
+    part(0.28, 0.6, 0.28, skin, 0, -0.72, 0, pv);
+    return {
+      pv,
+      sl
+    };
+  };
+  const leg = side => {
+    const pv = new THREE.Group();
+    pv.position.set(side * 0.26, 0.95, 0);
+    rig.add(pv);
+    part(0.42, 0.95, 0.42, pants, 0, -0.475, 0, pv);
+    part(0.44, 0.2, 0.58, 2171169, 0, -0.88, 0.07, pv);
+    return pv;
+  };
+  const aL = arm(-1), aR = arm(1), lL = leg(-1), lR = leg(1);
+  g.userData = {
+    body: torso,
+    head,
+    rig,
+    armL: aL.pv,
+    armR: aR.pv,
+    legL: lL,
+    legR: lR,
+    shirtMeshes: [
+      torso,
+      aL.sl,
+      aR.sl
+    ],
+    parts: [
+      torso,
+      aL.pv,
+      aR.pv,
+      lL,
+      lR
+    ]
+  };
   scene.add(g);
   return g;
 }
-const player = makeChar(14747136, 9262372, 1713022);
+function setShirt(c, col) {
+  c.userData.shirtMeshes.forEach(m => m.material.color.set(col));
+}
+function animChar(c, moving, t, sp) {
+  const u = c.userData;
+  if (moving) {
+    const w = t * (sp === undefined ? 10 : sp), s = Math.sin(w) * 0.7;
+    u.legL.rotation.x = s;
+    u.legR.rotation.x = -s;
+    u.armL.rotation.x = -s;
+    u.armR.rotation.x = s;
+    u.rig.position.y = Math.abs(Math.sin(w)) * 0.1;
+  } else {
+    [
+      u.legL,
+      u.legR,
+      u.armL,
+      u.armR
+    ].forEach(q => {
+      q.rotation.x *= 0.8;
+    });
+    u.rig.position.y *= 0.8;
+  }
+}
+const player = makeChar(14747136, 9262372, 1713022, 1118481);
 player.position.set(0, 0, 64);
 let vehGroup = null;
 function setVehicle(id) {
@@ -1997,9 +2241,10 @@ function setVehicle(id) {
     player.remove(vehGroup);
     vehGroup = null;
   }
-  const v = VEHICLES.find(x => x.id === id), legs = player.children[2];
-  player.userData.body.visible = true;
-  legs.visible = true;
+  const v = VEHICLES.find(x => x.id === id);
+  player.userData.parts.forEach(q => {
+    q.visible = true;
+  });
   if (!v)
     return;
   const g = new THREE.Group();
@@ -2030,8 +2275,9 @@ function setVehicle(id) {
     wheel(0.4, 0.2, 0, 0.4, 1.1);
     add(1.5, 0.9, 2.4, v.col, 0, 0.95, 0);
     add(1.5, 0.12, 2, 2236962, 0, 2.05, -0.1);
-    player.userData.body.visible = false;
-    legs.visible = false;
+    player.userData.parts.forEach(q => {
+      q.visible = false;
+    });
   } else {
     wheel(0.42, 0.3, -0.95, 0.42, 1);
     wheel(0.42, 0.3, 0.95, 0.42, 1);
@@ -2039,8 +2285,9 @@ function setVehicle(id) {
     wheel(0.42, 0.3, 0.95, 0.42, -1);
     add(2, 0.8, 3.6, v.col, 0, 0.85, 0);
     add(1.7, 0.7, 1.8, 9489145, 0, 1.6, -0.2);
-    player.userData.body.visible = false;
-    legs.visible = false;
+    player.userData.parts.forEach(q => {
+      q.visible = false;
+    });
   }
   player.add(g);
   vehGroup = g;
@@ -2114,7 +2361,12 @@ const paths = [
 paths.forEach((p, i) => {
   for (let k = 0; k < 2; k++) {
     npcs.push({
-      c: makeChar(shirts[(i * 2 + k) % 8], skins[(i + k) % 4], 3622735),
+      c: makeChar(shirts[(i * 2 + k) % 8], skins[(i + k) % 4], [
+        3622735,
+        1713022,
+        5125166,
+        2503224
+      ][(i + k) % 4], HAIRS[(i * 3 + k) % 5]),
       p,
       t: Math.random(),
       dir: 1,
@@ -2229,6 +2481,7 @@ function gain(xp, coins) {
   if (l > P.level) {
     P.level = l;
     say("LEVEL UP! You are now level " + l);
+    sfx("level");
   }
 }
 
@@ -2262,6 +2515,10 @@ function closePanel() {
   panel.style.display = "none";
   inPanel = false;
   Q = null;
+  clearInterval(examTimer);
+  clearInterval(jobTimer);
+  E = null;
+  J = null;
   if (P)
     saveProfile(P);
 }
@@ -2296,10 +2553,10 @@ function courseButtons(place) {
   return Object.keys(COURSES).filter(k => COURSES[k].place === place).map(k => "<button class=\"pbtn\" data-a=\"course\" data-v=\"" + esc(k) + "\">" + esc(COURSES[k].title) + "</button>").join("") || "<p>No courses added yet.</p>";
 }
 function libraryMenu() {
-  openPanel("PTI Library", coinLine() + "<p>Pick a course to read key notes or take a quiz. Each new correct answer earns coins.</p>" + courseButtons("library"));
+  openPanel("PTI Library", coinLine() + "<p>Pick a course to read key notes or take a quiz. Each new correct answer earns coins.</p>" + courseButtons("library") + libExtras());
 }
 function labMenu() {
-  openPanel("PGP 126 Laboratory", coinLine() + "<p>Welcome to the lab. Study the notes, then test yourself on formulas and apparatus.</p>" + courseButtons("lab"));
+  openPanel("PGP 126 Laboratory", coinLine() + "<p>Welcome to the lab. Study the notes, then test yourself on formulas and apparatus.</p>" + courseButtons("lab") + jobBtn("lab"));
 }
 function courseScreen(code) {
   const c = COURSES[code];
@@ -2330,7 +2587,7 @@ function startQuiz(code, cat) {
   showQ();
 }
 function showQ(keep) {
-  const c = COURSES[Q.code], q = Q.list[Q.i];
+  const q = Q.list[Q.i], c = COURSES[q._c || Q.code];
   if (!keep || Q.optsFor !== Q.i) {
     Q.opts = shuffle(q.o.map((t, i) => ({
       t,
@@ -2388,7 +2645,7 @@ function answer(k) {
   if (!Q || Q.locked || Q.dim.includes(k))
     return;
   Q.locked = true;
-  const c = COURSES[Q.code], q = Q.list[Q.i], ok = Q.opts[k].i === q.a;
+  const q = Q.list[Q.i], qc = q._c || Q.code, c = COURSES[qc], ok = Q.opts[k].i === q.a;
   const bs = [...pbody.querySelectorAll("[data-a=\"opt\"]")];
   bs.forEach((b, j) => {
     if (Q.opts[j].i === q.a)
@@ -2397,13 +2654,21 @@ function answer(k) {
   if (!ok)
     bs[k].classList.add("bad");
   pbody.querySelectorAll("[data-a=\"hint\"],[data-a=\"calc\"]").forEach(x => x.remove());
-  const sc = P.stats.courses[Q.code] = P.stats.courses[Q.code] || {
+  const sc = P.stats.courses[qc] = P.stats.courses[qc] || {
     a: 0,
     c: 0
   };
   sc.a++;
   if (ok)
     sc.c++;
+  if (ok) {
+    if (P.stats.wrong[q.id]) {
+      delete P.stats.wrong[q.id];
+      P.stats.revFixed = (P.stats.revFixed || 0) + 1;
+    }
+  } else
+    P.stats.wrong[q.id] = (P.stats.wrong[q.id] || 0) + 1;
+  sfx(ok ? "coin" : "wrong");
   let msg;
   if (ok) {
     Q.right++;
@@ -2424,16 +2689,16 @@ function answer(k) {
     msg = "Not quite. Here is the explanation:";
   saveProfile(P);
   const last = Q.i >= Q.list.length - 1;
-  $("fb").innerHTML = esc(msg) + explain(Q.code, q) + "<button class=\"pbtn solid\" data-a=\"next\">" + (last ? "FINISH" : "NEXT") + "</button>";
+  $("fb").innerHTML = esc(msg) + explain(qc, q) + "<button class=\"pbtn solid\" data-a=\"next\">" + (last ? "FINISH" : "NEXT") + "</button>";
 }
 function finishQuiz() {
-  const code = Q.code, cat = Q.cat, r = Q.right, n = Q.list.length, e = Q.earned;
-  openPanel("Quiz result", coinLine() + "<p><b>You got " + r + " of " + n + " correct.</b><br>Coins earned: " + e + "</p>" + "<button class=\"pbtn solid\" data-a=\"quiz\" data-v=\"" + esc(code) + "\" data-c=\"" + esc(cat || "") + "\">Another quiz</button>" + "<button class=\"pbtn\" data-a=\"course\" data-v=\"" + esc(code) + "\">Back to course</button>");
+  const code = Q.code, cat = Q.cat, r = Q.right, n = Q.list.length, e = Q.earned, rev = Q.rev;
+  openPanel("Quiz result", coinLine() + "<p><b>You got " + r + " of " + n + " correct.</b><br>Coins earned: " + e + "</p>" + (rev ? "<button class=\"pbtn solid\" data-a=\"revise\">Revise more mistakes (" + wrongCount() + " left)</button><button class=\"pbtn\" data-a=\"home\">Back</button>" : "<button class=\"pbtn solid\" data-a=\"quiz\" data-v=\"" + esc(code) + "\" data-c=\"" + esc(cat || "") + "\">Another quiz</button><button class=\"pbtn\" data-a=\"course\" data-v=\"" + esc(code) + "\">Back to course</button>"));
   Q = null;
 }
 function restaurant(n, msg) {
   const items = MENUS[n];
-  openPanel(n, coinLine() + (msg ? "<div class=\"fb\">" + esc(msg) + "</div>" : "") + "<p>Menu (price in coins)</p>" + items.map((it, i) => "<button class=\"pbtn\" data-a=\"buy\" data-v=\"" + i + "\">" + esc(it.n) + " - " + it.p + " coins (+" + it.h + " hunger)</button>").join("") + "<div class=\"note\">Low on coins? Answer questions in the library or lab to earn more.</div>");
+  openPanel(n, coinLine() + (msg ? "<div class=\"fb\">" + esc(msg) + "</div>" : "") + "<p>Menu (price in coins)</p>" + items.map((it, i) => "<button class=\"pbtn\" data-a=\"buy\" data-v=\"" + i + "\">" + esc(it.n) + " - " + it.p + " coins (+" + it.h + " hunger)</button>").join("") + jobBtn("rest") + "<div class=\"note\">Low on coins? Answer questions in the library or lab to earn more, or work a shift.</div>");
 }
 function buy(i) {
   const it = MENUS[curPlace][i];
@@ -2445,6 +2710,7 @@ function buy(i) {
   P.hunger = Math.min(100, P.hunger + it.h);
   P.stats.ate = (P.stats.ate || 0) + 1;
   saveProfile(P);
+  sfx("buy");
   restaurant(curPlace, "You bought " + it.n + ".");
 }
 function hostel(n, msg) {
@@ -2464,6 +2730,10 @@ const MEMOS = [
   {
     t: "Hints and calculator",
     b: "Stuck on a question? Use the hint to remove two wrong options (you earn half the coins). The calculator is here in the department and also appears inside calculation questions."
+  },
+  {
+    t: "Exams, revision and jobs",
+    b: "Take timed mock exams in the Classrooms and build your GPA. Fix mistakes with Revision in the Library. Work shifts in the Library, Laboratory and restaurants for coins. Use the gear button for sound and graphics settings."
   },
   {
     t: "New services",
@@ -2500,9 +2770,9 @@ function resultsScreen() {
       }, pct = st.a ? Math.round(st.c / st.a * 100) : 0;
     const rewarded = c.quiz.filter(q => P.done.includes(q.id)).length;
     const tag = !st.a ? "Not started" : pct >= 70 ? "Good" : pct >= 50 ? "Fair" : "Needs revision";
-    return "<div class=\"row\"><span><b>" + esc(k) + "</b><br>" + st.c + "/" + st.a + " correct (" + pct + "%) &middot; " + rewarded + "/" + c.quiz.length + " questions mastered</span><span>" + tag + "</span></div>";
+    return "<div class=\"row\"><span><b>" + esc(k) + "</b><br>" + st.c + "/" + st.a + " correct (" + pct + "%) &middot; " + rewarded + "/" + c.quiz.length + " questions mastered" + exTxt(k) + "</span><span>" + tag + "</span></div>";
   }).join("");
-  openPanel("My results", "<div class=\"note\">" + esc(P.username) + " &middot; Level " + P.level + " &middot; XP " + P.xp + " &middot; Coins " + P.coins + (P.fellowship ? " &middot; " + esc(P.fellowship) : "") + "</div>" + "<div class=\"note\">Lectures attended: " + (P.stats.lectures || 0) + " &middot; Vehicle: " + esc(vehName()) + " &middot; Items: " + (P.stats.items.length ? P.stats.items.map(i => (SHOP.find(x => x.id === i) || { n: i }).n).join(", ") : "none") + "</div>" + (rows || "<p>No results yet.</p>") + "<button class=\"pbtn solid\" data-a=\"home\">Back</button>");
+  openPanel("My results", "<div class=\"note\">" + esc(P.username) + " &middot; Level " + P.level + " &middot; XP " + P.xp + " &middot; Coins " + P.coins + (P.fellowship ? " &middot; " + esc(P.fellowship) : "") + "</div>" + "<div class=\"note\">Lectures attended: " + (P.stats.lectures || 0) + " &middot; Vehicle: " + esc(vehName()) + " &middot; Items: " + (P.stats.items.length ? P.stats.items.map(i => (SHOP.find(x => x.id === i) || { n: i }).n).join(", ") : "none") + "</div>" + gpaNote() + (rows || "<p>No results yet.</p>") + "<button class=\"pbtn solid\" data-a=\"home\">Back</button>");
 }
 function memosScreen() {
   openPanel("Notices and memos", MEMOS.map(m => "<div class=\"memo\"><b>" + esc(m.t) + "</b><br>" + esc(m.b) + "</div>").join("") + "<button class=\"pbtn solid\" data-a=\"home\">Back</button>");
@@ -2719,6 +2989,29 @@ const MISSIONS = [
     xp: 50,
     test: () => (P.stats.lectures || 0) >= 5,
     prog: () => Math.min(P.stats.lectures || 0, 5) + "/5"
+  },
+  {
+    id: "m14",
+    t: "Take a mock exam in the Classrooms",
+    coins: 30,
+    xp: 30,
+    test: () => (P.stats.examCount || 0) > 0
+  },
+  {
+    id: "m15",
+    t: "Complete 3 work shifts",
+    coins: 40,
+    xp: 30,
+    test: () => (P.stats.shifts || 0) >= 3,
+    prog: () => Math.min(P.stats.shifts || 0, 3) + "/3"
+  },
+  {
+    id: "m16",
+    t: "Fix 5 mistakes in Revision",
+    coins: 40,
+    xp: 30,
+    test: () => (P.stats.revFixed || 0) >= 5,
+    prog: () => Math.min(P.stats.revFixed || 0, 5) + "/5"
   }
 ];
 function missionsScreen(msg) {
@@ -2863,6 +3156,7 @@ function vehicleAction(a, id) {
       return garageMenu("Not enough coins for the " + v.n + ". Earn more by answering questions.");
     P.coins -= v.p;
     P.stats.cars.push(id);
+    sfx("buy");
   }
   P.stats.car = id;
   setVehicle(id);
@@ -2885,6 +3179,7 @@ function shopBuy(id) {
     return adminMenu("Not enough coins for " + it.n + ".");
   P.coins -= it.p;
   P.stats.items.push(id);
+  sfx("buy");
   saveProfile(P);
   adminMenu("You bought: " + it.n + ".");
 }
@@ -2895,7 +3190,7 @@ function classMenu(msg) {
 function classCourse(code, msg) {
   const c = COURSES[code];
   curClass = code;
-  openPanel(c.title, coinLine() + (msg ? "<div class=\"fb\">" + esc(msg) + "</div>" : "") + "<button class=\"pbtn solid\" data-a=\"lecture\">Attend lecture</button>" + (c.quiz.length ? "<button class=\"pbtn solid\" data-a=\"ctest\">Class test (5 questions, +50% coins)</button>" : "") + "<button class=\"pbtn\" data-a=\"home\">Back</button>");
+  openPanel(c.title, coinLine() + (msg ? "<div class=\"fb\">" + esc(msg) + "</div>" : "") + "<button class=\"pbtn solid\" data-a=\"lecture\">Attend lecture</button>" + (c.quiz.length ? "<button class=\"pbtn solid\" data-a=\"ctest\">Class test (5 questions, +50% coins)</button>" : "") + (c.quiz.length >= 15 ? "<button class=\"pbtn solid\" data-a=\"exam\">Mock exam (15 questions, timed, graded)</button>" : "") + "<button class=\"pbtn\" data-a=\"home\">Back</button>");
 }
 let curClass = null;
 function attendLecture() {
@@ -2925,10 +3220,456 @@ function classTest() {
   Q.mult = 1.5;
   showQ();
 }
+
+// ===== SOUND, SETTINGS, TUTORIAL =====
+let AC = null, musicTimer = null, musicStep = 0;
+function audio() {
+  if (!AC) {
+    try {
+      AC = new (window.AudioContext || window.webkitAudioContext)();
+    } catch (e) {
+      AC = null;
+    }
+  }
+  if (AC && AC.state === "suspended")
+    AC.resume();
+  return AC;
+}
+function tone(f, d, type, vol, delay) {
+  const a = audio();
+  if (!a)
+    return;
+  const o = a.createOscillator(), g = a.createGain(), t = a.currentTime + (delay || 0);
+  o.type = type || "square";
+  o.frequency.value = f;
+  g.gain.setValueAtTime(vol || 0.05, t);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+  o.connect(g);
+  g.connect(a.destination);
+  o.start(t);
+  o.stop(t + d + 0.02);
+}
+const SFX = {
+  click: () => tone(520, 0.05, "square", 0.025),
+  coin: () => {
+    tone(880, 0.08, "square", 0.045);
+    tone(1320, 0.16, "square", 0.045, 0.08);
+  },
+  wrong: () => {
+    tone(200, 0.2, "sawtooth", 0.045);
+    tone(150, 0.25, "sawtooth", 0.045, 0.12);
+  },
+  level: () => {
+    [
+      523,
+      659,
+      784,
+      1047
+    ].forEach((f, i) => tone(f, 0.16, "triangle", 0.06, i * 0.1));
+  },
+  buy: () => {
+    tone(660, 0.07, "square", 0.04);
+    tone(990, 0.12, "square", 0.04, 0.07);
+  }
+};
+function sfx(n) {
+  if (SET.sfx && SFX[n])
+    SFX[n]();
+}
+const NOTES = [
+  262,
+  294,
+  330,
+  392,
+  440,
+  392,
+  330,
+  294,
+  262,
+  330,
+  392,
+  523,
+  440,
+  392,
+  330,
+  294
+];
+function applyAudio() {
+  clearInterval(musicTimer);
+  musicTimer = null;
+  if (SET.music) {
+    audio();
+    musicTimer = setInterval(() => {
+      tone(NOTES[musicStep++ % NOTES.length], 0.38, "triangle", 0.03);
+    }, 430);
+  }
+}
+addEventListener("pointerdown", () => {
+  if (SET.sfx || SET.music)
+    audio();
+}, { once: true });
+function settingsScreen() {
+  const pix = [
+    "Sharp",
+    "Pixel",
+    "Chunky"
+  ];
+  openPanel("Settings", "<button class=\"pbtn\" data-a=\"setsfx\">Sound effects: " + (SET.sfx ? "ON" : "OFF") + "</button>" + "<button class=\"pbtn\" data-a=\"setmusic\">Music: " + (SET.music ? "ON" : "OFF") + "</button>" + "<p>Graphics style (Chunky is fastest on weak phones)</p>" + pix.map((n, i) => "<button class=\"pbtn" + (SET.pix === i ? " solid" : "") + "\" data-a=\"setpix\" data-v=\"" + i + "\">" + n + "</button>").join("") + "<button class=\"pbtn\" data-a=\"tut\" data-v=\"0\">Show the tutorial again</button><button class=\"pbtn solid\" data-a=\"close\">Close</button>");
+}
+$("setbtn").addEventListener("click", settingsScreen);
+const TUT = [
+  {
+    t: "Move around",
+    b: "Use the joystick on the left to walk. Hold RUN to sprint (it uses energy). Drag the right side of the screen to turn the camera."
+  },
+  {
+    t: "Enter buildings",
+    b: "When the ENTER button appears near a building, tap it. Walk close to a student and the button says TALK."
+  },
+  {
+    t: "Earn coins",
+    b: "Study in the Library, then answer questions correctly. Wrong answers show an explanation. Each new correct answer pays coins."
+  },
+  {
+    t: "Look after yourself",
+    b: "Hunger and energy matter. Buy food at Bush Mama or Tutu Restaurant, and rest in a hostel."
+  },
+  {
+    t: "Grow your life",
+    b: "Take mock exams in the Classrooms, fix mistakes with Revision in the Library, work shifts for coins, save at UBA Bank and buy vehicles at the Garage. Open Missions in the Department every day."
+  }
+];
+function tutScreen(i) {
+  const t = TUT[i];
+  openPanel("Tutorial " + (i + 1) + "/" + TUT.length, "<p><b>" + esc(t.t) + "</b></p><p>" + esc(t.b) + "</p>" + (i < TUT.length - 1 ? "<button class=\"pbtn solid\" data-a=\"tutnext\" data-v=\"" + (i + 1) + "\">Next</button>" : "<button class=\"pbtn solid\" data-a=\"tutskip\">Start playing</button>") + "<button class=\"pbtn\" data-a=\"tutskip\">Skip tutorial</button>");
+}
+function tutDone() {
+  if (P) {
+    P.stats.tut = true;
+    saveProfile(P);
+  }
+  closePanel();
+}
+
+// ===== EXAMS, GPA, REVISION =====
+const GRADES = [
+  {
+    m: 75,
+    g: "A",
+    p: 4
+  },
+  {
+    m: 70,
+    g: "AB",
+    p: 3.5
+  },
+  {
+    m: 65,
+    g: "B",
+    p: 3.25
+  },
+  {
+    m: 60,
+    g: "BC",
+    p: 3
+  },
+  {
+    m: 55,
+    g: "C",
+    p: 2.75
+  },
+  {
+    m: 50,
+    g: "CD",
+    p: 2.5
+  },
+  {
+    m: 45,
+    g: "D",
+    p: 2.25
+  },
+  {
+    m: 40,
+    g: "E",
+    p: 2
+  },
+  {
+    m: 0,
+    g: "F",
+    p: 0
+  }
+];
+const gradeOf = pct => GRADES.find(x => pct >= x.m);
+function calcGPA() {
+  const v = Object.values(P.stats.exams || {});
+  if (!v.length)
+    return null;
+  return v.reduce((a, x) => a + gradeOf(x.best).p, 0) / v.length;
+}
+const wrongCount = () => Object.keys(P.stats.wrong || {}).length;
+function gpaNote() {
+  const g = calcGPA();
+  let weak = null, wp = 101;
+  Object.keys(P.stats.courses).forEach(k => {
+    const st = P.stats.courses[k];
+    if (st.a >= 5) {
+      const pc = st.c / st.a * 100;
+      if (pc < wp) {
+        wp = pc;
+        weak = k;
+      }
+    }
+  });
+  return "<div class=\"note\">Exam GPA: <b>" + (g == null ? "no exams yet" : g.toFixed(2) + " / 4.00") + "</b>" + (weak ? " &middot; Weakest course: " + esc(weak) + " (" + Math.round(wp) + "%)" : "") + " &middot; Mistakes to revise: " + wrongCount() + "</div>";
+}
+function exTxt(k) {
+  const e = P.stats.exams[k];
+  return e ? " &middot; Exam best: " + gradeOf(e.best).g + " (" + e.best + "%)" : "";
+}
+let E = null, examTimer = null;
+function startExam(code) {
+  const c = COURSES[code], n = Math.min(15, c.quiz.length);
+  E = {
+    code,
+    list: shuffle(c.quiz).slice(0, n),
+    i: 0,
+    ans: [],
+    end: Date.now() + n * 25000,
+    opts: null,
+    optsFor: -1
+  };
+  clearInterval(examTimer);
+  examTimer = setInterval(examTick, 500);
+  showExamQ();
+}
+function examTick() {
+  if (!E)
+    return;
+  const left = Math.max(0, Math.round((E.end - Date.now()) / 1000)), el = $("etimer");
+  if (el)
+    el.textContent = Math.floor(left / 60) + ":" + (left % 60 < 10 ? "0" : "") + left % 60;
+  if (left <= 0)
+    finishExam(true);
+}
+function showExamQ(keep) {
+  const q = E.list[E.i];
+  if (!keep || E.optsFor !== E.i) {
+    E.opts = shuffle(q.o.map((t, i) => ({
+      t,
+      i
+    })));
+    E.optsFor = E.i;
+  }
+  openPanel(COURSES[E.code].title + " - Mock exam", "<div class=\"note\">Question " + (E.i + 1) + " of " + E.list.length + " &middot; Time left: <b id=\"etimer\"></b><br>No hints or explanations during the exam.</div><p><b>" + esc(q.q) + "</b></p>" + E.opts.map((o, k) => "<button class=\"pbtn\" data-a=\"eopt\" data-v=\"" + k + "\">" + esc(o.t) + "</button>").join("") + (q.cat === "Calculations" ? "<button class=\"pbtn\" data-a=\"calc\" data-v=\"exam\">Open calculator</button>" : ""));
+  examTick();
+}
+function examAnswer(k) {
+  if (!E)
+    return;
+  E.ans[E.i] = E.opts[k].i;
+  E.i++;
+  if (E.i >= E.list.length)
+    finishExam(false);
+  else
+    showExamQ();
+}
+function finishExam(timeup) {
+  clearInterval(examTimer);
+  examTimer = null;
+  const ex = E;
+  if (!ex)
+    return;
+  E = null;
+  const n = ex.list.length;
+  let right = 0;
+  const wrongQs = [];
+  ex.list.forEach((q, i) => {
+    if (ex.ans[i] === q.a)
+      right++;
+    else {
+      wrongQs.push(q);
+      P.stats.wrong[q.id] = (P.stats.wrong[q.id] || 0) + 1;
+    }
+  });
+  const pct = Math.round(right / n * 100), gr = gradeOf(pct), today = new Date().toISOString().slice(0, 10), prev = P.stats.exams[ex.code];
+  P.stats.exams[ex.code] = {
+    best: Math.max(pct, prev ? prev.best : 0),
+    last: pct,
+    n: (prev ? prev.n : 0) + 1
+  };
+  P.stats.examCount = (P.stats.examCount || 0) + 1;
+  let reward = "No reward today (you already earned an exam reward for this course today).";
+  if (P.stats.examDay[ex.code] !== today) {
+    P.stats.examDay[ex.code] = today;
+    const coins = Math.round(pct / 5), xp = Math.round(pct / 2);
+    gain(xp, coins);
+    reward = "Reward: +" + coins + " coins and +" + xp + " XP.";
+    sfx("coin");
+  }
+  saveProfile(P);
+  const best = gradeOf(P.stats.exams[ex.code].best);
+  openPanel("Exam result", "<div class=\"memo\"><b>" + esc(COURSES[ex.code].title) + "</b><br>Score: " + right + "/" + n + " (" + pct + "%)" + (timeup ? " - time ran out" : "") + "<br>Grade: <b>" + gr.g + "</b> (" + gr.p.toFixed(2) + " points)<br>Best grade for this course: " + best.g + "<br>" + esc(reward) + "</div>" + "<p>Game grading scale, not official school grading.</p>" + (wrongQs.length ? "<p><b>Review your mistakes:</b></p>" + wrongQs.slice(0, 10).map(q => "<div class=\"memo\"><b>" + esc(q.q) + "</b>" + explain(ex.code, q) + "</div>").join("") + "<div class=\"note\">Wrong questions were added to Revision.</div>" : "<p>Perfect score!</p>") + "<button class=\"pbtn solid\" data-a=\"cclass\" data-v=\"" + esc(ex.code) + "\">Back</button>");
+}
+function startRevision() {
+  const ids = P.stats.wrong || {}, list = [];
+  Object.keys(COURSES).forEach(code => COURSES[code].quiz.forEach(q => {
+    if (ids[q.id])
+      list.push(Object.assign({}, q, { _c: code }));
+  }));
+  if (!list.length)
+    return openPanel("Revision", "<p>You have no mistakes to revise right now. Questions you get wrong will appear here.</p>" + "<button class=\"pbtn solid\" data-a=\"home\">Back</button>");
+  const pick = shuffle(list).slice(0, 10);
+  Q = {
+    code: pick[0]._c,
+    cat: "",
+    list: pick,
+    i: 0,
+    right: 0,
+    earned: 0,
+    locked: false,
+    rev: true
+  };
+  showQ();
+}
+
+// ===== PART-TIME JOBS =====
+let J = null, jobTimer = null;
+const jobBtn = t => "<button class=\"pbtn\" data-a=\"job\" data-v=\"" + t + "\">Work a shift (costs 15 energy, earns coins)</button>";
+function libExtras() {
+  return "<button class=\"pbtn solid\" data-a=\"revise\">Revision: fix your mistakes (" + wrongCount() + ")</button>" + jobBtn("lib");
+}
+function jobStart(t) {
+  if (P.energy < 15)
+    return say("You are too tired to work. Rest in a hostel.");
+  if (P.hunger < 10)
+    return say("You are too hungry to work. Eat first.");
+  P.energy -= 15;
+  P.hunger = Math.max(0, P.hunger - 5);
+  if (t === "lib")
+    jobShelve();
+  else if (t === "lab")
+    jobTiming();
+  else
+    jobServe();
+}
+function jobShelve() {
+  const codes = Object.keys(COURSES).filter(k => /^PGP/.test(k)), set = shuffle(codes).slice(0, 6);
+  J = {
+    t: "lib",
+    target: set.slice().sort(),
+    next: 0,
+    miss: 0
+  };
+  openPanel("Library shift", "<p>Shelve the books in order, from the lowest course number to the highest.</p>" + set.map(b => "<button class=\"pbtn\" data-a=\"jbook\" data-v=\"" + esc(b) + "\">" + esc(b) + "</button>").join("") + "<div class=\"fb\" id=\"jmsg\"></div>");
+}
+function jobBook(v, btn) {
+  if (!J || J.t !== "lib")
+    return;
+  if (v === J.target[J.next]) {
+    btn.classList.add("good");
+    btn.disabled = true;
+    J.next++;
+    if (J.next >= J.target.length)
+      jobFinish(Math.max(5, 22 - 3 * J.miss), "You shelved all the books" + (J.miss ? " with " + J.miss + " mistake(s)." : " perfectly!"));
+  } else {
+    J.miss++;
+    btn.classList.add("bad");
+    setTimeout(() => btn.classList.remove("bad"), 400);
+    $("jmsg").textContent = "Wrong order. Mistakes: " + J.miss;
+  }
+}
+function jobTiming() {
+  J = {
+    t: "lab",
+    round: 1,
+    hits: 0,
+    pos: 0,
+    dir: 1,
+    zl: 20 + Math.random() * 50
+  };
+  openPanel("Lab shift", "<p>Stop the marker inside the green zone. Round <b id=\"jr\">1</b> of 5.</p><div class=\"tbar\"><div id=\"tz\"></div><div id=\"tm\"></div></div><button class=\"pbtn solid\" data-a=\"jstop\">STOP</button><div class=\"fb\" id=\"jmsg\"></div>");
+  $("tz").style.left = J.zl + "%";
+  $("tz").style.width = "22%";
+  clearInterval(jobTimer);
+  jobTimer = setInterval(() => {
+    if (!J || J.t !== "lab")
+      return;
+    J.pos += J.dir * 2;
+    if (J.pos >= 100) {
+      J.pos = 100;
+      J.dir = -1;
+    }
+    if (J.pos <= 0) {
+      J.pos = 0;
+      J.dir = 1;
+    }
+    const m = $("tm");
+    if (m)
+      m.style.left = J.pos + "%";
+  }, 30);
+}
+function jobStop() {
+  if (!J || J.t !== "lab")
+    return;
+  const hit = J.pos >= J.zl && J.pos <= J.zl + 22;
+  if (hit)
+    J.hits++;
+  $("jmsg").textContent = hit ? "Good! Perfect mix." : "Missed.";
+  if (J.round >= 5) {
+    clearInterval(jobTimer);
+    jobFinish(5 + J.hits * 4, "You mixed " + J.hits + " of 5 samples correctly.");
+  } else {
+    J.round++;
+    $("jr").textContent = J.round;
+    J.zl = 20 + Math.random() * 50;
+    $("tz").style.left = J.zl + "%";
+  }
+}
+function jobServe() {
+  J = {
+    t: "rest",
+    place: curPlace,
+    round: 0,
+    miss: 0
+  };
+  jobOrder();
+}
+function jobOrder() {
+  const items = MENUS[J.place];
+  J.target = items[Math.floor(Math.random() * items.length)].n;
+  const opts = shuffle(items.map(i => i.n).filter(n => n !== J.target)).slice(0, 3).concat(J.target);
+  openPanel(J.place + " shift", "<p>Order " + (J.round + 1) + " of 6: the customer wants <b>" + esc(J.target) + "</b>. Tap the right dish.</p>" + shuffle(opts).map(n => "<button class=\"pbtn\" data-a=\"jopt\" data-v=\"" + esc(n) + "\">" + esc(n) + "</button>").join("") + "<div class=\"fb\" id=\"jmsg\"></div>");
+}
+function jobOpt(v, btn) {
+  if (!J || J.t !== "rest")
+    return;
+  if (v === J.target) {
+    J.round++;
+    if (J.round >= 6)
+      jobFinish(Math.max(5, 22 - 3 * J.miss), "You served all 6 orders" + (J.miss ? " with " + J.miss + " mistake(s)." : " perfectly!"));
+    else
+      jobOrder();
+  } else {
+    J.miss++;
+    btn.classList.add("bad");
+    setTimeout(() => btn.classList.remove("bad"), 400);
+    $("jmsg").textContent = "Wrong dish. Mistakes: " + J.miss;
+  }
+}
+function jobFinish(coins, text) {
+  clearInterval(jobTimer);
+  J = null;
+  P.stats.shifts = (P.stats.shifts || 0) + 1;
+  gain(10, coins);
+  saveProfile(P);
+  sfx("coin");
+  openPanel("Shift complete", coinLine() + "<div class=\"memo\"><b>" + esc(text) + "</b><br>You earned " + coins + " coins and 10 XP.</div>" + "<button class=\"pbtn solid\" data-a=\"home\">Back</button>");
+}
 pbody.addEventListener("click", e => {
   const b = e.target.closest("button");
   if (!b || !b.dataset.a)
     return;
+  sfx("click");
   const a = b.dataset.a, v = b.dataset.v;
   if (a === "course")
     courseScreen(v);
@@ -2954,6 +3695,42 @@ pbody.addEventListener("click", e => {
     enter(curPlace);
   else if (a === "hint")
     useHint();
+  else if (a === "settings")
+    settingsScreen();
+  else if (a === "setsfx") {
+    SET.sfx = !SET.sfx;
+    saveSet();
+    settingsScreen();
+  } else if (a === "setmusic") {
+    SET.music = !SET.music;
+    saveSet();
+    applyAudio();
+    settingsScreen();
+  } else if (a === "setpix") {
+    SET.pix = +v;
+    saveSet();
+    applyPix();
+    settingsScreen();
+  } else if (a === "close")
+    closePanel();
+  else if (a === "tut" || a === "tutnext")
+    tutScreen(+v);
+  else if (a === "tutskip")
+    tutDone();
+  else if (a === "exam")
+    startExam(curClass);
+  else if (a === "eopt")
+    examAnswer(+v);
+  else if (a === "revise")
+    startRevision();
+  else if (a === "job")
+    jobStart(v);
+  else if (a === "jbook")
+    jobBook(v, b);
+  else if (a === "jstop")
+    jobStop();
+  else if (a === "jopt")
+    jobOpt(v, b);
   else if (a === "vbuy" || a === "vequip" || a === "vunequip")
     vehicleAction(a, v);
   else if (a === "sbuy")
@@ -2983,6 +3760,8 @@ pbody.addEventListener("click", e => {
   else if (a === "calcback") {
     if (calcFrom === "quiz" && Q)
       showQ(true);
+    else if (calcFrom === "exam" && E)
+      showExamQ(true);
     else
       deptMenu();
   } else if (a === "results")
@@ -3101,8 +3880,10 @@ function loop() {
     if (!blocked(player.position.x, nz))
       player.position.z = nz;
     player.rotation.y = Math.atan2(dx, dz);
-    body.position.y = 1.3 + Math.sin(performance.now() / 90) * 0.08;
+    animChar(player, true, performance.now() / 1000, vehGroup ? 0 : 11);
   }
+  if (mag <= 0.08)
+    animChar(player, false);
   if (P && mag <= 0.08)
     P.energy = Math.min(100, P.energy + 3 * dt * (has("backpack") ? 1.5 : 1));
   npcs.forEach(n => {
@@ -3118,7 +3899,7 @@ function loop() {
     const [a, b, c, d] = n.p;
     n.c.position.set(a + (c - a) * n.t, 0, b + (d - b) * n.t);
     n.c.rotation.y = Math.atan2((c - a) * n.dir, (d - b) * n.dir);
-    n.c.userData.body.position.y = 1.3 + Math.sin(performance.now() / 110 + n.sp * 300) * 0.06;
+    animChar(n.c, true, performance.now() / 1000 + n.sp * 300, 9);
   });
   const d = 11, h = 7;
   const tx = player.position.x + Math.sin(camAng) * d, tz = player.position.z + Math.cos(camAng) * d;
