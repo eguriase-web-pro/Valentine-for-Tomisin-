@@ -504,6 +504,110 @@ canvas {
   background:#ffebee;
 }
 
+#chatsheet {
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  height:52vh;
+  background:#fff;
+  border-radius:18px 18px 0 0;
+  box-shadow:0 -6px 24px rgba(0,0,0,.35);
+  z-index:45;
+  display:flex;
+  flex-direction:column;
+  padding:10px 12px 12px;
+  box-sizing:border-box;
+}
+
+#chatsheet * {
+  touch-action:auto;
+  user-select:auto;
+}
+
+#chead {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-weight:800;
+  color:#e10600;
+  margin-bottom:6px;
+  font-size:16px;
+}
+
+#cclose {
+  background:#e10600;
+  color:#fff;
+  border:0;
+  border-radius:50%;
+  width:30px;
+  height:30px;
+  font-weight:800;
+}
+
+#clist {
+  font-size:12px;
+  color:#555;
+  margin-bottom:6px;
+}
+
+#clog {
+  flex:1;
+  overflow-y:auto;
+  background:#f4f6f8;
+  border-radius:10px;
+  padding:6px 8px;
+  font-size:14px;
+  min-height:0;
+}
+
+.cm {
+  margin:5px 0;
+  word-wrap:break-word;
+}
+
+.cm b {
+  color:#1565c0;
+}
+
+.cm.dm {
+  background:#fff3e0;
+  border-radius:6px;
+  padding:2px 6px;
+}
+
+#cbar {
+  display:flex;
+  gap:6px;
+  margin-top:8px;
+}
+
+#cbar select {
+  max-width:118px;
+  padding:9px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  font-size:14px;
+}
+
+#cbar input {
+  flex:1;
+  padding:10px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  font-size:16px;
+  min-width:0;
+}
+
+#csend {
+  background:#e10600;
+  color:#fff;
+  border:0;
+  border-radius:8px;
+  padding:0 14px;
+  font-weight:700;
+}
+
 </style>
 </head>
 <body>
@@ -546,6 +650,12 @@ canvas {
 <div id="joy"><div id="knob"></div></div>
 <div class="btn" id="run">RUN</div>
 <div class="btn" id="act">ENTER</div>
+<div id="chatsheet" style="display:none">
+  <div id="chead"><span>Campus chat</span><button id="cclose">X</button></div>
+  <div id="clist"></div>
+  <div id="clog"></div>
+  <div id="cbar"><select id="cto"><option value="">Everyone</option></select><input id="cin" maxlength="140" placeholder="Type a message" autocomplete="off"><button id="csend">Send</button></div>
+</div>
 <button id="setbtn">&#9881;</button>
 <button id="chatbtn">&#128172;</button>
 
@@ -1473,20 +1583,20 @@ window.COURSES["GLT"] = {
 // ===== Restaurant menus (n = food, p = price in coins, h = hunger restored) =====
 window.MENUS = {
  "Bush Mama": [
-  {n:"Pounded yam and egusi", p:60, h:45},
-  {n:"Eba and okra soup", p:45, h:40},
-  {n:"Boiled yam and fish stew", p:40, h:35},
-  {n:"Suya", p:25, h:20},
-  {n:"Zobo drink", p:10, h:8},
-  {n:"Bottle of water", p:5, h:3}
+  {n:"Pounded yam and egusi", p:30, h:45},
+  {n:"Eba and okra soup", p:22, h:40},
+  {n:"Boiled yam and fish stew", p:20, h:35},
+  {n:"Suya", p:12, h:20},
+  {n:"Zobo drink", p:5, h:8},
+  {n:"Bottle of water", p:3, h:3}
  ],
  "Tutu Restaurant": [
-  {n:"Jollof rice and chicken", p:55, h:45},
-  {n:"Fried rice and plantain", p:50, h:42},
-  {n:"Amala and ewedu", p:40, h:38},
-  {n:"Indomie and egg", p:25, h:25},
-  {n:"Moi moi", p:15, h:15},
-  {n:"Malt drink", p:12, h:8}
+  {n:"Jollof rice and chicken", p:28, h:45},
+  {n:"Fried rice and plantain", p:25, h:42},
+  {n:"Amala and ewedu", p:20, h:38},
+  {n:"Indomie and egg", p:12, h:25},
+  {n:"Moi moi", p:8, h:15},
+  {n:"Malt drink", p:6, h:8}
  ]
 };
 </script>
@@ -1500,21 +1610,22 @@ const SET = (() => {
   try {
     return Object.assign({
       sfx: true,
-      music: false,
+      music: true,
       pix: 1,
-      invert: false
-    }, JSON.parse(localStorage.getItem("pngpd_settings")));
+      invert: false,
+      track: 0
+    }, JSON.parse(localStorage.getItem("pngpd_settings2")));
   } catch (e) {
     return {
       sfx: true,
-      music: false,
+      music: true,
       pix: 1
     };
   }
 })();
 const saveSet = () => {
   try {
-    localStorage.setItem("pngpd_settings", JSON.stringify(SET));
+    localStorage.setItem("pngpd_settings2", JSON.stringify(SET));
   } catch (e) {
   }
 };
@@ -1528,7 +1639,7 @@ const VEHICLES = [
   {
     id: "bike",
     n: "Bicycle",
-    p: 200,
+    p: 80,
     spd: 1.2,
     col: 6323595,
     type: "bike"
@@ -1536,7 +1647,7 @@ const VEHICLES = [
   {
     id: "okada",
     n: "Okada (motorbike)",
-    p: 600,
+    p: 250,
     spd: 1.5,
     col: 16750592,
     type: "moto"
@@ -1544,26 +1655,50 @@ const VEHICLES = [
   {
     id: "keke",
     n: "Keke (tricycle)",
-    p: 1200,
-    spd: 1.7,
+    p: 500,
+    spd: 1.6,
     col: 16771899,
     type: "keke"
   },
   {
     id: "saloon",
     n: "Used saloon car",
-    p: 2500,
-    spd: 1.9,
+    p: 1000,
+    spd: 1.8,
     col: 2001125,
     type: "car"
   },
   {
     id: "suv",
     n: "Brand new SUV",
-    p: 6000,
-    spd: 2.2,
+    p: 2000,
+    spd: 2,
     col: 2503224,
     type: "car"
+  },
+  {
+    id: "g63",
+    n: "G-Wagon (G63)",
+    p: 4000,
+    spd: 2.2,
+    col: 1118481,
+    type: "g63"
+  },
+  {
+    id: "rolls",
+    n: "Rolls-Royce",
+    p: 6500,
+    spd: 2.4,
+    col: 15527921,
+    type: "limo"
+  },
+  {
+    id: "lambo",
+    n: "Lamborghini",
+    p: 9000,
+    spd: 2.8,
+    col: 16766464,
+    type: "super"
   }
 ];
 const SHOP = [
@@ -1767,15 +1902,27 @@ scene.background = new THREE.Color(8900331);
 scene.fog = new THREE.Fog(8900331, 50, 130);
 const cam = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 220);
 const ren = new THREE.WebGLRenderer({ antialias: false });
+const texCache = {};
+function texFilter(t) {
+  const nearest = SET.pix >= 2;
+  t.magFilter = nearest ? THREE.NearestFilter : THREE.LinearFilter;
+  t.minFilter = nearest ? THREE.NearestFilter : THREE.LinearFilter;
+}
 function applyPix() {
+  SET.pix = Math.max(0, Math.min(3, SET.pix | 0));
   const r = [
+    Math.min(devicePixelRatio, 2),
     Math.min(devicePixelRatio, 1.5),
-    0.5,
-    0.34
+    0.75,
+    0.5
   ][SET.pix];
   ren.setPixelRatio(r);
   ren.setSize(innerWidth, innerHeight);
-  ren.domElement.style.imageRendering = SET.pix ? "pixelated" : "auto";
+  ren.domElement.style.imageRendering = SET.pix >= 2 ? "pixelated" : "auto";
+  Object.keys(texCache).forEach(k => {
+    texFilter(texCache[k]);
+    texCache[k].needsUpdate = true;
+  });
 }
 document.body.appendChild(ren.domElement);
 applyPix();
@@ -1785,19 +1932,27 @@ const sun = new THREE.DirectionalLight(16777215, 0.6);
 sun.position.set(30, 50, 20);
 scene.add(sun);
 const clouds = [];
-for (let i = 0; i < 10; i++) {
+for (let i = 0; i < 12; i++) {
   const cm = new THREE.MeshBasicMaterial({
     color: 16777215,
     transparent: true,
-    opacity: 0.85
+    opacity: 0.95,
+    fog: false
   });
-  const c = new THREE.Mesh(new THREE.BoxGeometry(14 + Math.random() * 10, 2, 6 + Math.random() * 4), cm);
-  c.position.set((Math.random() - 0.5) * 300, 45 + Math.random() * 10, (Math.random() - 0.5) * 300);
-  scene.add(c);
-  clouds.push(c);
+  const grp = new THREE.Group();
+  const n = 4 + Math.floor(Math.random() * 3);
+  for (let k = 0; k < n; k++) {
+    const r = 5 + Math.random() * 5, sp = new THREE.Mesh(new THREE.IcosahedronGeometry(r, 1), cm);
+    sp.position.set((k - n / 2) * 7 + Math.random() * 3, Math.random() * 3, Math.random() * 5);
+    sp.scale.set(1, 0.55, 0.8);
+    grp.add(sp);
+  }
+  grp.position.set((Math.random() - 0.5) * 320, 48 + Math.random() * 14, (Math.random() - 0.5) * 320);
+  grp.userData.cm = cm;
+  scene.add(grp);
+  clouds.push(grp);
 }
 const M = c => new THREE.MeshLambertMaterial({ color: c });
-const texCache = {};
 function rng32(a) {
   return function () {
     a |= 0;
@@ -1811,7 +1966,7 @@ function pixTex(hex, kind, rx, ry) {
   const key = hex + kind + rx + "x" + ry;
   if (texCache[key])
     return texCache[key];
-  const S = 16, cv = document.createElement("canvas");
+  const S = 32, K = 2, cv = document.createElement("canvas");
   cv.width = cv.height = S;
   const g = cv.getContext("2d"), b = new THREE.Color(hex), R = rng32(hex + kind.length * 977);
   const sh = k => "rgb(" + [
@@ -1822,60 +1977,118 @@ function pixTex(hex, kind, rx, ry) {
   g.fillStyle = sh(1);
   g.fillRect(0, 0, S, S);
   const dots = (n, lo, hi) => {
-    for (let i = 0; i < n; i++) {
+    for (let i = 0; i < n * K; i++) {
       g.fillStyle = sh(lo + R() * (hi - lo));
       g.fillRect(Math.floor(R() * S), Math.floor(R() * S), 1, 1);
     }
   };
-  if (kind === "grass")
-    dots(80, 0.78, 1.25);
-  else if (kind === "road")
-    dots(60, 0.8, 1.2);
-  else if (kind === "leaf")
-    dots(70, 0.7, 1.3);
-  else if (kind === "brick") {
-    dots(30, 0.92, 1.08);
+  if (kind === "grass") {
+    dots(120, 0.78, 1.25);
+    for (let i = 0; i < 30; i++) {
+      g.fillStyle = sh(1.3);
+      g.fillRect(Math.floor(R() * S), Math.floor(R() * S), 1, 2);
+    }
+  } else if (kind === "road") {
+    dots(100, 0.8, 1.2);
+  } else if (kind === "leaf") {
+    dots(110, 0.7, 1.3);
+  } else if (kind === "brick") {
+    dots(50, 0.92, 1.08);
     g.fillStyle = sh(0.7);
-    for (let y = 0; y < S; y += 4) {
+    for (let y = 0; y < S; y += 4 * K) {
       g.fillRect(0, y, S, 1);
-      const off = (y >> 2 & 1) * 4;
-      for (let x = off; x < S; x += 8)
-        g.fillRect(x, y, 1, 4);
+      const off = (y / (4 * K) & 1) * 4 * K;
+      for (let x = off; x < S; x += 8 * K)
+        g.fillRect(x, y, 1, 4 * K);
     }
   } else if (kind === "roof") {
-    dots(30, 0.85, 1.1);
+    dots(50, 0.85, 1.1);
     g.fillStyle = sh(0.72);
-    for (let y = 0; y < S; y += 3)
+    for (let y = 0; y < S; y += 3 * K)
       g.fillRect(0, y, S, 1);
   } else if (kind === "plank") {
     g.fillStyle = sh(0.72);
-    for (let x = 0; x < S; x += 4)
+    for (let x = 0; x < S; x += 4 * K)
       g.fillRect(x, 0, 1, S);
-    dots(20, 0.9, 1.1);
+    dots(40, 0.9, 1.1);
   } else if (kind === "window") {
     g.fillStyle = sh(0.55);
-    g.fillRect(0, 0, S, 1);
-    g.fillRect(0, S - 1, S, 1);
-    g.fillRect(0, 0, 1, S);
-    g.fillRect(S - 1, 0, 1, S);
-    g.fillRect(7, 0, 2, S);
-    g.fillRect(0, 7, S, 2);
+    g.fillRect(0, 0, S, 2);
+    g.fillRect(0, S - 2, S, 2);
+    g.fillRect(0, 0, 2, S);
+    g.fillRect(S - 2, 0, 2, S);
+    g.fillRect(S / 2 - 1, 0, 2, S);
+    g.fillRect(0, S / 2 - 1, S, 2);
     g.fillStyle = sh(1.25);
-    g.fillRect(2, 2, 3, 2);
+    g.fillRect(4, 4, 6, 4);
   } else
-    dots(25, 0.9, 1.1);
+    dots(40, 0.9, 1.1);
   const t = new THREE.CanvasTexture(cv);
-  t.magFilter = THREE.NearestFilter;
-  t.minFilter = THREE.NearestFilter;
   t.wrapS = t.wrapT = THREE.RepeatWrapping;
   t.repeat.set(rx, ry);
+  texFilter(t);
   texCache[key] = t;
   return t;
 }
 function mat(c, kind, rx, ry) {
   return kind ? new THREE.MeshLambertMaterial({ map: pixTex(c, kind, rx, ry) }) : M(c);
 }
+const batch = {
+  pos: [],
+  nor: [],
+  col: [],
+  idx: [],
+  n: 0
+};
+const _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _p = new THREE.Vector3(), _s = new THREE.Vector3(), _n3 = new THREE.Matrix3(), _cc = new THREE.Color(), _nv = new THREE.Vector3();
+const G_BOX = new THREE.BoxGeometry(1, 1, 1), G_CYL = new THREE.CylinderGeometry(1, 1, 1, 12), G_CONE = new THREE.CylinderGeometry(0, 1, 1, 12);
+const G_ICO = new THREE.IcosahedronGeometry(1, 1);
+G_ICO.computeVertexNormals();
+const G_SPH = new THREE.SphereGeometry(1, 14, 10);
+function bAdd(geo, color, x, y, z, rx, ry, rz, sx, sy, sz) {
+  _e.set(rx || 0, ry || 0, rz || 0);
+  _q.setFromEuler(_e);
+  _p.set(x, y, z);
+  _s.set(sx, sy, sz);
+  _m4.compose(_p, _q, _s);
+  _n3.getNormalMatrix(_m4);
+  const pa = geo.attributes.position, na = geo.attributes.normal, ia = geo.index, base = batch.n;
+  _cc.set(color);
+  for (let i = 0; i < pa.count; i++) {
+    _p.set(pa.getX(i), pa.getY(i), pa.getZ(i)).applyMatrix4(_m4);
+    batch.pos.push(_p.x, _p.y, _p.z);
+    _nv.set(na.getX(i), na.getY(i), na.getZ(i)).applyMatrix3(_n3).normalize();
+    batch.nor.push(_nv.x, _nv.y, _nv.z);
+    batch.col.push(_cc.r, _cc.g, _cc.b);
+  }
+  if (ia) {
+    for (let i = 0; i < ia.count; i++)
+      batch.idx.push(ia.getX(i) + base);
+  } else {
+    for (let i = 0; i < pa.count; i++)
+      batch.idx.push(i + base);
+  }
+  batch.n += pa.count;
+}
+const bbox = (w, h, d, c, x, y, z, ry) => bAdd(G_BOX, c, x, y, z, 0, ry || 0, 0, w, h, d);
+const bcyl = (r, h, c, x, y, z, rx, rz) => bAdd(G_CYL, c, x, y, z, rx || 0, 0, rz || 0, r, h, r);
+const bcone = (r, h, c, x, y, z) => bAdd(G_CONE, c, x, y, z, 0, 0, 0, r, h, r);
+const bico = (r, c, x, y, z, sx, sy, sz) => bAdd(G_ICO, c, x, y, z, 0, 0, 0, r * (sx || 1), r * (sy || 1), r * (sz || 1));
+function finalizeBatch() {
+  const g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.Float32BufferAttribute(batch.pos, 3));
+  g.setAttribute("normal", new THREE.Float32BufferAttribute(batch.nor, 3));
+  g.setAttribute("color", new THREE.Float32BufferAttribute(batch.col, 3));
+  g.setIndex(batch.idx);
+  const m = new THREE.Mesh(g, new THREE.MeshLambertMaterial({ vertexColors: true }));
+  m.frustumCulled = false;
+  scene.add(m);
+}
 function box(w, h, d, c, x, y, z, kind) {
+  if (!kind) {
+    bbox(w, h, d, c, x, y, z);
+    return null;
+  }
   const small = kind === "window" || kind === "plank";
   const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat(c, kind, small ? 1 : Math.max(1, Math.round(w / 3)), small ? 1 : Math.max(1, Math.round(h / 3))));
   m.position.set(x, y, z);
@@ -2060,37 +2273,307 @@ const places = [
     16771899
   ]
 ];
-const solids = [], spots = [];
-places.forEach(([n, c, x, z, w, d, h, rc]) => {
-  const sx = x === 0 ? 0 : Math.sign(x), frontX = x - sx * (w / 2), frontZ = z + d / 2;
-  box(w, h, d, c, x, h / 2, z, "brick");
-  box(w + 1.2, 1, d + 1.2, rc, x, h + 0.5, z, "roof");
-  if (sx !== 0) {
-    box(0.5, 4.5, 3, 7162945, frontX, 2.25, z, "plank");
-    box(0.4, 1.6, 2, 8508666, frontX, h * 0.65, z - d / 4, "window");
-    box(0.4, 1.6, 2, 8508666, frontX, h * 0.65, z + d / 4, "window");
-    if (h >= 8) {
-      box(0.4, 1.6, 2, 8508666, frontX, h * 0.3, z - d / 4, "window");
-      box(0.4, 1.6, 2, 8508666, frontX, h * 0.3, z + d / 4, "window");
-    }
-    spots.push({
-      n,
-      x: frontX - sx * 3.5,
-      z
-    });
-  } else {
-    box(3, 4.5, 0.5, 7162945, x, 2.25, frontZ, "plank");
-    box(2, 1.6, 0.4, 8508666, x - 6, h * 0.6, frontZ, "window");
-    box(2, 1.6, 0.4, 8508666, x + 6, h * 0.6, frontZ, "window");
-    box(2, 1.6, 0.4, 8508666, x - 6, h * 0.3, frontZ, "window");
-    box(2, 1.6, 0.4, 8508666, x + 6, h * 0.3, frontZ, "window");
-    spots.push({
-      n,
-      x,
-      z: frontZ + 3.5
-    });
+const solids = [], spots = [], doors = [], bldMats = [];
+const FL = {
+  "Admin Block": 3,
+  "PNGPD Department": 3,
+  "PTI Library": 2,
+  "PGP 126 Laboratory": 2,
+  "Classrooms": 2,
+  "Kokori Hostel": 3,
+  "PTDF Hostel": 3,
+  "Noble Hostel": 3,
+  "NDDC Hostel": 3,
+  "Bush Mama": 1,
+  "Tutu Restaurant": 1,
+  "Fellowship Hall": 2,
+  "UBA Bank": 2,
+  "Garage": 1
+};
+const FLH = 3.6;
+function mixCol(hex, to, k) {
+  const a = new THREE.Color(hex), b = new THREE.Color(to);
+  return a.lerp(b, k);
+}
+function facadeTex(base, floors, cols, tag) {
+  const key = "fac" + base + "_" + floors + "_" + cols + tag;
+  if (texCache[key])
+    return {
+      map: texCache[key],
+      glow: texCache[key + "g"]
+    };
+  const cw = 48, fh = 56, W = cols * cw, H = floors * fh, R = rng32(base + cols * 31 + floors);
+  const c = document.createElement("canvas");
+  c.width = W;
+  c.height = H;
+  const g = c.getContext("2d");
+  const m = document.createElement("canvas");
+  m.width = W;
+  m.height = H;
+  const gm = m.getContext("2d");
+  const wall = mixCol(base, 16777215, 0.45).getStyle(), dark = mixCol(base, 0, 0.35).getStyle();
+  g.fillStyle = wall;
+  g.fillRect(0, 0, W, H);
+  gm.fillStyle = "#000";
+  gm.fillRect(0, 0, W, H);
+  for (let i = 0; i < W * H / 60; i++) {
+    g.fillStyle = "rgba(0,0,0," + R() * 0.05 + ")";
+    g.fillRect(R() * W, R() * H, 2, 2);
   }
-  sign(n, x, h + 3, z);
+  for (let r = 0; r < floors; r++) {
+    const y0 = r * fh;
+    g.fillStyle = dark;
+    g.fillRect(0, y0 + fh - 4, W, 4);
+    for (let k = 0; k < cols; k++) {
+      const x0 = k * cw + 7, w = cw - 14, y = y0 + 9, h = fh - 22;
+      const gr = g.createLinearGradient(0, y, 0, y + h);
+      gr.addColorStop(0, "#b9e4fb");
+      gr.addColorStop(0.5, "#5ba7d6");
+      gr.addColorStop(1, "#245f93");
+      g.fillStyle = gr;
+      g.fillRect(x0, y, w, h);
+      g.fillStyle = "rgba(255,255,255,0.28)";
+      g.beginPath();
+      g.moveTo(x0 + 4, y + h);
+      g.lineTo(x0 + w * 0.55, y);
+      g.lineTo(x0 + w * 0.8, y);
+      g.lineTo(x0 + w * 0.3, y + h);
+      g.fill();
+      g.strokeStyle = "#2b3a45";
+      g.lineWidth = 3;
+      g.strokeRect(x0, y, w, h);
+      g.beginPath();
+      g.moveTo(x0 + w / 2, y);
+      g.lineTo(x0 + w / 2, y + h);
+      g.stroke();
+      if (R() < 0.78) {
+        gm.fillStyle = "#fff";
+        gm.fillRect(x0 + 2, y + 2, w - 4, h - 4);
+      }
+    }
+  }
+  const mk = cv => {
+    const t = new THREE.CanvasTexture(cv);
+    texFilter(t);
+    return t;
+  };
+  const a = mk(c), b2 = mk(m);
+  texCache[key] = a;
+  texCache[key + "g"] = b2;
+  return {
+    map: a,
+    glow: b2
+  };
+}
+function stripeTex(c1, c2) {
+  const cv = document.createElement("canvas");
+  cv.width = 64;
+  cv.height = 16;
+  const g = cv.getContext("2d");
+  for (let i = 0; i < 8; i++) {
+    g.fillStyle = i % 2 ? c2 : c1;
+    g.fillRect(i * 8, 0, 8, 16);
+  }
+  const t = new THREE.CanvasTexture(cv);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  texFilter(t);
+  return t;
+}
+function flagTex() {
+  const cv = document.createElement("canvas");
+  cv.width = 90;
+  cv.height = 60;
+  const g = cv.getContext("2d");
+  g.fillStyle = "#008751";
+  g.fillRect(0, 0, 30, 60);
+  g.fillStyle = "#fff";
+  g.fillRect(30, 0, 30, 60);
+  g.fillStyle = "#008751";
+  g.fillRect(60, 0, 30, 60);
+  return new THREE.CanvasTexture(cv);
+}
+const glassMaterial = () => new THREE.MeshLambertMaterial({
+  color: 8374504,
+  transparent: true,
+  opacity: 0.5
+});
+function buildBuilding(n, c, x, z, w, d, rc) {
+  const fl = FL[n] || 2, h = fl * FLH + 0.4;
+  const sx = x === 0 ? 0 : Math.sign(x), axisX = sx !== 0;
+  const nx = axisX ? -sx : 0, nz = axisX ? 0 : 1;
+  const fx = x + nx * (w / 2), fz = z + nz * (d / 2);
+  const tW = facadeTex(c, fl, Math.max(2, Math.round(w / 3.2)), "w"), tD = facadeTex(c, fl, Math.max(2, Math.round(d / 3.2)), "d");
+  const mk = t => {
+    const m = new THREE.MeshLambertMaterial({
+      map: t.map,
+      emissive: 16769696,
+      emissiveMap: t.glow,
+      emissiveIntensity: 0
+    });
+    bldMats.push(m);
+    return m;
+  };
+  const roofMat = new THREE.MeshLambertMaterial({ color: 7901340 }), botMat = new THREE.MeshLambertMaterial({ color: 9479342 });
+  const body = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), [
+    mk(tD),
+    mk(tD),
+    roofMat,
+    botMat,
+    mk(tW),
+    mk(tW)
+  ]);
+  body.position.set(x, h / 2, z);
+  scene.add(body);
+  bbox(w + 0.5, 0.45, d + 0.5, 10395294, x, 0.22, z);
+  bbox(w + 0.7, 0.5, d + 0.7, rc, x, h + 0.25, z);
+  bbox(1.8, 0.9, 1.3, 13621468, x - w * 0.25, h + 0.95, z - d * 0.2);
+  bbox(1.4, 0.8, 1.2, 13621468, x + w * 0.2, h + 0.9, z + d * 0.15);
+  bcyl(0.7, 1.3, 9268835, x + w * 0.3, h + 1.15, z - d * 0.25);
+  const fb = (along, out, y, sa, sh, so, col) => {
+    axisX ? bbox(so, sh, sa, col, fx + nx * out, y, z + along) : bbox(sa, sh, so, col, x + along, y, fz + nz * out);
+  };
+  const fp = (along, out, y) => axisX ? [
+    fx + nx * out,
+    y,
+    z + along
+  ] : [
+    x + along,
+    y,
+    fz + nz * out
+  ];
+  fb(0, 1.1, 3.7, 6, 0.28, 2.6, rc);
+  fb(-2.7, 2.1, 1.85, 0.3, 3.7, 0.3, 15527921);
+  fb(2.7, 2.1, 1.85, 0.3, 3.7, 0.3, 15527921);
+  fb(0, 1, 0.12, 5.4, 0.24, 2, 12434877);
+  fb(0, 1.6, 0.04, 6, 0.1, 3, 10395294);
+  fb(0, 0.07, 3.28, 3.5, 0.3, 0.14, 2503224);
+  fb(-1.75, 0.07, 1.6, 0.12, 3.2, 0.14, 2503224);
+  fb(1.75, 0.07, 1.6, 0.12, 3.2, 0.14, 2503224);
+  const pw = 1.6, mkPanel = al => {
+      const gm = glassMaterial();
+      const geo = axisX ? new THREE.BoxGeometry(0.1, 3, pw) : new THREE.BoxGeometry(pw, 3, 0.1);
+      const m = new THREE.Mesh(geo, gm);
+      const pp = fp(al, 0.12, 1.6);
+      m.position.set(pp[0], pp[1], pp[2]);
+      scene.add(m);
+      return m;
+    };
+  const pa = mkPanel(-pw / 2), pb = mkPanel(pw / 2);
+  const door = {
+    pa,
+    pb,
+    pw,
+    axis: axisX ? "z" : "x",
+    a0: (axisX ? z : x) - pw / 2,
+    b0: (axisX ? z : x) + pw / 2,
+    o: 0,
+    t: 0
+  };
+  doors.push(door);
+  let extra = 0;
+  if (n === "PTI Library") {
+    for (let i = -1.5; i <= 1.5; i++)
+      axisX ? bcyl(0.34, 5, 16119285, fx + nx * 2, 2.5, z + i * 3) : bcyl(0.34, 5, 16119285, x + i * 3, 2.5, fz + nz * 2);
+    fb(0, 2, 5.2, 10.5, 0.5, 1.2, 15527921);
+    bAdd(G_SPH, 1402304, x, h + 0.6, z, 0, 0, 0, 3.4, 3, 3.4);
+    bcyl(3.5, 0.8, 15527921, x, h + 0.8, z);
+    bcyl(0.12, 2.2, 11583173, x, h + 5.2, z);
+    extra = 5.5;
+  } else if (n === "UBA Bank") {
+    for (let i = -1.5; i <= 1.5; i++)
+      axisX ? bcyl(0.3, 4.4, 16448250, fx + nx * 2, 2.2, z + i * 3) : bcyl(0.3, 4.4, 16448250, x + i * 3, 2.2, fz + nz * 2);
+    fb(0, 2, 4.6, 10.5, 0.5, 1.2, 13840175);
+    fb(0, 0.05, h - 1.4, w > d ? d : w, 0.9, 0.3, 13840175);
+    fb(-5.2, 0.6, 1.3, 1.2, 2.4, 1, 4545124);
+  } else if (n === "Bush Mama" || n === "Tutu Restaurant") {
+    const aw = new THREE.Mesh(new THREE.BoxGeometry(axisX ? 2.4 : 7, 0.18, axisX ? 7 : 2.4), new THREE.MeshLambertMaterial({ map: stripeTex(n === "Bush Mama" ? "#e91e63" : "#00acc1", "#ffffff") }));
+    const ap = fp(0, 1.6, 3);
+    aw.position.set(ap[0], ap[1], ap[2]);
+    scene.add(aw);
+    for (let t = 0; t < 2; t++) {
+      const tp = fp(-3 + t * 6, 5.2, 0);
+      bcyl(0.8, 0.1, 15723497, tp[0], 1.05, tp[2]);
+      bcyl(0.1, 1, 6111287, tp[0], 0.5, tp[2]);
+      [
+        [
+          0.9,
+          0
+        ],
+        [
+          -0.9,
+          0
+        ],
+        [
+          0,
+          0.9
+        ],
+        [
+          0,
+          -0.9
+        ]
+      ].forEach(o => bcyl(0.26, 0.5, 9268835, tp[0] + o[0], 0.25, tp[2] + o[1]));
+    }
+  } else if (n.indexOf("Hostel") >= 0) {
+    for (let f = 1; f < fl; f++) {
+      fb(0, 0.8, f * FLH, w * 0.7, 0.18, 1.6, 13621468);
+      fb(0, 1.55, f * FLH + 0.55, w * 0.7, 0.9, 0.06, 5533306);
+    }
+  } else if (n === "Fellowship Hall") {
+    const sh = new THREE.Shape();
+    sh.moveTo(-d / 2 - 0.3, 0);
+    sh.lineTo(d / 2 + 0.3, 0);
+    sh.lineTo(0, 3);
+    sh.lineTo(-d / 2 - 0.3, 0);
+    const gm = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, {
+      depth: w + 0.6,
+      bevelEnabled: false
+    }), new THREE.MeshLambertMaterial({ color: 9329226 }));
+    gm.rotation.y = Math.PI / 2;
+    gm.position.set(x - (w + 0.6) / 2, h + 0.5, z);
+    scene.add(gm);
+    bbox(2.2, 5, 2.2, 15527921, x + (axisX ? 0 : w / 2 - 1.6), h + 2.4, z + (axisX ? d / 2 - 1.6 : 0));
+    bcone(1.9, 2.6, 6111287, x + (axisX ? 0 : w / 2 - 1.6), h + 6.2, z + (axisX ? d / 2 - 1.6 : 0));
+    extra = 7;
+  } else if (n === "Admin Block") {
+    bbox(w * 0.45, FLH, d * 0.65, c, x, h + FLH / 2 + 0.5, z - 1);
+    bbox(w * 0.45 + 0.5, 0.4, d * 0.65 + 0.5, rc, x, h + FLH + 0.7, z - 1);
+    bcyl(0.09, 7, 11583173, x + w * 0.3, h + 4, z);
+    const fg = new THREE.Mesh(new THREE.PlaneGeometry(3, 2), new THREE.MeshBasicMaterial({
+      map: flagTex(),
+      side: THREE.DoubleSide
+    }));
+    fg.position.set(x + w * 0.3 + 1.6, h + 6.2, z);
+    scene.add(fg);
+    extra = FLH + 3;
+  } else if (n === "PGP 126 Laboratory") {
+    bcyl(0.55, 3.2, 11583173, x - w * 0.35, h + 2, z + d * 0.2);
+    for (let i = 0; i < 3; i++)
+      bcyl(0.35, 0.9, 9479342, x - w * 0.1 + i * 1.6, h + 0.9, z + d * 0.1);
+  } else if (n === "PNGPD Department" || n === "Classrooms") {
+    for (let i = -2; i <= 2; i++)
+      fb(i * (axisX ? d : w) / 5.2, 0.35, h / 2, 0.28, h, 0.7, rc);
+  } else if (n === "Garage") {
+    fb(-4.6, 0.08, 1.6, 3.6, 3, 0.12, 5533306);
+    fb(4.6, 0.08, 1.6, 3.6, 3, 0.12, 5533306);
+    for (let i = -1; i <= 1; i += 2)
+      for (let k = 0; k < 5; k++)
+        fb(i * 4.6, 0.16, 0.5 + k * 0.6, 3.4, 0.07, 0.06, 3622735);
+  }
+  sign(n, x, h + 3.2 + extra, z);
+  return {
+    x: axisX ? fx + nx * 3.6 : x,
+    z: axisX ? z : fz + nz * 3.6,
+    door
+  };
+}
+places.forEach(([n, c, x, z, w, d, h, rc]) => {
+  const sp = buildBuilding(n, c, x, z, w, d, rc);
+  spots.push({
+    n,
+    x: sp.x,
+    z: sp.z,
+    door: sp.door
+  });
   solids.push({
     x,
     z,
@@ -2098,6 +2581,15 @@ places.forEach(([n, c, x, z, w, d, h, rc]) => {
     hd: d / 2 + 0.6
   });
 });
+function updateDoors(dt) {
+  const k = Math.min(1, dt * 6);
+  doors.forEach(d => {
+    d.o += (d.t - d.o) * k;
+    const off = d.o * d.pw * 0.95;
+    d.pa.position[d.axis] = d.a0 - off;
+    d.pb.position[d.axis] = d.b0 + off;
+  });
+}
 flat(34, 22, 6732650, 66, 0.03, -22, "grass");
 flat(30, 0.3, 16777215, 66, 0.05, -22);
 flat(0.3, 18, 16777215, 66, 0.05, -22);
@@ -2156,41 +2648,237 @@ for (let z = -80; z <= 66; z += 18)
     box(0.9, 0.5, 0.9, 16774557, sx * 6, 5.2, z);
   }
 const rnd = (a, b) => a + Math.random() * (b - a);
-for (let i = 0; i < 55; i++) {
+function rr(g, x, y, w, h, r) {
+  g.beginPath();
+  g.moveTo(x + r, y);
+  g.arcTo(x + w, y, x + w, y + h, r);
+  g.arcTo(x + w, y + h, x, y + h, r);
+  g.arcTo(x, y + h, x, y, r);
+  g.arcTo(x, y, x + w, y, r);
+  g.closePath();
+}
+function billboardTex() {
+  const c = document.createElement("canvas");
+  c.width = 1024;
+  c.height = 512;
+  const g = c.getContext("2d");
+  const gr = g.createLinearGradient(0, 0, 1024, 512);
+  gr.addColorStop(0, "#071a45");
+  gr.addColorStop(1, "#1e56c8");
+  g.fillStyle = gr;
+  g.fillRect(0, 0, 1024, 512);
+  g.fillStyle = "rgba(255,213,79,0.18)";
+  g.beginPath();
+  g.moveTo(560, 0);
+  g.lineTo(700, 0);
+  g.lineTo(380, 512);
+  g.lineTo(240, 512);
+  g.fill();
+  g.fillStyle = "rgba(255,213,79,0.32)";
+  g.beginPath();
+  g.moveTo(720, 0);
+  g.lineTo(760, 0);
+  g.lineTo(440, 512);
+  g.lineTo(400, 512);
+  g.fill();
+  g.strokeStyle = "#ffd54f";
+  g.lineWidth = 10;
+  g.strokeRect(14, 14, 996, 484);
+  g.textAlign = "left";
+  g.textBaseline = "alphabetic";
+  g.fillStyle = "#ffd54f";
+  g.font = "bold 120px sans-serif";
+  g.fillText("VOTE", 56, 150);
+  g.fillStyle = "#ffffff";
+  g.font = "bold 190px sans-serif";
+  g.shadowColor = "rgba(0,0,0,0.5)";
+  g.shadowBlur = 14;
+  g.shadowOffsetY = 6;
+  g.fillText("PATRICK", 50, 330);
+  g.shadowBlur = 0;
+  g.shadowOffsetY = 0;
+  g.fillStyle = "#e3f2fd";
+  g.font = "bold 62px sans-serif";
+  g.fillText("FOR VICE PRESIDENT", 56, 405);
+  g.fillStyle = "#ffd54f";
+  rr(g, 56, 426, 220, 62, 14);
+  g.fill();
+  g.fillStyle = "#071a45";
+  g.font = "bold 46px sans-serif";
+  g.textAlign = "center";
+  g.fillText("NSChE", 166, 473);
+  g.fillStyle = "#c5d9ff";
+  g.font = "27px sans-serif";
+  g.textAlign = "left";
+  g.fillText("Your vote counts", 300, 467);
+  g.fillStyle = "#ffffff";
+  rr(g, 826, 30, 150, 150, 22);
+  g.fill();
+  g.strokeStyle = "#071a45";
+  g.lineWidth = 10;
+  g.strokeRect(846, 50, 110, 110);
+  g.strokeStyle = "#2e7d32";
+  g.lineWidth = 20;
+  g.lineCap = "round";
+  g.lineJoin = "round";
+  g.beginPath();
+  g.moveTo(858, 108);
+  g.lineTo(890, 140);
+  g.lineTo(946, 66);
+  g.stroke();
+  const t = new THREE.CanvasTexture(c);
+  t.minFilter = THREE.LinearFilter;
+  t.magFilter = THREE.LinearFilter;
+  return t;
+}
+const BILLBOARDS = [
+  [
+    -11,
+    52,
+    Math.PI / 2
+  ],
+  [
+    11,
+    38,
+    -Math.PI / 2
+  ],
+  [
+    -11,
+    4,
+    Math.PI / 2
+  ],
+  [
+    11,
+    -12,
+    -Math.PI / 2
+  ],
+  [
+    -11,
+    -52,
+    Math.PI / 2
+  ],
+  [
+    11,
+    -50,
+    -Math.PI / 2
+  ],
+  [
+    -17,
+    59,
+    0
+  ]
+];
+(function () {
+  const tex = billboardTex(), face = new THREE.MeshBasicMaterial({ map: tex });
+  BILLBOARDS.forEach(([bx, bz, ry]) => {
+    const cs = Math.cos(ry), sn = Math.sin(ry), W = (lx, lz) => [
+        bx + lx * cs + lz * sn,
+        bz - lx * sn + lz * cs
+      ];
+    bbox(10.6, 5.6, 0.35, 2503224, bx, 6.4, bz, ry);
+    [
+      -3.6,
+      3.6
+    ].forEach(lx => {
+      const q = W(lx, 0);
+      bbox(0.4, 4, 0.4, 3622735, q[0], 2, q[1], ry);
+    });
+    [
+      -3.5,
+      0,
+      3.5
+    ].forEach(lx => {
+      const q = W(lx, 0.6);
+      bbox(0.35, 0.3, 0.9, 16775620, q[0], 9.5, q[1], ry);
+      const a = W(lx, 0.2);
+      bbox(0.1, 0.1, 0.8, 6323595, a[0], 9.3, a[1], ry);
+    });
+    const f = new THREE.Mesh(new THREE.PlaneGeometry(10, 5), face);
+    const q = W(0, 0.2);
+    f.position.set(q[0], 6.4, q[1]);
+    f.rotation.y = ry;
+    scene.add(f);
+    const horiz = Math.abs(Math.sin(ry)) > 0.5;
+    solids.push(horiz ? {
+      x: bx,
+      z: bz,
+      hw: 0.8,
+      hd: 5.4
+    } : {
+      x: bx,
+      z: bz,
+      hw: 5.4,
+      hd: 0.8
+    });
+  });
+}());
+const nearBoard = (x, z) => BILLBOARDS.some(b => Math.hypot(x - b[0], z - b[1]) < 9);
+for (let i = 0; i < 64; i++) {
   const x = rnd(-120, 120), z = rnd(-100, 95);
-  if (Math.abs(x) < 8 || Math.abs(z + 22) < 7 || Math.abs(z - 14) < 7)
+  if (Math.abs(x) < 8 || Math.abs(z + 22) < 7 || Math.abs(z - 14) < 7 || nearBoard(x, z))
     continue;
-  if (places.some(p => Math.abs(x - p[2]) < p[4] / 2 + 5 && Math.abs(z - p[3]) < p[5] / 2 + 5))
+  if (places.some(p => Math.abs(x - p[2]) < p[4] / 2 + 6 && Math.abs(z - p[3]) < p[5] / 2 + 6))
     continue;
   if (Math.abs(x - 66) < 22 && Math.abs(z + 22) < 16)
     continue;
-  const lc = [
-    3046706,
-    6732650,
-    4431943
-  ][i % 3];
-  box(0.9, 3, 0.9, 7162945, x, 1.5, z, "plank");
-  box(3.4, 1.3, 3.4, lc, x, 3.4, z, "leaf");
-  box(2.5, 1.3, 2.5, lc, x, 4.6, z, "leaf");
-  box(1.4, 1.2, 1.4, lc, x, 5.7, z, "leaf");
+  const kind = i % 4;
+  if (kind === 3) {
+    const lean = (Math.random() - 0.5) * 0.35;
+    for (let k = 0; k < 5; k++)
+      bcyl(0.32 - k * 0.03, 1.4, 9268835, x + lean * k * 0.9, 0.7 + k * 1.35, z, 0, -lean * 0.35);
+    const tx = x + lean * 4.5, ty = 7.2;
+    for (let f = 0; f < 8; f++) {
+      const a = f / 8 * Math.PI * 2;
+      bAdd(G_BOX, 3046706, tx + Math.cos(a) * 1.2, ty - 0.3, z + Math.sin(a) * 1.2, 0, -a, -0.5, 2.8, 0.08, 0.55);
+    }
+    bico(0.3, 7162945, tx, ty - 0.6, z + 0.3, 1, 1, 1);
+    bico(0.3, 7162945, tx + 0.35, ty - 0.7, z - 0.2, 1, 1, 1);
+  } else {
+    const lc = [
+      3046706,
+      3706428,
+      5606191,
+      4431943
+    ][(i >> 2) % 4];
+    bcyl(0.28, 3.4, 7162945, x, 1.7, z, 0, 0);
+    bcyl(0.45, 0.6, 6111287, x, 0.3, z, 0, 0);
+    bico(2.1, lc, x, 4.4, z, 1, 0.85, 1);
+    bico(1.6, mixCol(lc, 16777215, 0.12), x + 0.9, 5.2, z + 0.4, 1, 0.85, 1);
+    bico(1.5, mixCol(lc, 0, 0.1), x - 0.8, 5.1, z - 0.5, 1, 0.85, 1);
+    bico(1.2, lc, x, 6, z, 1, 0.9, 1);
+  }
   solids.push({
     x,
     z,
-    hw: 1.2,
-    hd: 1.2
+    hw: 1,
+    hd: 1
   });
 }
-for (let i = 0; i < 35; i++) {
+for (let i = 0; i < 36; i++) {
   const x = rnd(-120, 120), z = rnd(-100, 95);
-  if (Math.abs(x) < 8)
+  if (Math.abs(x) < 7 || nearBoard(x, z))
     continue;
-  box(0.5, 0.5, 0.5, [
+  if (places.some(p => Math.abs(x - p[2]) < p[4] / 2 + 2 && Math.abs(z - p[3]) < p[5] / 2 + 2))
+    continue;
+  bico(0.7, [
+    3046706,
+    5606191
+  ][i % 2], x, 0.45, z, 1.2, 0.8, 1.2);
+}
+for (let i = 0; i < 45; i++) {
+  const x = rnd(-120, 120), z = rnd(-100, 95);
+  if (Math.abs(x) < 7)
+    continue;
+  const col = [
     14747136,
     16771899,
     16728193,
     16777215
-  ][i % 4], x, 0.25, z);
+  ][i % 4];
+  bcyl(0.04, 0.4, 3046706, x, 0.2, z);
+  bico(0.16, col, x, 0.45, z, 1, 0.7, 1);
 }
+finalizeBatch();
 const HAIRS = [
   1118481,
   2824978,
@@ -2198,74 +2886,152 @@ const HAIRS = [
   0,
   6111287
 ];
+
+// ===== CHARACTERS: rounded bodies with faces, hair, hands, shoes and ground shadows =====
+const GEO = {
+  head: new THREE.SphereGeometry(0.42, 20, 16),
+  hairCap: new THREE.SphereGeometry(0.44, 20, 14, 0, Math.PI * 2, 0, Math.PI * 0.52),
+  hairBack: new THREE.BoxGeometry(0.84, 0.56, 0.22),
+  fringe: new THREE.BoxGeometry(0.66, 0.12, 0.06),
+  eye: new THREE.SphereGeometry(0.072, 10, 8),
+  pupil: new THREE.SphereGeometry(0.038, 8, 6),
+  brow: new THREE.BoxGeometry(0.17, 0.034, 0.05),
+  nose: new THREE.BoxGeometry(0.1, 0.15, 0.1),
+  mouth: new THREE.BoxGeometry(0.2, 0.04, 0.04),
+  ear: new THREE.SphereGeometry(0.095, 8, 6),
+  neck: new THREE.CylinderGeometry(0.15, 0.17, 0.26, 12),
+  torso: new THREE.SphereGeometry(0.5, 22, 16),
+  sleeve: new THREE.CylinderGeometry(0.15, 0.13, 0.56, 12),
+  shoulder: new THREE.SphereGeometry(0.19, 12, 10),
+  forearm: new THREE.CylinderGeometry(0.125, 0.1, 0.6, 12),
+  hand: new THREE.SphereGeometry(0.13, 10, 8),
+  thigh: new THREE.CylinderGeometry(0.2, 0.16, 0.95, 14),
+  shoe: new THREE.SphereGeometry(0.2, 12, 8),
+  belt: new THREE.BoxGeometry(1, 0.1, 0.62),
+  shadow: new THREE.CircleGeometry(0.55, 18)
+};
+const CMAT = {
+  eye: new THREE.MeshLambertMaterial({ color: 16777215 }),
+  pupil: new THREE.MeshLambertMaterial({ color: 1118481 }),
+  shoe: new THREE.MeshLambertMaterial({ color: 2171169 }),
+  mouth: new THREE.MeshLambertMaterial({ color: 8077102 }),
+  belt: new THREE.MeshLambertMaterial({ color: 4073251 }),
+  shadow: new THREE.MeshBasicMaterial({
+    color: 0,
+    transparent: true,
+    opacity: 0.22,
+    depthWrite: false
+  })
+};
 function makeChar(shirt, skin, pants, hair) {
   const g = new THREE.Group(), rig = new THREE.Group();
   g.add(rig);
-  const part = (w, h, d, c, x, y, z, parent) => {
-    const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), M(c));
+  const skinM = new THREE.MeshLambertMaterial({ color: skin }), hairM = new THREE.MeshLambertMaterial({ color: hair });
+  const shirtM = new THREE.MeshLambertMaterial({ color: shirt }), pantsM = new THREE.MeshLambertMaterial({ color: pants });
+  const add = (geo, mat, x, y, z, parent) => {
+    const m = new THREE.Mesh(geo, mat);
     m.position.set(x, y, z);
     (parent || rig).add(m);
     return m;
   };
-  const torso = part(1, 1.3, 0.55, shirt, 0, 1.55, 0);
-  part(1.04, 0.22, 0.58, 3622735, 0, 0.95, 0);
-  const head = part(0.8, 0.8, 0.8, skin, 0, 2.55, 0);
-  const hairM = [
-    part(0.86, 0.28, 0.86, hair, 0, 2.98, 0),
-    part(0.86, 0.7, 0.2, hair, 0, 2.65, -0.33)
+  const sh = new THREE.Mesh(GEO.shadow, CMAT.shadow);
+  sh.rotation.x = -Math.PI / 2;
+  sh.position.y = 0.02;
+  g.add(sh);
+  const torso = add(GEO.torso, shirtM, 0, 1.55, 0);
+  torso.scale.set(1, 1.3, 0.66);
+  add(GEO.belt, CMAT.belt, 0, 0.98, 0);
+  const neck = add(GEO.neck, skinM, 0, 2.2, 0);
+  const head = add(GEO.head, skinM, 0, 2.55, 0);
+  const hc = add(GEO.hairCap, hairM, 0, 0.02, 0, head);
+  const hb = add(GEO.hairBack, hairM, 0, -0.12, -0.3, head);
+  const fr = add(GEO.fringe, hairM, 0, 0.31, 0.37, head);
+  const ears = [
+    add(GEO.ear, skinM, -0.41, 0, 0, head),
+    add(GEO.ear, skinM, 0.41, 0, 0, head)
   ];
-  part(0.14, 0.14, 0.05, 1118481, -0.2, 2.6, 0.41);
-  part(0.14, 0.14, 0.05, 1118481, 0.2, 2.6, 0.41);
-  part(0.26, 0.06, 0.05, 8077102, 0, 2.38, 0.41);
+  const brows = [];
+  [
+    -0.15,
+    0.15
+  ].forEach(x => {
+    add(GEO.eye, CMAT.eye, x, 0.06, 0.36, head);
+    add(GEO.pupil, CMAT.pupil, x, 0.06, 0.42, head);
+    brows.push(add(GEO.brow, hairM, x, 0.18, 0.36, head));
+  });
+  const nose = add(GEO.nose, skinM, 0, -0.04, 0.42, head);
+  add(GEO.mouth, CMAT.mouth, 0, -0.18, 0.39, head);
   const arm = side => {
     const pv = new THREE.Group();
-    pv.position.set(side * 0.68, 2.15, 0);
+    pv.position.set(side * 0.55, 2, 0);
     rig.add(pv);
-    const sl = part(0.34, 0.45, 0.34, shirt, 0, -0.22, 0, pv), fa = part(0.28, 0.6, 0.28, skin, 0, -0.72, 0, pv);
+    const shd = add(GEO.shoulder, shirtM, 0, 0, 0, pv);
+    const sl = add(GEO.sleeve, shirtM, 0, -0.28, 0, pv);
+    const fa = add(GEO.forearm, skinM, 0, -0.86, 0, pv);
+    const hd = add(GEO.hand, skinM, 0, -1.22, 0, pv);
     return {
-      pv,
-      sl,
-      fa
+      pv: pv,
+      sl: sl,
+      shd: shd,
+      fa: fa,
+      hd: hd
     };
   };
   const leg = side => {
     const pv = new THREE.Group();
     pv.position.set(side * 0.26, 0.95, 0);
     rig.add(pv);
-    pv.userData.pm = part(0.42, 0.95, 0.42, pants, 0, -0.475, 0, pv);
-    part(0.44, 0.2, 0.58, 2171169, 0, -0.88, 0.07, pv);
-    return pv;
+    const th = add(GEO.thigh, pantsM, 0, -0.475, 0, pv);
+    add(GEO.shoe, CMAT.shoe, 0, -0.84, 0.08, pv).scale.set(0.95, 0.6, 1.7);
+    return {
+      pv: pv,
+      th: th
+    };
   };
   const aL = arm(-1), aR = arm(1), lL = leg(-1), lR = leg(1);
   g.userData = {
     body: torso,
-    head,
-    rig,
+    head: head,
+    rig: rig,
     armL: aL.pv,
     armR: aR.pv,
-    legL: lL,
-    legR: lR,
+    legL: lL.pv,
+    legR: lR.pv,
     shirtMeshes: [
       torso,
       aL.sl,
-      aR.sl
+      aR.sl,
+      aL.shd,
+      aR.shd
     ],
     skinMeshes: [
       head,
+      neck,
+      nose,
+      ears[0],
+      ears[1],
       aL.fa,
-      aR.fa
+      aR.fa,
+      aL.hd,
+      aR.hd
     ],
-    hairMeshes: hairM,
+    hairMeshes: [
+      hc,
+      hb,
+      fr,
+      brows[0],
+      brows[1]
+    ],
     pantsMeshes: [
-      lL.userData.pm,
-      lR.userData.pm
+      lL.th,
+      lR.th
     ],
     parts: [
       torso,
       aL.pv,
       aR.pv,
-      lL,
-      lR
+      lL.pv,
+      lR.pv
     ]
   };
   scene.add(g);
@@ -2388,7 +3154,7 @@ function applyLook() {
   u.hairMeshes.forEach(m => m.material.color.setHex(L.hair));
   u.pantsMeshes.forEach(m => m.material.color.setHex(L.pants));
   ACCS.forEach(a => {
-    u.acc[a.id].visible = L.on.includes(a.id);
+    u.acc[a.id].visible = L.on.includes(a.id) && !vehGroup;
   });
 }
 let vehGroup = null;
@@ -2397,12 +3163,19 @@ function setVehicle(id) {
     player.remove(vehGroup);
     vehGroup = null;
   }
-  const v = VEHICLES.find(x => x.id === id);
-  player.userData.parts.forEach(q => {
+  const v = VEHICLES.find(x => x.id === id), U = player.userData;
+  U.parts.forEach(q => {
     q.visible = true;
   });
-  if (!v)
+  U.head.visible = true;
+  Object.values(U.acc || {}).forEach(a => {
+    a.visible = false;
+  });
+  if (!v) {
+    if (P && P.stats && P.stats.look)
+      applyLook();
     return;
+  }
   const g = new THREE.Group();
   const add = (w, h, d, c, x, y, z) => {
     const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), M(c));
@@ -2410,10 +3183,16 @@ function setVehicle(id) {
     g.add(m);
   };
   const wheel = (r, w, x, y, z) => {
-    const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, w, 10), M(2171169));
+    const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, w, 12), M(2171169));
     m.rotation.z = Math.PI / 2;
     m.position.set(x, y, z);
     g.add(m);
+  };
+  const hide = () => {
+    U.parts.forEach(q => {
+      q.visible = false;
+    });
+    U.head.visible = false;
   };
   if (v.type === "bike") {
     wheel(0.45, 0.15, 0, 0.45, 0.9);
@@ -2431,9 +3210,62 @@ function setVehicle(id) {
     wheel(0.4, 0.2, 0, 0.4, 1.1);
     add(1.5, 0.9, 2.4, v.col, 0, 0.95, 0);
     add(1.5, 0.12, 2, 2236962, 0, 2.05, -0.1);
-    player.userData.parts.forEach(q => {
-      q.visible = false;
-    });
+    hide();
+  } else if (v.type === "g63") {
+    wheel(0.45, 0.3, -1, 0.45, 1.1);
+    wheel(0.45, 0.3, 1, 0.45, 1.1);
+    wheel(0.45, 0.3, -1, 0.45, -1.1);
+    wheel(0.45, 0.3, 1, 0.45, -1.1);
+    add(2.2, 1, 4, v.col, 0, 1.05, 0);
+    add(2, 0.8, 2.5, 9489145, 0, 1.85, -0.1);
+    add(2, 0.08, 2.6, 2236962, 0, 2.3, -0.1);
+    add(0.3, 0.3, 0.3, 16771899, 1.2, 1.4, 2);
+    hide();
+  } else if (v.type === "limo") {
+    [
+      [
+        -1.05,
+        2
+      ],
+      [
+        1.05,
+        2
+      ],
+      [
+        -1.05,
+        -1.9
+      ],
+      [
+        1.05,
+        -1.9
+      ]
+    ].forEach(p => wheel(0.42, 0.3, p[0], 0.42, p[1]));
+    add(2.1, 0.9, 5.2, v.col, 0, 0.9, 0);
+    add(1.95, 0.7, 2.8, 9489145, 0, 1.75, 0.2);
+    add(0.1, 0.1, 0.1, 16766464, 0, 1.2, 2.6);
+    hide();
+  } else if (v.type === "super") {
+    [
+      [
+        -1,
+        1.35
+      ],
+      [
+        1,
+        1.35
+      ],
+      [
+        -1.1,
+        -1.35
+      ],
+      [
+        1.1,
+        -1.35
+      ]
+    ].forEach(p => wheel(0.4, 0.36, p[0], 0.4, p[1]));
+    add(2.3, 0.6, 4.2, v.col, 0, 0.55, 0);
+    add(1.7, 0.45, 1.7, 3622735, 0, 1.05, -0.25);
+    hide();
   } else {
     wheel(0.42, 0.3, -0.95, 0.42, 1);
     wheel(0.42, 0.3, 0.95, 0.42, 1);
@@ -2441,9 +3273,7 @@ function setVehicle(id) {
     wheel(0.42, 0.3, 0.95, 0.42, -1);
     add(2, 0.8, 3.6, v.col, 0, 0.85, 0);
     add(1.7, 0.7, 1.8, 9489145, 0, 1.6, -0.2);
-    player.userData.parts.forEach(q => {
-      q.visible = false;
-    });
+    hide();
   }
   player.add(g);
   vehGroup = g;
@@ -2585,10 +3415,12 @@ addEventListener("mouseup", () => {
 });
 const keys = {};
 addEventListener("keydown", e => {
-  keys[e.key.toLowerCase()] = 1;
+  if (!typing(e))
+    keys[e.key.toLowerCase()] = 1;
 });
 addEventListener("keyup", e => {
-  keys[e.key.toLowerCase()] = 0;
+  if (!typing(e))
+    keys[e.key.toLowerCase()] = 0;
 });
 const runBtn = $("run");
 runBtn.addEventListener("touchstart", e => {
@@ -2678,6 +3510,7 @@ function closePanel() {
   clearInterval(jobTimer);
   E = null;
   J = null;
+  CONV = null;
   if (P)
     saveProfile(P);
 }
@@ -2903,7 +3736,7 @@ const MEMOS = [
   },
   {
     t: "Live campus",
-    b: "When you are logged in, other online players appear on campus and on the minimap with name tags. Use the chat button for quick messages."
+    b: "When you are logged in, other online players appear on campus and on the minimap with name tags. Use the chat button to text everyone, or privately message one player. Walk up to strangers for 10-question chats."
   },
   {
     t: "Looks, football and achievements",
@@ -3296,27 +4129,457 @@ function bankDo(v) {
 }
 function talkNpc(n) {
   const line = NPC_LINES[Math.floor(Math.random() * NPC_LINES.length)];
-  openPanel(n.name, "<p><b>" + esc(n.name) + ":</b> \"" + esc(line) + "\"</p><button class=\"pbtn solid\" data-a=\"npcq\">Take a quick question (earn coins)</button><button class=\"pbtn\" data-a=\"npcbye\">Goodbye</button>");
+  openPanel(n.name, "<p><b>" + esc(n.name) + ":</b> \"" + esc(line) + "\"</p>" + "<button class=\"pbtn solid\" data-a=\"npcq\" data-v=\"" + esc(n.name) + "\">Chat: 10 questions and facts</button>" + "<button class=\"pbtn\" data-a=\"npcbye\">Goodbye</button>");
 }
-function npcQuestion() {
+
+// ===== STRANGERS: 10-item conversations =====
+const FACTS = [
+  "Crude oil is measured in barrels. One barrel is about 159 litres.",
+  "Pure water boils at 100 degrees Celsius at sea level.",
+  "Natural gas is mostly methane, the simplest hydrocarbon.",
+  "Sound travels faster in water than in air.",
+  "Nigeria has 36 states and a Federal Capital Territory, Abuja.",
+  "Asaba is the capital of Delta State.",
+  "Hydrocarbons are compounds made of hydrogen and carbon.",
+  "Fractional distillation separates crude oil into fractions by boiling point.",
+  "Light travels at about 300,000 kilometres per second in a vacuum.",
+  "The human body is roughly 60 per cent water.",
+  "Bananas contain a little potassium-40, which makes them very slightly radioactive.",
+  "The Eiffel Tower can grow up to 15 centimetres taller in summer as its iron expands.",
+  "The first computer bug was a real moth, found stuck in a relay in 1947.",
+  "Energy cannot be created or destroyed, only changed from one form to another.",
+  "Water is a polar molecule, which is why it dissolves so many substances.",
+  "Stainless steel resists rust because of the chromium in it."
+];
+const GQ = [
+  {
+    q: "At sea level, what temperature does pure water boil at?",
+    o: [
+      "90 degrees C",
+      "100 degrees C",
+      "110 degrees C",
+      "120 degrees C"
+    ],
+    a: 1
+  },
+  {
+    q: "How many states does Nigeria have, excluding the Federal Capital Territory?",
+    o: [
+      "30",
+      "33",
+      "36",
+      "40"
+    ],
+    a: 2
+  },
+  {
+    q: "What is the capital of Delta State?",
+    o: [
+      "Warri",
+      "Asaba",
+      "Sapele",
+      "Ughelli"
+    ],
+    a: 1
+  },
+  {
+    q: "What is the SI unit of pressure?",
+    o: [
+      "Newton",
+      "Pascal",
+      "Joule",
+      "Watt"
+    ],
+    a: 1
+  },
+  {
+    q: "How many US gallons are in one barrel of oil?",
+    o: [
+      "21",
+      "32",
+      "42",
+      "55"
+    ],
+    a: 2
+  },
+  {
+    q: "Which gas is the main component of natural gas?",
+    o: [
+      "Ethane",
+      "Methane",
+      "Propane",
+      "Oxygen"
+    ],
+    a: 1
+  },
+  {
+    q: "What does LPG stand for?",
+    o: [
+      "Liquid Propane Gas",
+      "Liquefied Petroleum Gas",
+      "Low Pressure Gas",
+      "Light Petroleum Grade"
+    ],
+    a: 1
+  },
+  {
+    q: "Which metal is liquid at room temperature?",
+    o: [
+      "Iron",
+      "Mercury",
+      "Aluminium",
+      "Copper"
+    ],
+    a: 1
+  },
+  {
+    q: "What is the chemical symbol for sodium?",
+    o: [
+      "So",
+      "Sd",
+      "Na",
+      "Sn"
+    ],
+    a: 2
+  },
+  {
+    q: "Which planet is known as the Red Planet?",
+    o: [
+      "Venus",
+      "Mars",
+      "Jupiter",
+      "Saturn"
+    ],
+    a: 1
+  },
+  {
+    q: "What is 15 per cent of 200?",
+    o: [
+      "20",
+      "25",
+      "30",
+      "35"
+    ],
+    a: 2
+  },
+  {
+    q: "How many sides does a hexagon have?",
+    o: [
+      "5",
+      "6",
+      "7",
+      "8"
+    ],
+    a: 1
+  },
+  {
+    q: "Which unit measures electrical resistance?",
+    o: [
+      "Volt",
+      "Ampere",
+      "Ohm",
+      "Watt"
+    ],
+    a: 2
+  },
+  {
+    q: "What is the freezing point of water at sea level, in degrees Celsius?",
+    o: [
+      "-10",
+      "0",
+      "4",
+      "10"
+    ],
+    a: 1
+  },
+  {
+    q: "What is the specific gravity of pure water?",
+    o: [
+      "0.8",
+      "1.0",
+      "1.2",
+      "1.5"
+    ],
+    a: 1
+  }
+];
+let CONV = null;
+function convStart(name) {
+  const today = todayStr();
+  if (P.stats.talkDay !== today) {
+    P.stats.talkDay = today;
+    P.stats.talkN = 0;
+  }
+  const rew = (P.stats.talkN || 0) < 3;
+  if (rew) {
+    P.stats.talkN = (P.stats.talkN || 0) + 1;
+    saveProfile(P);
+  }
+  const pool = [];
   const codes = Object.keys(COURSES).filter(k => COURSES[k].quiz.length);
-  if (!codes.length)
-    return closePanel();
-  const code = codes[Math.floor(Math.random() * codes.length)], c = COURSES[code];
-  const fresh = c.quiz.filter(q => !P.done.includes(q.id)), pool = fresh.length ? fresh : c.quiz;
-  const q = pool[Math.floor(Math.random() * pool.length)];
-  curPlace = null;
-  Q = {
-    code,
-    cat: "",
-    list: [q],
+  if (codes.length) {
+    const code = codes[Math.floor(Math.random() * codes.length)], qs = COURSES[code].quiz;
+    const qq = qs[Math.floor(Math.random() * qs.length)];
+    pool.push({
+      type: "q",
+      q: qq.q,
+      o: qq.o,
+      a: qq.a,
+      code: code,
+      cat: qq.cat || ""
+    });
+  }
+  shuffle(GQ).slice(0, 5).forEach(x => pool.push({
+    type: "q",
+    q: x.q,
+    o: x.o,
+    a: x.a,
+    code: null,
+    cat: ""
+  }));
+  shuffle(FACTS).slice(0, 4).forEach(f => pool.push({
+    type: "f",
+    t: f
+  }));
+  const items = shuffle(pool).slice(0, 10).map(it => {
+    if (it.type !== "q")
+      return it;
+    const order = shuffle(it.o.map((_, i) => i));
+    return Object.assign({}, it, {
+      o: order.map(i => it.o[i]),
+      a: order.indexOf(it.a)
+    });
+  });
+  CONV = {
+    npc: name || "Stranger",
+    items: items,
     i: 0,
-    right: 0,
-    earned: 0,
+    rew: rew,
+    correct: 0,
+    coins: 0,
+    xp: 0,
     locked: false
   };
-  showQ();
+  convShow();
 }
+function convShow() {
+  const it = CONV.items[CONV.i];
+  if (!it)
+    return convEnd();
+  const head = "<div class=\"note\">" + esc(CONV.npc) + " &middot; " + (CONV.i + 1) + " of " + CONV.items.length + "</div>";
+  if (it.type === "f") {
+    openPanel(CONV.npc, head + "<div class=\"memo\"><b>Did you know?</b><br>" + esc(it.t) + "</div><button class=\"pbtn solid\" data-a=\"convnext\">Continue</button>");
+  } else {
+    CONV.locked = false;
+    openPanel(CONV.npc, head + "<p><b>" + esc(it.q) + "</b></p>" + it.o.map((t, k) => "<button class=\"pbtn\" data-a=\"convans\" data-v=\"" + k + "\">" + esc(t) + "</button>").join("") + "<div class=\"fb\" id=\"cfb\"></div>");
+  }
+}
+function convAnswer(k) {
+  if (!CONV || CONV.locked)
+    return;
+  const it = CONV.items[CONV.i];
+  if (!it || it.type !== "q")
+    return;
+  CONV.locked = true;
+  const ok = k === it.a;
+  let msg;
+  if (ok) {
+    CONV.correct++;
+    if (CONV.rew) {
+      gain(2, 2);
+      CONV.coins += 2;
+      CONV.xp += 2;
+      msg = "Correct! +2 coins and +2 XP.";
+    } else
+      msg = "Correct!";
+    sfx("coin");
+  } else {
+    msg = "Not quite. The answer is: " + it.o[it.a] + ".";
+    sfx("wrong");
+  }
+  const expl = it.code ? explain(it.code, {
+    q: it.q,
+    o: it.o,
+    a: it.a,
+    cat: it.cat
+  }) : "";
+  const bs = pbody.querySelectorAll("[data-a=\"convans\"]");
+  bs.forEach((b, j) => {
+    if (j === it.a)
+      b.classList.add("good");
+  });
+  if (!ok && bs[k])
+    bs[k].classList.add("bad");
+  $("cfb").innerHTML = esc(msg) + (ok ? "" : expl) + "<br><button class=\"pbtn solid\" data-a=\"convnext\">Continue</button>";
+}
+function convNext() {
+  if (!CONV)
+    return;
+  const it = CONV.items[CONV.i];
+  if (it && it.type === "f" && CONV.rew) {
+    gain(1, 0);
+    CONV.xp += 1;
+  }
+  CONV.i++;
+  if (CONV.i >= CONV.items.length)
+    convEnd();
+  else
+    convShow();
+}
+function convEnd() {
+  const c = CONV;
+  CONV = null;
+  if (c.rew)
+    saveProfile(P);
+  const qn = c.items.filter(x => x.type === "q").length;
+  openPanel("Conversation over", coinLine() + "<div class=\"memo\"><b>" + esc(c.npc) + "</b> waves goodbye.<br>Questions right: " + c.correct + " of " + qn + (c.rew ? "<br>Reward: " + c.coins + " coins and " + c.xp + " XP." : "<br>No reward: you have already had your 3 rewarded chats today.") + "</div><button class=\"pbtn solid\" data-a=\"close\">Close</button>");
+}
+function openDoor(d) {
+  d.t = 1;
+  clearTimeout(d.tm);
+  d.tm = setTimeout(() => {
+    d.t = 0;
+  }, 3200);
+  sfx("click");
+}
+
+// ===== CAMPUS CHAT (texting between online players) =====
+const BADW = [
+  "fuck",
+  "shit",
+  "bitch",
+  "asshole",
+  "dick"
+];
+let CHATLOG = [], chatOpen = false, chatUnread = 0, lastChatAt = 0;
+const typing = e => !!(e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName));
+function cleanText(t) {
+  let x = String(t == null ? "" : t).replace(/\s+/g, " ").trim().slice(0, 140);
+  BADW.forEach(w => {
+    x = x.replace(new RegExp(w, "gi"), "***");
+  });
+  return x;
+}
+function chatNames() {
+  if (!rt)
+    return [];
+  return Object.keys(rt.presenceState()).filter(id => id !== uid).map(id => ({
+    id: id,
+    n: presInfo(id).n || "Player"
+  }));
+}
+function renderChat() {
+  const log = $("clog");
+  if (!log)
+    return;
+  log.innerHTML = CHATLOG.map(m => m.sys ? "<div class=\"cm\" style=\"color:#777\">" + esc(m.t) + "</div>" : "<div class=\"cm" + (m.to ? " dm" : "") + "\"><b>" + esc(m.n) + "</b>" + (m.to ? " (private)" : "") + ": " + esc(m.t) + "</div>").join("") || "<div class=\"cm\" style=\"color:#777\">No messages yet. Say hello!</div>";
+  log.scrollTop = log.scrollHeight;
+  const sel = $("cto"), cur = sel.value, people = chatNames();
+  sel.innerHTML = "<option value=\"\">Everyone</option>" + people.map(x => "<option value=\"" + esc(x.id) + "\">" + esc(x.n) + "</option>").join("");
+  sel.value = cur;
+  $("clist").textContent = rt && rtReady ? "Online now: " + (people.length + 1) + " (including you)" : "Chat works when you are logged in and online.";
+}
+function pushChat(m) {
+  CHATLOG.push(m);
+  if (CHATLOG.length > 60)
+    CHATLOG.shift();
+  if (chatOpen)
+    renderChat();
+}
+function updateChatBtn() {
+  const b = $("chatbtn");
+  b.textContent = chatUnread ? String.fromCodePoint(128172) + chatUnread : String.fromCodePoint(128172);
+}
+function openChat() {
+  if (inPanel)
+    closePanel();
+  chatOpen = true;
+  chatUnread = 0;
+  updateChatBtn();
+  $("chatsheet").style.display = "flex";
+  renderChat();
+}
+function closeChat() {
+  chatOpen = false;
+  $("chatsheet").style.display = "none";
+}
+function sendChat() {
+  const inp = $("cin"), t = cleanText(inp.value);
+  if (!t)
+    return;
+  const now = Date.now();
+  if (now - lastChatAt < 1500) {
+    pushChat({
+      sys: true,
+      n: "System",
+      t: "Slow down a little."
+    });
+    return;
+  }
+  lastChatAt = now;
+  inp.value = "";
+  const to = $("cto").value || null;
+  if (to && !chatNames().some(x => x.id === to)) {
+    pushChat({
+      sys: true,
+      n: "System",
+      t: "That player is no longer online."
+    });
+    return;
+  }
+  const m = {
+    i: uid,
+    n: P.username,
+    to: to,
+    t: t
+  };
+  pushChat(m);
+  if (rt && rtReady)
+    rt.send({
+      type: "broadcast",
+      event: "msg",
+      payload: m
+    });
+  else
+    pushChat({
+      sys: true,
+      n: "System",
+      t: "You are offline, so only you can see this. Log in to chat with other players."
+    });
+  if (!to)
+    showBubble(player, t.slice(0, 60));
+  sfx("click");
+}
+function onMsg(m) {
+  if (!m || m.i === uid)
+    return;
+  if (m.to && m.to !== uid)
+    return;
+  const msg = {
+    i: m.i,
+    n: cleanText(m.n || "Player").slice(0, 16),
+    to: m.to ? uid : null,
+    t: cleanText(m.t)
+  };
+  if (!msg.t)
+    return;
+  pushChat(msg);
+  if (!msg.to && others[m.i])
+    showBubble(others[m.i].g, msg.t.slice(0, 60));
+  if (!chatOpen) {
+    chatUnread++;
+    updateChatBtn();
+  }
+  sfx("click");
+}
+$("cclose").addEventListener("click", closeChat);
+$("csend").addEventListener("click", sendChat);
+$("cin").addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    sendChat();
+  }
+});
 
 // ===== GARAGE, ADMIN BLOCK, CLASSROOMS =====
 const has = id => !!(P && P.stats && P.stats.items && P.stats.items.includes(id));
@@ -3406,7 +4669,7 @@ function attendLecture() {
   if (P.hunger < 10)
     return classCourse(curClass, "You are too hungry to concentrate. Eat first.");
   P.energy -= 20;
-  P.hunger = Math.max(0, P.hunger - 5);
+  P.hunger = Math.max(0, P.hunger - 2);
   P.stats.att[curClass] = today;
   P.stats.lectures = (P.stats.lectures || 0) + 1;
   gain(15, 0);
@@ -3494,15 +4757,183 @@ const NOTES = [
   330,
   294
 ];
-function applyAudio() {
-  clearInterval(musicTimer);
-  musicTimer = null;
-  if (SET.music) {
-    audio();
-    musicTimer = setInterval(() => {
-      tone(NOTES[musicStep++ % NOTES.length], 0.38, "triangle", 0.03);
-    }, 430);
+
+// ===== MUSIC: scheduled loop with chords, bass, arpeggio and drums (day and night tracks) =====
+const MUS = {
+  t: null,
+  on: false,
+  next: 0,
+  step: 0,
+  nb: null
+};
+const PROG = {
+  day: {
+    bpm: 112,
+    chords: [
+      [
+        60,
+        64,
+        67
+      ],
+      [
+        67,
+        71,
+        74
+      ],
+      [
+        69,
+        72,
+        76
+      ],
+      [
+        65,
+        69,
+        72
+      ]
+    ],
+    bass: [
+      36,
+      43,
+      45,
+      41
+    ]
+  },
+  night: {
+    bpm: 84,
+    chords: [
+      [
+        57,
+        60,
+        64
+      ],
+      [
+        65,
+        69,
+        72
+      ],
+      [
+        60,
+        64,
+        67
+      ],
+      [
+        64,
+        67,
+        71
+      ]
+    ],
+    bass: [
+      33,
+      41,
+      36,
+      40
+    ]
   }
+};
+const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+function isNightNow() {
+  const h = gameMin / 60 % 24;
+  return h < 6 || h >= 18;
+}
+function noiseBuf(a) {
+  if (MUS.nb)
+    return MUS.nb;
+  const n = Math.floor(a.sampleRate * 0.25), b = a.createBuffer(1, n, a.sampleRate), d = b.getChannelData(0);
+  for (let i = 0; i < n; i++)
+    d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 3);
+  MUS.nb = b;
+  return b;
+}
+function mNote(f, t, d, type, vol) {
+  const a = audio();
+  if (!a)
+    return;
+  const o = a.createOscillator(), g = a.createGain();
+  o.type = type;
+  o.frequency.setValueAtTime(f, t);
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(vol, t + 0.015);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+  o.connect(g);
+  g.connect(a.destination);
+  o.start(t);
+  o.stop(t + d + 0.05);
+}
+function mHit(t, vol, hp, decay) {
+  const a = audio();
+  if (!a)
+    return;
+  const s = a.createBufferSource(), f = a.createBiquadFilter(), g = a.createGain();
+  s.buffer = noiseBuf(a);
+  f.type = "highpass";
+  f.frequency.value = hp;
+  g.gain.setValueAtTime(vol, t);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + decay);
+  s.connect(f);
+  f.connect(g);
+  g.connect(a.destination);
+  s.start(t);
+  s.stop(t + decay + 0.02);
+}
+function mKick(t) {
+  const a = audio();
+  if (!a)
+    return;
+  const o = a.createOscillator(), g = a.createGain();
+  o.frequency.setValueAtTime(110, t);
+  o.frequency.exponentialRampToValueAtTime(38, t + 0.14);
+  g.gain.setValueAtTime(0.18, t);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
+  o.connect(g);
+  g.connect(a.destination);
+  o.start(t);
+  o.stop(t + 0.24);
+}
+function musicTick() {
+  const a = audio();
+  if (!a || !MUS.on)
+    return;
+  const pr = isNightNow() ? PROG.night : PROG.day, sd = 60 / pr.bpm / 2;
+  if (MUS.next < a.currentTime)
+    MUS.next = a.currentTime + 0.05;
+  while (MUS.next < a.currentTime + 0.15) {
+    const s = MUS.step, bar = Math.floor(s / 8) % 4, k = s % 8, t = MUS.next, ch = pr.chords[bar];
+    if (k === 0)
+      ch.forEach(n => mNote(mtof(n), t, sd * 7.6, "sine", 0.012));
+    if (k % 2 === 0)
+      mNote(mtof(pr.bass[bar]), t, sd * 1.7, "triangle", 0.09);
+    mNote(mtof(ch[k % 3] + (k >= 4 ? 12 : 0)), t, sd * 0.85, "triangle", 0.03);
+    if (k === 0 || k === 4)
+      mKick(t);
+    if (k === 2 || k === 6)
+      mHit(t, 0.07, 1800, 0.14);
+    if (k % 2 === 1)
+      mHit(t, 0.025, 7000, 0.05);
+    MUS.next += sd;
+    MUS.step++;
+  }
+}
+function startMusic() {
+  if (MUS.t)
+    return;
+  const a = audio();
+  if (!a)
+    return;
+  MUS.on = true;
+  MUS.next = a.currentTime + 0.05;
+  MUS.step = 0;
+  MUS.t = setInterval(musicTick, 30);
+}
+function stopMusic() {
+  clearInterval(MUS.t);
+  MUS.t = null;
+  MUS.on = false;
+}
+function applyAudio() {
+  if (SET.music)
+    startMusic();
+  else
+    stopMusic();
 }
 addEventListener("pointerdown", () => {
   if (SET.sfx || SET.music)
@@ -3510,6 +4941,7 @@ addEventListener("pointerdown", () => {
 }, { once: true });
 function settingsScreen() {
   const pix = [
+    "Ultra sharp",
     "Sharp",
     "Pixel",
     "Chunky"
@@ -3744,7 +5176,7 @@ function jobStart(t) {
   if (P.hunger < 10)
     return say("You are too hungry to work. Eat first.");
   P.energy -= 15;
-  P.hunger = Math.max(0, P.hunger - 5);
+  P.hunger = Math.max(0, P.hunger - 2);
   if (t === "lib")
     jobShelve();
   else if (t === "lab")
@@ -4324,7 +5756,7 @@ function startRealtime(priv) {
       }
     });
     rt = ch;
-    ch.on("broadcast", { event: "pos" }, m => onPos(m.payload)).on("broadcast", { event: "say" }, m => onSay(m.payload)).on("presence", { event: "leave" }, e => removeOther(e.key)).on("presence", { event: "sync" }, () => {
+    ch.on("broadcast", { event: "pos" }, m => onPos(m.payload)).on("broadcast", { event: "say" }, m => onSay(m.payload)).on("broadcast", { event: "msg" }, m => onMsg(m.payload)).on("presence", { event: "leave" }, e => removeOther(e.key)).on("presence", { event: "sync" }, () => {
       updateOnline();
       Object.keys(others).forEach(id => restyle(others[id], presInfo(id)));
     }).subscribe(async status => {
@@ -4350,8 +5782,7 @@ function startRealtime(priv) {
   }
 }
 function chatScreen() {
-  const names = rt ? Object.values(rt.presenceState()).map(a => a[0] && a[0].n).filter(Boolean) : [];
-  openPanel("Chat and players", "<div class=\"note\">Online now (" + names.length + "): " + esc(names.join(", ") || "just you") + "</div><p>Say something (preset messages only):</p>" + SAYS.map((t, i) => "<button class=\"pbtn\" data-a=\"say\" data-v=\"" + i + "\">" + esc(t) + "</button>").join("") + "<button class=\"pbtn solid\" data-a=\"close\">Close</button>");
+  openChat();
 }
 function saySend(i) {
   if (!SAYS[i])
@@ -4481,7 +5912,11 @@ pbody.addEventListener("click", e => {
   else if (a === "bank")
     bankDo(v);
   else if (a === "npcq")
-    npcQuestion();
+    convStart(v);
+  else if (a === "convnext")
+    convNext();
+  else if (a === "convans")
+    convAnswer(+v);
   else if (a === "npcbye")
     closePanel();
   else if (a === "calc")
@@ -4511,13 +5946,15 @@ pbody.addEventListener("click", e => {
     attendFel();
 });
 function doAct() {
-  if (!P || inPanel)
+  if (!P || inPanel || chatOpen)
     return;
   if (!near) {
     if (nearNpc)
       talkNpc(nearNpc);
     return;
   }
+  if (near.door)
+    openDoor(near.door);
   if (!P.visited.includes(near.n)) {
     P.visited.push(near.n);
     gain(20, 10);
@@ -4532,7 +5969,7 @@ actBtn.addEventListener("touchstart", e => {
 }, { passive: false });
 actBtn.addEventListener("click", doAct);
 addEventListener("keydown", e => {
-  if (e.key === "e")
+  if (e.key === "e" && !typing(e))
     doAct();
 });
 function blocked(x, z) {
@@ -4649,7 +6086,7 @@ function updateSky(dt) {
     c.position.x += dt * 1.5;
     if (c.position.x > 160)
       c.position.x = -160;
-    c.material.color.setScalar(0.25 + 0.75 * f);
+    c.userData.cm.color.setRGB(0.25 + 0.75 * f, 0.25 + 0.75 * f, 0.25 + 0.75 * f);
   });
   if ((clkN += 1) % 15 === 0) {
     const pad = n => (n < 10 ? "0" : "") + n;
@@ -4661,9 +6098,10 @@ function loop() {
   requestAnimationFrame(loop);
   const dt = Math.min(clock.getDelta(), 0.05);
   updateSky(dt);
+  updateDoors(dt);
   const ix = jx + (keys.d || keys.arrowright ? 1 : 0) - (keys.a || keys.arrowleft ? 1 : 0);
   const iy = jy + (keys.s || keys.arrowdown ? 1 : 0) - (keys.w || keys.arrowup ? 1 : 0);
-  const mag = P && !inPanel ? Math.min(1, Math.hypot(ix, iy)) : 0;
+  const mag = P && !inPanel && !chatOpen ? Math.min(1, Math.hypot(ix, iy)) : 0;
   const wantRun = (running || keys.shift) && P && P.energy > 1 && P.hunger > 5;
   if (mag > 0.08) {
     const sp = (wantRun ? 13 : 6.5) * vehMult() * mag * dt;
@@ -4932,7 +6370,7 @@ setInterval(() => {
       say("You are hungry! Eat at Bush Mama or Tutu Restaurant.");
     saveProfile(P);
   }
-}, 30000);
+}, 90000);
 addEventListener("visibilitychange", () => {
   if (document.hidden && P) {
     saveProfile(P);
