@@ -483,6 +483,27 @@ canvas {
   padding:0;
 }
 
+#chatbtn {
+  position:fixed;
+  top:calc(174px + env(safe-area-inset-top, 0px));
+  right:8px;
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  border:2px solid #fff;
+  background:rgba(0,0,0,.45);
+  color:#fff;
+  font-size:18px;
+  z-index:21;
+  padding:0;
+  display:none;
+}
+
+.memo.hot {
+  border-left-color:#d50000;
+  background:#ffebee;
+}
+
 </style>
 </head>
 <body>
@@ -490,6 +511,7 @@ canvas {
   <div class="pill">PNGPD LIFE 2.0</div>
   <div class="pill" id="loc">PTI Entrance</div>
   <div class="pill" id="clk">Day 1 - 08:00</div>
+  <div class="pill" id="onl" style="display:none;background:#1b5e20">Online: 1</div>
   <div id="stats"></div>
 </div>
 <canvas id="mini" width="220" height="220"></canvas>
@@ -525,6 +547,7 @@ canvas {
 <div class="btn" id="run">RUN</div>
 <div class="btn" id="act">ENTER</div>
 <button id="setbtn">&#9881;</button>
+<button id="chatbtn">&#128172;</button>
 
 <script>
 window.COURSES = {};
@@ -1478,7 +1501,8 @@ const SET = (() => {
     return Object.assign({
       sfx: true,
       music: false,
-      pix: 1
+      pix: 1,
+      invert: false
     }, JSON.parse(localStorage.getItem("pngpd_settings")));
   } catch (e) {
     return {
@@ -1706,6 +1730,8 @@ function startGame(d) {
   applyAudio();
   if (!P.stats.tut)
     setTimeout(() => tutScreen(0), 600);
+  if (ONLINE && sb)
+    startRealtime(true);
 }
 $("bgo").addEventListener("click", async () => {
   const sel = document.querySelector(".sw.on");
@@ -2574,12 +2600,13 @@ runBtn.addEventListener("touchend", () => {
   running = false;
   runBtn.style.background = "#ff9800";
 });
-let camAng = 0, camId = null, lastX = 0;
+let camAng = 0, camTilt = 0, camId = null, lastX = 0, lastY = 0;
 ren.domElement.addEventListener("touchstart", e => {
   const t = e.changedTouches[0];
   if (t.clientX > innerWidth * 0.4 && camId === null) {
     camId = t.identifier;
     lastX = t.clientX;
+    lastY = t.clientY;
   }
 }, { passive: true });
 ren.domElement.addEventListener("touchmove", e => {
@@ -2587,6 +2614,8 @@ ren.domElement.addEventListener("touchmove", e => {
     if (t.identifier === camId) {
       camAng -= (t.clientX - lastX) * 0.008;
       lastX = t.clientX;
+      camTilt = Math.max(-0.5, Math.min(1.15, camTilt + (SET.invert ? 1 : -1) * (t.clientY - lastY) * 0.006));
+      lastY = t.clientY;
     }
 }, { passive: true });
 ren.domElement.addEventListener("touchend", e => {
@@ -2856,6 +2885,11 @@ function hostel(n, msg) {
 // ===== DEPARTMENT, FELLOWSHIP, CALCULATOR =====
 const MEMOS = [
   {
+    hot: true,
+    t: "UPDATE: Notice/Result Board Project (class contribution)",
+    b: "Trust you all had a productive day. The EXCOs and Honourables-elect have secured a better carpentry option than the one first recommended by the department. A carpenter has agreed to build the new notice/result board within the deadline set by the department.\n\nTotal estimated cost: \u20A6110,000. Shared among the class this is about \u20A61,410 per person, but everyone should pay \u20A61,500 to leave a small buffer for unforeseen expenses.\n\nPAYMENT DETAILS AND DEADLINE\nAmount: \u20A61,500 per student\nDeadline: on or before Wednesday, 14/10/2026\nMethod: transfer to the class Treasurer's account\nBank: Kuda\nAccount number: 2082585648\nAccount name: Okelola Praise\n\nAfter paying, send your payment screenshot, full name and matriculation number to the PNGPD ND1 Connect (25/26) group, tagging both the Treasurer and the Assistant Course Rep for documentation and accountability.\n\nRefund: if you already paid the earlier \u20A62,100, DM the Treasurer (Mr Praise) immediately for a refund of \u20A6600, in line with the updated payment arrangement.\n\nLASTLY\nEveryone must comply so the board is built and mounted within the department's deadline, avoiding conflict or disciplinary action from the Directorate. This is a compulsory responsibility for every student, including the class representative, the EXCOs and the Honourables-elect. No one is exempt. Failure to comply will lead to your name and details being submitted to the HOD and Course Advisor. This keeps things fair, accountable and equal for everyone. Thank you for your cooperation."
+  },
+  {
     t: "Welcome to PNGPD LIFE 2.0",
     b: "Walk around campus and press ENTER at buildings. Answer course questions correctly to earn coins."
   },
@@ -2866,6 +2900,10 @@ const MEMOS = [
   {
     t: "Hints and calculator",
     b: "Stuck on a question? Use the hint to remove two wrong options (you earn half the coins). The calculator is here in the department and also appears inside calculation questions."
+  },
+  {
+    t: "Live campus",
+    b: "When you are logged in, other online players appear on campus and on the minimap with name tags. Use the chat button for quick messages."
   },
   {
     t: "Looks, football and achievements",
@@ -2915,7 +2953,7 @@ function resultsScreen() {
   openPanel("My results", "<div class=\"note\">" + esc(P.username) + " &middot; Level " + P.level + " &middot; XP " + P.xp + " &middot; Coins " + P.coins + (P.fellowship ? " &middot; " + esc(P.fellowship) : "") + "</div>" + "<div class=\"note\">Lectures attended: " + (P.stats.lectures || 0) + " &middot; Vehicle: " + esc(vehName()) + " &middot; Items: " + (P.stats.items.length ? P.stats.items.map(i => (SHOP.find(x => x.id === i) || { n: i }).n).join(", ") : "none") + "</div>" + gpaNote() + (rows || "<p>No results yet.</p>") + "<button class=\"pbtn solid\" data-a=\"home\">Back</button>");
 }
 function memosScreen() {
-  openPanel("Notices and memos", MEMOS.map(m => "<div class=\"memo\"><b>" + esc(m.t) + "</b><br>" + esc(m.b) + "</div>").join("") + "<button class=\"pbtn solid\" data-a=\"home\">Back</button>");
+  openPanel("Notices and memos", MEMOS.map(m => "<div class=\"memo" + (m.hot ? " hot" : "") + "\"><b>" + esc(m.t) + "</b><br>" + esc(m.b).replace(/\n/g, "<br>") + "</div>").join("") + "<button class=\"pbtn solid\" data-a=\"home\">Back</button>");
 }
 async function boardScreen() {
   if (!ONLINE || !sb)
@@ -3476,13 +3514,13 @@ function settingsScreen() {
     "Pixel",
     "Chunky"
   ];
-  openPanel("Settings", "<button class=\"pbtn\" data-a=\"setsfx\">Sound effects: " + (SET.sfx ? "ON" : "OFF") + "</button>" + "<button class=\"pbtn\" data-a=\"setmusic\">Music: " + (SET.music ? "ON" : "OFF") + "</button>" + "<p>Graphics style (Chunky is fastest on weak phones)</p>" + pix.map((n, i) => "<button class=\"pbtn" + (SET.pix === i ? " solid" : "") + "\" data-a=\"setpix\" data-v=\"" + i + "\">" + n + "</button>").join("") + "<button class=\"pbtn\" data-a=\"tut\" data-v=\"0\">Show the tutorial again</button><button class=\"pbtn solid\" data-a=\"close\">Close</button>");
+  openPanel("Settings", "<button class=\"pbtn\" data-a=\"setsfx\">Sound effects: " + (SET.sfx ? "ON" : "OFF") + "</button>" + "<button class=\"pbtn\" data-a=\"setmusic\">Music: " + (SET.music ? "ON" : "OFF") + "</button>" + "<button class=\"pbtn\" data-a=\"setinv\">Invert up/down look: " + (SET.invert ? "ON" : "OFF") + "</button>" + "<p>Graphics style (Chunky is fastest on weak phones)</p>" + pix.map((n, i) => "<button class=\"pbtn" + (SET.pix === i ? " solid" : "") + "\" data-a=\"setpix\" data-v=\"" + i + "\">" + n + "</button>").join("") + "<button class=\"pbtn\" data-a=\"tut\" data-v=\"0\">Show the tutorial again</button><button class=\"pbtn solid\" data-a=\"close\">Close</button>");
 }
 $("setbtn").addEventListener("click", settingsScreen);
 const TUT = [
   {
     t: "Move around",
-    b: "Use the joystick on the left to walk. Hold RUN to sprint (it uses energy). Drag the right side of the screen to turn the camera."
+    b: "Use the joystick on the left to walk. Hold RUN to sprint (it uses energy). Drag the right side of the screen to turn the camera: left and right to turn, up and down to look at the sky or the ground."
   },
   {
     t: "Enter buildings",
@@ -3988,6 +4026,7 @@ function lookSet(v) {
     applyLook();
   }
   saveProfile(P);
+  retrack();
   wardrobeScreen("");
 }
 function accToggle(id) {
@@ -4059,6 +4098,283 @@ function footballShoot(i) {
   } else
     footballKick(m);
 }
+
+// ===== LIVE CAMPUS (other players) =====
+const SAYS = [
+  "Hello!",
+  "Good morning!",
+  "Let's study together",
+  "Who wants to play football?",
+  "Meet me at the library",
+  "Meet me at Bush Mama",
+  "Well done!",
+  "Good luck on your exam",
+  "See you later!"
+];
+let rt = null, rtReady = false, myLast = 0, lastSent = {
+    x: 0,
+    z: 0,
+    ry: 0
+  };
+const others = {};
+function makeTag(text, bg, fg, w, fontPx) {
+  const c = document.createElement("canvas");
+  c.width = w || 256;
+  c.height = 64;
+  const g = c.getContext("2d");
+  g.fillStyle = bg || "rgba(0,0,0,0.65)";
+  g.fillRect(0, 8, c.width, 48);
+  g.fillStyle = fg || "#ffffff";
+  g.font = "bold " + (fontPx || 24) + "px sans-serif";
+  g.textAlign = "center";
+  g.textBaseline = "middle";
+  g.fillText(text.length > 30 ? text.slice(0, 29) + "..." : text, c.width / 2, 33);
+  const tex = new THREE.CanvasTexture(c);
+  tex.magFilter = THREE.NearestFilter;
+  tex.minFilter = THREE.NearestFilter;
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: tex,
+    depthTest: false,
+    transparent: true,
+    fog: false
+  }));
+  sp.scale.set(c.width / 51, 1.25, 1);
+  sp.renderOrder = 5;
+  return sp;
+}
+function presInfo(id) {
+  if (!rt)
+    return {};
+  const a = rt.presenceState()[id];
+  return a && a[0] ? {
+    n: a[0].n,
+    c: a[0].c,
+    s: a[0].s,
+    h: a[0].h,
+    p: a[0].p
+  } : {};
+}
+function createOther(id, info) {
+  const col = parseInt((info.c || "#2196f3").slice(1), 16);
+  const g = makeChar(col, info.s || 9262372, info.p || 1713022, info.h || 1118481);
+  const o = {
+    g,
+    tag: null,
+    tx: 0,
+    tz: 0,
+    tr: 0,
+    last: performance.now(),
+    name: info.n || "Player",
+    lvl: info.l || 1,
+    first: true
+  };
+  setTag(o);
+  others[id] = o;
+  return o;
+}
+function setTag(o) {
+  if (o.tag)
+    o.g.remove(o.tag);
+  o.tag = makeTag(o.name + " Lv" + o.lvl);
+  o.tag.position.set(0, 4, 0);
+  o.g.add(o.tag);
+}
+function restyle(o, info) {
+  if (info.c)
+    setShirt(o.g, info.c);
+  const u = o.g.userData;
+  if (info.s != null)
+    u.skinMeshes.forEach(m => m.material.color.setHex(info.s));
+  if (info.h != null)
+    u.hairMeshes.forEach(m => m.material.color.setHex(info.h));
+  if (info.p != null)
+    u.pantsMeshes.forEach(m => m.material.color.setHex(info.p));
+  if (info.n && info.n !== o.name) {
+    o.name = info.n;
+    setTag(o);
+  }
+}
+function removeOther(id) {
+  const o = others[id];
+  if (!o)
+    return;
+  scene.remove(o.g);
+  delete others[id];
+  updateOnline();
+}
+function updateOnline() {
+  if (!rt)
+    return;
+  const n = Object.keys(rt.presenceState()).length || 1;
+  const el = $("onl");
+  el.textContent = "Online: " + n;
+  el.style.display = "block";
+}
+function onPos(pl) {
+  if (!pl || pl.i === uid)
+    return;
+  let o = others[pl.i];
+  if (!o)
+    o = createOther(pl.i, Object.assign(presInfo(pl.i), {
+      n: presInfo(pl.i).n || pl.n,
+      l: pl.l
+    }));
+  o.tx = pl.x;
+  o.tz = pl.z;
+  o.tr = pl.r;
+  o.last = performance.now();
+  if (pl.l && pl.l !== o.lvl) {
+    o.lvl = pl.l;
+    setTag(o);
+  }
+  if (o.first) {
+    o.g.position.set(pl.x, 0, pl.z);
+    o.g.rotation.y = pl.r;
+    o.first = false;
+  }
+}
+function showBubble(g, text) {
+  if (g.userData.bub) {
+    g.remove(g.userData.bub);
+    clearTimeout(g.userData.bubT);
+  }
+  const b = makeTag(text, "rgba(255,255,255,0.95)", "#222222", 384, 22);
+  b.position.set(0, 5.2, 0);
+  g.add(b);
+  g.userData.bub = b;
+  g.userData.bubT = setTimeout(() => {
+    g.remove(b);
+    g.userData.bub = null;
+  }, 6000);
+}
+function onSay(pl) {
+  if (!pl || pl.i === uid)
+    return;
+  const o = others[pl.i];
+  if (o && SAYS[pl.t])
+    showBubble(o.g, SAYS[pl.t]);
+}
+function sendPos(now) {
+  if (!rt || !rtReady || !P)
+    return;
+  const x = player.position.x, z = player.position.z, r = player.rotation.y;
+  const moved = Math.hypot(x - lastSent.x, z - lastSent.z) > 0.15 || Math.abs(r - lastSent.ry) > 0.05;
+  if (now - myLast < (moved ? 400 : 3000))
+    return;
+  myLast = now;
+  lastSent = {
+    x,
+    z,
+    ry: r
+  };
+  rt.send({
+    type: "broadcast",
+    event: "pos",
+    payload: {
+      i: uid,
+      n: P.username,
+      l: P.level,
+      x: +x.toFixed(1),
+      z: +z.toFixed(1),
+      r: +r.toFixed(2)
+    }
+  });
+}
+function updateOthers(dt) {
+  const now = performance.now(), k = 1 - Math.exp(-dt * 7);
+  Object.keys(others).forEach(id => {
+    const o = others[id];
+    if (now - o.last > 20000) {
+      removeOther(id);
+      return;
+    }
+    const p = o.g.position, dx = o.tx - p.x, dz = o.tz - p.z;
+    p.x += dx * k;
+    p.z += dz * k;
+    let d = o.tr - o.g.rotation.y;
+    while (d > Math.PI)
+      d -= Math.PI * 2;
+    while (d < -Math.PI)
+      d += Math.PI * 2;
+    o.g.rotation.y += d * k;
+    animChar(o.g, Math.hypot(dx, dz) > 0.25, now / 1000, 10);
+  });
+}
+function retrack() {
+  if (rt && rtReady && P) {
+    const L = P.stats.look;
+    rt.track({
+      n: P.username,
+      c: P.shirt_color,
+      s: L.skin,
+      h: L.hair,
+      p: L.pants
+    });
+  }
+}
+function startRealtime(priv) {
+  if (rt || !sb)
+    return;
+  try {
+    const ch = sb.channel("pngpd-campus", {
+      config: {
+        private: priv,
+        broadcast: { self: false },
+        presence: { key: uid }
+      }
+    });
+    rt = ch;
+    ch.on("broadcast", { event: "pos" }, m => onPos(m.payload)).on("broadcast", { event: "say" }, m => onSay(m.payload)).on("presence", { event: "leave" }, e => removeOther(e.key)).on("presence", { event: "sync" }, () => {
+      updateOnline();
+      Object.keys(others).forEach(id => restyle(others[id], presInfo(id)));
+    }).subscribe(async status => {
+      if (status === "SUBSCRIBED") {
+        rtReady = true;
+        $("chatbtn").style.display = "block";
+        retrack();
+        updateOnline();
+        say("You are online. Other players show up on campus and the minimap.");
+      } else if ((status === "CHANNEL_ERROR" || status === "TIMED_OUT") && priv && !rtReady) {
+        try {
+          sb.removeChannel(ch);
+        } catch (e) {
+        }
+        rt = null;
+        startRealtime(false);
+      } else if ((status === "CHANNEL_ERROR" || status === "TIMED_OUT") && !priv && !rtReady) {
+        say("Live campus is unavailable right now. You can still play.");
+      }
+    });
+  } catch (e) {
+    rt = null;
+  }
+}
+function chatScreen() {
+  const names = rt ? Object.values(rt.presenceState()).map(a => a[0] && a[0].n).filter(Boolean) : [];
+  openPanel("Chat and players", "<div class=\"note\">Online now (" + names.length + "): " + esc(names.join(", ") || "just you") + "</div><p>Say something (preset messages only):</p>" + SAYS.map((t, i) => "<button class=\"pbtn\" data-a=\"say\" data-v=\"" + i + "\">" + esc(t) + "</button>").join("") + "<button class=\"pbtn solid\" data-a=\"close\">Close</button>");
+}
+function saySend(i) {
+  if (!SAYS[i])
+    return;
+  showBubble(player, SAYS[i]);
+  if (rt && rtReady)
+    rt.send({
+      type: "broadcast",
+      event: "say",
+      payload: {
+        i: uid,
+        t: i
+      }
+    });
+}
+$("chatbtn").addEventListener("click", chatScreen);
+addEventListener("pagehide", () => {
+  try {
+    if (rt)
+      sb.removeChannel(rt);
+  } catch (e) {
+  }
+});
 pbody.addEventListener("click", e => {
   const b = e.target.closest("button");
   if (!b || !b.dataset.a)
@@ -4101,7 +4417,12 @@ pbody.addEventListener("click", e => {
     footballStart();
   else if (a === "shoot")
     footballShoot(+v);
-  else if (a === "settings")
+  else if (a === "chat")
+    chatScreen();
+  else if (a === "say") {
+    saySend(+v);
+    closePanel();
+  } else if (a === "settings")
     settingsScreen();
   else if (a === "setsfx") {
     SET.sfx = !SET.sfx;
@@ -4111,6 +4432,10 @@ pbody.addEventListener("click", e => {
     SET.music = !SET.music;
     saveSet();
     applyAudio();
+    settingsScreen();
+  } else if (a === "setinv") {
+    SET.invert = !SET.invert;
+    saveSet();
     settingsScreen();
   } else if (a === "setpix") {
     SET.pix = +v;
@@ -4225,6 +4550,13 @@ function drawMini() {
   mg.fillRect(0, mz(10), 220, 9);
   mg.fillStyle = "#ffeb3b";
   places.forEach(p => mg.fillRect(mx(p[2]) - 5, mz(p[3]) - 4, 10, 8));
+  mg.fillStyle = "#00e5ff";
+  Object.keys(others).forEach(k => {
+    const o = others[k];
+    mg.beginPath();
+    mg.arc(mx(o.g.position.x), mz(o.g.position.z), 4, 0, Math.PI * 2);
+    mg.fill();
+  });
   mg.fillStyle = "#fff";
   mg.beginPath();
   mg.arc(mx(player.position.x), mz(player.position.z), 6, 0, Math.PI * 2);
@@ -4243,16 +4575,76 @@ function drawStats() {
 }
 
 // ===== LOOP =====
+const skyGeo = new THREE.SphereGeometry(190, 16, 12);
+skyGeo.setAttribute("color", new THREE.BufferAttribute(new Float32Array(skyGeo.attributes.position.count * 3), 3));
+const skyDome = new THREE.Mesh(skyGeo, new THREE.MeshBasicMaterial({
+  vertexColors: true,
+  side: THREE.BackSide,
+  fog: false,
+  depthWrite: false
+}));
+skyDome.renderOrder = -10;
+scene.add(skyDome);
+const sunM = new THREE.Mesh(new THREE.BoxGeometry(18, 18, 2), new THREE.MeshBasicMaterial({
+  color: 16773494,
+  fog: false
+}));
+const moonM = new THREE.Mesh(new THREE.BoxGeometry(13, 13, 2), new THREE.MeshBasicMaterial({
+  color: 15527921,
+  fog: false
+}));
+scene.add(sunM, moonM);
+const starArr = new Float32Array(360 * 3);
+for (let i = 0; i < 360; i++) {
+  const th = Math.random() * Math.PI * 2, ph = Math.acos(Math.random() * 0.95 + 0.05);
+  starArr[i * 3] = Math.sin(ph) * Math.cos(th) * 175;
+  starArr[i * 3 + 1] = Math.cos(ph) * 175;
+  starArr[i * 3 + 2] = Math.sin(ph) * Math.sin(th) * 175;
+}
+const starGeo = new THREE.BufferGeometry();
+starGeo.setAttribute("position", new THREE.BufferAttribute(starArr, 3));
+const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({
+  color: 16777215,
+  size: 2.5,
+  sizeAttenuation: false,
+  transparent: true,
+  opacity: 0,
+  fog: false,
+  depthWrite: false
+}));
+scene.add(stars);
+const C_NT = new THREE.Color(330527), C_NH = new THREE.Color(1319229), C_DT = new THREE.Color(3116000), C_DH = new THREE.Color(12576511), C_DUSK = new THREE.Color(16747088);
+const tTop = new THREE.Color(), tHor = new THREE.Color();
 let gameMin = 8 * 60, clkN = 0;
-const NIGHT = new THREE.Color(858941), DAY = new THREE.Color(8900331), skyNow = new THREE.Color();
 function updateSky(dt) {
   gameMin += dt * 2;
-  const hr = gameMin / 60 % 24, f = Math.max(0, Math.sin((hr - 6) / 12 * Math.PI));
-  skyNow.copy(NIGHT).lerp(DAY, f);
-  scene.background.copy(skyNow);
-  scene.fog.color.copy(skyNow);
+  const hr = gameMin / 60 % 24, ang = (hr - 6) / 12 * Math.PI, sh = Math.sin(ang);
+  const f = Math.max(0, Math.min(1, sh * 1.6 + 0.2)), dusk = Math.max(0, 1 - Math.abs(sh) * 4);
+  tTop.copy(C_NT).lerp(C_DT, f);
+  tHor.copy(C_NH).lerp(C_DH, f).lerp(C_DUSK, dusk * 0.6);
+  scene.background.copy(tHor);
+  scene.fog.color.copy(tHor);
   hemi.intensity = 0.35 + 0.55 * f;
   sun.intensity = 0.1 + 0.5 * f;
+  const px = player.position.x, pz = player.position.z;
+  skyDome.position.set(px, 0, pz);
+  stars.position.set(px, 0, pz);
+  if (clkN % 6 === 0) {
+    const cols = skyGeo.attributes.color, pos = skyGeo.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const t = Math.pow(Math.max(0, Math.min(1, (pos.getY(i) / 190 + 0.05) / 1.05)), 0.7);
+      cols.setXYZ(i, tHor.r + (tTop.r - tHor.r) * t, tHor.g + (tTop.g - tHor.g) * t, tHor.b + (tTop.b - tHor.b) * t);
+    }
+    cols.needsUpdate = true;
+  }
+  stars.material.opacity = Math.max(0, Math.min(0.95, 1 - f * 1.8));
+  const sx = -Math.cos(ang) * 150, sy = Math.sin(ang) * 150;
+  sunM.position.set(px + sx, sy, pz - 60);
+  moonM.position.set(px - sx, -sy, pz - 60);
+  sunM.visible = sy > 6;
+  moonM.visible = -sy > 6;
+  sunM.lookAt(cam.position);
+  moonM.lookAt(cam.position);
   clouds.forEach(c => {
     c.position.x += dt * 1.5;
     if (c.position.x > 160)
@@ -4290,6 +4682,8 @@ function loop() {
   }
   if (mag <= 0.08)
     animChar(player, false);
+  sendPos(performance.now());
+  updateOthers(dt);
   if (P && mag <= 0.08)
     P.energy = Math.min(100, P.energy + 3 * dt * (has("backpack") ? 1.5 : 1));
   npcs.forEach(n => {
@@ -4313,6 +4707,7 @@ function loop() {
   cam.position.z += (tz - cam.position.z) * 0.1;
   cam.position.y += (h - cam.position.y) * 0.1;
   cam.lookAt(player.position.x, 2, player.position.z);
+  cam.rotateX(camTilt);
   near = null;
   let best = 1000000000;
   spots.forEach(s => {
